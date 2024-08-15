@@ -1,3 +1,4 @@
 # point of sale
 
-![image](https://github.com/danthio/pos/assets/109515278/57994f76-adae-43fe-81c8-a794d18ae163)
+![image](https://github.com/user-attachments/assets/7982dfcb-f353-46ec-8393-26fdee7a9c8e)
+
