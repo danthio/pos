@@ -17,7 +17,7 @@ add_items_coords={}
 
 add_item_im=0
 
-
+"""
 
 db_items=database.connect("data/items.db")
 cur=db_items.cursor()
@@ -31,20 +31,298 @@ rows=cur.fetchall()
 for row in rows:
 	print(row)
 
+"""
+
+def forget_widgets(except_=None):
+	global t_widgets
+
+	entries=t_widgets["entries"]
+
+	for e in entries:
+
+		e.place_forget()
+
+	text=t_widgets["text"]
+
+	for t in text:
+
+		t.place_forget()
+
+	canvas=t_widgets["canvas"]
+
+	for c in canvas:
+
+		if c==except_:
+			continue
+
+		c.place_forget()
+
+
+def delete_widgets():
+	global t_widgets
+
+	entries=t_widgets["entries"]
+
+	for e in entries:
+
+		e.delete(0,tk.END)
+
+
+	text=t_widgets["text"]
+
+	for t in text:
+
+		t.delete(0.0, tk.END)
+
+
+def entries_show_reset():
+	global t_widgets
+
+	entries=t_widgets["entries"]
+
+	for e in entries:
+
+		e["show"]=""
+
+qp=None
+add_c_coord=[]
+def draw_selected_item(id_):
+	global can,sel_item,sell_items_ims
+	global dashboard,can,can2,can3,can4
+	global quit,qp
+	global ent1,ent2
+	global add_c_coord
+
+	f=font.Font(family="FreeMono",size=13)
+
+
+	im=Image.new("RGBA",(int(can["width"]),int(can["height"])),(0,0,0,128))
+	sell_items_ims["can_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can_overlay_"]=can.create_image(0,can.canvasy(0),image=sell_items_ims["can_overlay"],anchor="nw")
+
+
+
+	im=Image.new("RGBA",(int(can2["width"]),int(can2["height"])),(0,0,0,128))
+	sell_items_ims["can2_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can2_overlay_"]=can2.create_image(0,0,image=sell_items_ims["can2_overlay"],anchor="nw")
+
+
+
+	im=Image.new("RGBA",(int(can3["width"]),int(can3["height"])),(0,0,0,128))
+	sell_items_ims["can3_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can3_overlay_"]=can3.create_image(0,0,image=sell_items_ims["can3_overlay"],anchor="nw")
+
+
+
+	im=Image.new("RGBA",(int(can4["width"]),int(can4["height"])),(0,0,0,128))
+	sell_items_ims["can4_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can4_overlay_"]=can4.create_image(can4.canvasx(0),can4.canvasy(0),image=sell_items_ims["can4_overlay"],anchor="nw")
+
+
+
+
+
+	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
+
+	xx,yy=730,400
+
+
+
+
+	x=x+((int(can["width"])-x)-xx)/2
+	y=can.canvasy(40+((int(can["height"])-40)-yy)/2)
+
+	v=len(sell_items_ims)+1
+
+	x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x,y-20,image=sell_items_ims[v],anchor="nw")
+
+	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
+
+	qp=[x2-5-25,y1+5]
+
+
+
+	sel_item=id_
+
+	
+	db_items=database.connect("data/items.db")
+	cur=db_items.cursor()
+
+
+	cur.execute(f"SELECT * FROM items WHERE item_id={id_}")
+	rows=cur.fetchall()
+
+
+
+	for row in rows:
+		name=row[1]
+		bp=row[2]
+		sp=row[3]
+		qt=row[4]
+		desc=row[5]
+		im_=row[6]
+
+
+
+	can.create_text(x1+((x2-270)-x1)/2,y1+15,text=name,font=("FreeMono",13),fill="#000000",anchor="c")
+
+	can.create_line(x2-270, y1+10, x2-270,y2-10,fill="#000000")
+	
+
+	x1_,y1_,x2_,y2_=x1+10,y1+30,x2-270-10,y2-50
+
+	#can.create_rectangle(x1_,y1_,x2_,y2_, outline="#aaaaaa")
+
+	if im_!="":
+
+		im=Image.open(f"data/images/{im_}")
+		_x,_y=im.size
+
+		if _x/_y>(x2_-x1_)/(y2_-y1_):
+
+			x_=(x2_-x1_)
+			y_=x_*_y/_x
+
+		elif _x/_y<(x2_-x1_)/(y2_-y1_):
+
+			y_=(y2_-y1_)
+			x_=y_*_x/_y
+
+		else:
+			x_=(x2_-x1_)
+			y_=(y2_-y1_)
+
+		x_=int(round(x_,0))
+		y_=int(round(y_,0))
+
+		im=im.resize((x_,y_))
+
+
+		__x=((x2_-x1_)-x_)/2
+		__y=((y2_-y1_)-y_)/2
+
+		v+=1
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1_+__x,y1_+__y,image=sell_items_ims[v],anchor="nw")
+
+	else:
+		can.create_text(x1_+(x2_-x1_)/2,y1_+(y2_-y1_)/2,text="No Image",font=("FreeMono",13),fill="#000000",anchor="c")
+
+	can.create_text(x1+((x2-270)-x1)/2,y2-25,text=desc,fill="#000000",font=("FreeMono",13),anchor="c")
+
+
+
+
+	can.create_text(x2-270+10,y1+30+30, text="Selling Price", font=("FreeMono",13),fill="#000000",anchor="w")
+	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30,text=f"Ksh. {sp}", font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+
+	can.create_text(x2-270+10,y1+30+30+40, text="Items Left", font=("FreeMono",13),fill="#000000",anchor="w")
+	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30+40,text=str(qt), font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+
+	can.create_text(x2-270+10,y1+30+30+40*3, text="Sold at", font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+	
+	x1,y1,x2,y2=x2-270+10+f.measure("Sold at")+30,y1+30+30+40*3-15.5, x2-270+10+f.measure("Sold at")+30+166,y1+30+30+40*3+15.5,
+
+	v+=1
+
+	im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+	ent1.delete(0,tk.END)
+	ent1.insert(tk.END,str(sp))
+
+
+	ent1.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0))
+
+
+
+
+
+	v+=1
+
+	im=draw_round_rect(5,x1,y1+40,x2,y2+40, "#000000",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y1+40,image=sell_items_ims[v],anchor="nw")
+
+	ent2.delete(0,tk.END)
+	ent2.insert(tk.END,str(1))
+
+
+	ent2.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0)+40)
+
+
+	x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
+
+	can.create_text(x2-270+10,y1+30+30+40*4, text="Quantity", font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+	#can.create_text(x2-270+10,y2-10-30-10-30, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+
+	v+=1
+
+	x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
+
+	x1,y1,x2,y2=x2-270+10, y2-10-30, x2-10,y2-10
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+	can.create_text(x1+(x2-x1)/2, y1+15,text="Add to Cart",fill="#ffffff",font=("FreeMono",13),anchor="c")
+
+
+	add_c_coord=[x1,y1,x2,y2]
+
+
+	ent1.focus_set()
+
+	
+
 
 sell_items_ims={}
 
+_scroll_={}
+v1,h1=0,0
+v2,h2=0,0
+
+cart_ar=[]
+items_ar=[]
+sel_item=None
 def main(con=0):
 
 	global st,st_
-	global can
+	global can,can2,can3
 	global add_items_ims
 	global dashboard
-	global name,bp,sp,qt,desc
+	global ent1,ent2,ent3,ent4,text1
 	global delete,crop1,crop2,refresh
 	global add_items_coords
 	global add_item_im
 	global sell_items_ims
+	global _scroll_
+	global v1,h1
+	global v2,h2
+	global cart_ar
+	global items_ar
+	global sel_item
 
 	st_="main"
 
@@ -52,17 +330,90 @@ def main(con=0):
 
 	if st=="Sell Items":
 
+		items_ar=[]
 
-		can["width"]=width
-		can["height"]=height
-		can["scrollregion"]=(0,0,width,height)
+
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+			cart_ar=[]
+			delete_widgets()
+
+		can["width"]=width-300
+		can["height"]=height-40
+		can["scrollregion"]=(0,0,width,height-40)
 		can["bg"]="#ffffff"
 
-		name.place_forget()
-		bp.place_forget()
-		sp.place_forget()
-		qt.place_forget()
-		desc.place_forget()
+		can["scrollregion"]=(0,0,width-300,height-40)
+
+
+		if con==0:
+
+			dict_={"widget": can,
+					"sb_widget":can3,
+					"sb_st":"vertical",
+					"sb_sz":10,
+					"v_sb_coord":[(0,height-40,0,10),0],
+					"_y":height-40,
+					"v":v1,
+					"h_":h1,
+					"w":int(can["width"]),
+					"h":int(can["height"]),
+					"_x":width-300,
+					"_x2":width-300,
+					"scrollregion":can["scrollregion"],
+					"v_drag_st":0,
+					"h_drag_st":0,
+					"v_var":0,
+					"h_var":0
+
+
+					}
+
+		else:
+
+			dict_={"widget": can,
+					"sb_widget":can3,
+					"sb_st":"vertical",
+					"sb_sz":10,
+					"v_sb_coord":[(0,height-40,0,10),_scroll_["can"]["v_sb_coord"][-1]],
+					"_y":height-40,
+					"v":v1,
+					"h_":h1,
+					"w":int(can["width"]),
+					"h":int(can["height"]),
+					"_x":width-300,
+					"_x2":width-300,
+					"scrollregion":can["scrollregion"],
+					"v_drag_st":0,
+					"h_drag_st":0,
+					"v_var":0,
+					"h_var":0
+
+
+					}			
+
+		_scroll_["can"]=dict_
+
+
+		can.place(in_=root,x=0,y=40)
+
+		can2["width"]=width
+		can2["height"]=40
+
+		can2.delete("all")
+		can2.place(in_=root,x=0,y=0)
+
+
+		can3["width"]=300
+		can3["height"]=height-40
+		can3["bg"]="#ffffff"
+
+		can3.delete("all")
+		can3.place(in_=root,x=width-300,y=40)
+
+
+		
 
 
 		can.delete("all")
@@ -77,19 +428,61 @@ def main(con=0):
 
 		x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-		x+=20
-
-		y=30
-
+		
 
 		xx=150
 		yy=200
 
+
+		#det space between items
+
+		_x_=int(can["width"])-x
+
+		n=len(rows)
+
+		n_=n
+
+		con_n=0
+		for _n in range(n):
+
+			xv=(_x_-(n_*xx))/(n_+1)
+
+			if xv<20:
+				n_-=1
+				con_n=1
+			else:
+
+				_n_=[n_,xv]
+
+				break
+
+			if con_n==0:
+				_n_=[n,20]
+
+
+
+
+
+		y=20
+
+
+
 		v=0
+
+		_x_=x
+
+
+		_x_=x+_n_[1]
+
+
+		rc=1
 
 		for row in rows:
 
-			x1,y1,x2,y2=x,y,x+xx,y+yy
+			x1,y1,x2,y2=_x_,y,_x_+xx,y+yy
+
+
+			items_ar.append([row[0],x1,y1,x2,y2])
 
 
 			im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
@@ -102,30 +495,15 @@ def main(con=0):
 
 			x1_,y1_,x2_,y2_=x1+5,y1+15, x2-5,y2-25-25-25-25
 
+
 			if not row[-1]=="":
 
-				im=Image.open(f"data/images/{row[-1]}")
+				im=Image.open(f"data/images/{row[-1].replace(".png","_1.png")}")
 				_x,_y=im.size
 
-				if _x/_y>(x2_-x1_)/(y2_-y1_):
+				x_=int(_x)
+				y_=int(_y)
 
-					x_=(x2_-x1_)
-					y_=x_*_y/_x
-
-				elif _x/_y<(x2_-x1_)/(y2_-y1_):
-
-					y_=(y2_-y1_)
-					x_=y_*_x/_y
-
-				else:
-
-					y_=(x2_-x1_)
-					x_=(y2_-y1_)
-
-				x_=int(x_)
-				y_=int(y_)
-
-				im=im.resize((x_,y_))
 
 
 				v+=1
@@ -153,22 +531,282 @@ def main(con=0):
 			v+=1
 
 
+			if rc==_n_[0]:
 
-			x+=xx+20
+				y+=yy+20
+				_x_=x+_n_[1]
+
+				rc=1
+
+			else:
+				_x_+=xx+_n_[1]
+
+				rc+=1
+
+
+
+
+		if rc-1==0:
+			_y=y
+		else:
+			_y=y+yy+20
+
+		if _y<=int(can["height"]):
+
+			y_=int(can["height"])
+
+		else:
+
+			y_=_y
+			can["scrollregion"]=(0,0,int(can["width"]),int(y_))
+
+
+
+		_scroll_["can"]["_y"]=y_
+
+		if con==0:
+
+			_scroll_["can"]["v_sb_coord"][-1]=0
+
+
+		draw_v_sb("can")
+
+
+		v+=1
+
+		x1,y1,x2,y2=10+5,5,int(can3["width"])-5,int(can3["height"])-5
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
+
+
+
+		can3.create_text(int(can3["width"])/2,20, text="Cart", font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+
+		v+=1
+
+		x1,y1,x2,y2=10+5+10,40,int(can3["width"])-5-10,int(can3["height"])-10-30-(10+30)*4-30
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
+
+
+		#cart
+
+		can4["width"]=(x2-x1)-5-4-10-4
+		can4["height"]=(y2-y1)-15-15-4-10-4
+
+		can4["bg"]="#ffffff"
+
+		can4.delete("all")
+
+		_x=int(can3.place_info()["x"])
+
+		can4.place(in_=root,x=_x+x1+5,y=y1+40+15)
+
+		can4["scrollregion"]=(0,0,int(can4["width"]),int(can4["height"]))
+
+		
+
+		dict_={"widget": can4,
+				"sb_widget":can3,
+				"sb_st":"both",
+				"sb_sz":10,
+				"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x1+5+int(can4["width"])+4,x1+5+int(can4["width"])+4+10),0],
+				"h_sb_coord":[(x1+5,x1+5+int(can4["width"]),y2-15-4-10,y2-15-4),0],
+				"_y":int(can4["height"]),
+				"v":v2,
+				"h_":h2,
+				"w":int(can4["width"]),
+				"h":int(can4["height"]),
+				"_x":int(can4["width"]),
+				"_x2":int(can4["width"]),
+				"scrollregion":can4["scrollregion"],
+				"v_drag_st":0,
+				"h_drag_st":0,
+				"v_var":0,
+				"h_var":0
+
+
+				}
+
+		_scroll_["cart"]=dict_
+
+
+		db_items=database.connect("data/items.db")
+		cur=db_items.cursor()
+
+
+		y=0
+
+		can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
+
+
+		total=0
+		discount=0
+		no_items=0
+
+		for i in cart_ar:
+
+			id_,sold_at,quantity=i
+
+
+
+
+
+			cur.execute(f"SELECT * FROM items WHERE item_id={id_}")
+			rows=cur.fetchall()
+
+
+
+			for row in rows:
+				name=row[1]
+				sp=row[3]
+
+
+			can4.create_text(5,y+15,text=name,font=("FreeMono",13),fill="#ff0000",anchor="w")
+			can4.create_text(5,y+15+30+10,text=f"Units {quantity}",font=("FreeMono",13),fill="#000000",anchor="w")
+			can4.create_text(5,y+15+30+10+30,text=f"Total Ksh. {int(sold_at)*int(quantity)}",font=("FreeMono",13),fill="#000000",anchor="w")
+
+			y+=15+30+10+30+20
+
+			can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
+
+
+			no_items+=int(quantity)
+			total+=int(sold_at)*int(quantity)
+			discount+=int(sp)-int(sold_at)
+
+
+		if y<=int(can4["height"]):
+
+			_scroll_["cart"]["_y"]=int(can4["height"])
+
+			can4["scrollregion"]=(0,0,int(can4["width"]),int(can4["height"]))
+
+
+		else:
+
+			can4["scrollregion"]=(0,0,int(can4["width"]),y)
+
+			_scroll_["cart"]["_y"]=y
+
+
+
+
+
+
+		
+
+		_scroll_["cart"]["v_sb_coord"][-1]=1
+		_scroll_["cart"]["h_sb_coord"][-1]=0
+
+		draw_v_sb("cart")
+		draw_h_sb("cart")
+
+
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*4, text="Items", font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*4, text=str(no_items), font=("FreeMono",13),fill="#000000",anchor="e")		
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*3, text="Discount", font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*3, text=f"Ksh. {discount}", font=("FreeMono",13),fill="#000000",anchor="e")		
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*2, text=f"Ksh. {total}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
+
+
+
+		v+=1
+
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-10-30,int(can3["width"])-5-10,int(can3["height"])-10-10-30
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
+
+		can3.create_text(x1+(x2-x1)/2, y1+15, text="Pay with Cash", font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+			
+
+
+
+
+
+
+		v+=1
+
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30,int(can3["width"])-5-10,int(can3["height"])-10
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
+
+		can3.create_text(x1+(x2-x1)/2, y1+15, text="Pay with MPESA", font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+		if sel_item!=None:
+
+			draw_selected_item(sel_item)
+
+
+			
 
 
 	elif st=="Add Items":
 
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+			delete_widgets()
+
 
 		can["width"]=width
-		can["height"]=height
-		can["scrollregion"]=(0,0,width,height)
+		can["height"]=height-40
+		can["scrollregion"]=(0,0,width,height-40)
 		can["bg"]="#ffffff"
+
+		can.place(in_=root,x=0,y=40)
+
+
+		can2["width"]=width
+		can2["height"]=40
+
+		can2.delete("all")
+		can2.place(in_=root,x=0,y=0)
+
+
+
+
+
+		v=0
+
+		im=Image.new("RGBA",(width,40),(0,0,0,128))
+
+		add_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(0,0,image=add_items_ims[v],anchor="nw")
+
+
+
+
+
+
+
 
 
 		can.delete("all")
 
-		v=0
+		v+=1
 
 		im=Image.new("RGBA",(width,height),(0,0,0,128))
 
@@ -184,91 +822,91 @@ def main(con=0):
 		x=x+((width-x)-xx)/2
 		y=40+((height-40)-yy)/2
 
+		#print(y,"yy")
+
 		
 
 
 
 		v+=1
 
-		x1,y1,x2,y2=x,y, x+xx,y+yy
+		x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
-		can.create_image(x,y,image=add_items_ims[v],anchor="nw")
+		can.create_image(x,y-20,image=add_items_ims[v],anchor="nw")
 
 
 
 
 		if con==0:
 
-			name.delete(0,tk.END)
-			bp.delete(0,tk.END)
-			sp.delete(0,tk.END)	
-			qt.delete(0,tk.END)	
-			desc.delete(0.0,tk.END)	
+			#delete ent/txt
+
+			pass
 
 
 
 		
 
-		can.create_text(x+10+10,y+20+15, text="Item Name",font=("FreeMono",13), anchor="w",fill="#000000")
+		can.create_text(x+10+10,y+20+15-20, text="Item Name",font=("FreeMono",13), anchor="w",fill="#000000")
 
 		v+=1
 
-		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6
+		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5-20,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6-20
 
 		im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		name.place(in_=root,x=x+150-20+10,y=y+20+15-10)
+		ent1.place(in_=root,x=x+150-20+10,y=y+20+15-10+40-20)
 
 		add_items_coords["item name"]=[x1,y1,x2,y2]
 
 		
 
-		can.create_text(x+10+10,y+20+15+50, text="Buying Price",font=("FreeMono",13), anchor="w",fill="#000000")
+		can.create_text(x+10+10,y+20+15+50-20, text="Buying Price",font=("FreeMono",13), anchor="w",fill="#000000")
 
 		v+=1
 
-		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50
+		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50-20,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50-20
 
 		im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		bp.place(in_=root,x=x+150-20+10,y=y+20+15-10+50)
+		ent2.place(in_=root,x=x+150-20+10,y=y+20+15-10+50+40-20)
 
 
 		add_items_coords["bp"]=[x1,y1,x2,y2]
 
-		can.create_text(x+10+10,y+20+15+50*2, text="Selling Price",font=("FreeMono",13), anchor="w",fill="#000000")
+		can.create_text(x+10+10,y+20+15+50*2-20, text="Selling Price",font=("FreeMono",13), anchor="w",fill="#000000")
 
 		v+=1
 
-		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50*2,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50*2
+		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50*2-20,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50*2-20
 
 		im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		sp.place(in_=root,x=x+150-20+10,y=y+20+15-10+50*2)
+		ent3.place(in_=root,x=x+150-20+10,y=y+20+15-10+50*2+40-20)
 	
 
 		add_items_coords["sp"]=[x1,y1,x2,y2]	
 
 
-		can.create_text(x+10+10,y+20+15+50*3, text="Quantity",font=("FreeMono",13), anchor="w",fill="#000000")
+		can.create_text(x+10+10,y+20+15+50*3-20, text="Quantity",font=("FreeMono",13), anchor="w",fill="#000000")
 
 		v+=1
 
-		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50*3,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50*3
+		x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+50*3-20,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+50*3-20
 
 		im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		qt.place(in_=root,x=x+150-20+10,y=y+20+15-10+50*3)
+		ent4.place(in_=root,x=x+150-20+10,y=y+20+15-10+50*3+40-20)
 
 		add_items_coords["q"]=[x1,y1,x2,y2]
 
@@ -276,7 +914,7 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=x+10+10,y+20+15-10-5+50*4+10,x+150-5+100+60+6-20+10,y+20+15-10-5++50*4+10+100
+		x1,y1,x2,y2=x+10+10,y+20+15-10-5+50*4+10-20,x+150-5+100+60+6-20+10,y+20+15-10-5++50*4+10+100-20
 
 		im=draw_round_rect(10,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		draw=ImageDraw.Draw(im)
@@ -290,12 +928,12 @@ def main(con=0):
 
 		add_items_coords["desc"]=[x1,y1,x2,y2]
 
-		desc.place(in_=root,x=x1+15,y=y1+15,)
+		text1.place(in_=root,x=x1+15,y=y1+15+40)
 
 
 		v+=1
 
-		x1,y1,x2,y2=x+150-5+100+60+6-20+10+20,y+20+15-10-5,x+xx-20,y2
+		x1,y1,x2,y2=x+150-5+100+60+6-20+10+20,y+20+15-10-5-20,x+xx-20,y2
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
@@ -359,17 +997,433 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=x+xx/2-80,y+yy-10-30, x+xx/2+80,y+yy-10
+		x1,y1,x2,y2=x+xx/2-80,y+yy-10-30-20, x+xx/2+80,y+yy-10-20
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		can.create_text(x+xx/2, y+yy-10-15, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="c")
+		can.create_text(x+xx/2, y+yy-10-15-20, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 		add_items_coords["save"]=[x1,y1,x2,y2]
 
-		name.focus_set()
+
+
+
+		ent1.focus_set()
+
+
+
+
+
+
+
+sb_dict1={}
+sb_dict2={}
+
+def draw_v_sb(widget):
+    global _scroll_
+    global can,can2,can3
+    global sb_dict1
+
+
+
+
+    widget_=_scroll_[widget]["widget"]
+    sb_widget=_scroll_[widget]["sb_widget"]
+    sb_sz=_scroll_[widget]["sb_sz"]
+    v_sb_coord=_scroll_[widget]["v_sb_coord"]
+    _y=_scroll_[widget]["_y"]
+    v=_scroll_[widget]["v"]
+    w=_scroll_[widget]["w"]
+    h=_scroll_[widget]["h"]
+
+    x=v_sb_coord[0][2]
+    y=v_sb_coord[0][0]
+
+
+    p=v_sb_coord[-1]*h
+    sz=h*h/_y
+
+
+
+
+
+
+
+    if p+sz>v_sb_coord[0][1]-y:
+
+
+        v_sb_coord[-1]=(v_sb_coord[0][1]-(v_sb_coord[0][1]-sz))/h
+        v_sb_coord[-1]=1-v_sb_coord[-1]
+
+        _scroll_[widget]["v_sb_coord"]=v_sb_coord
+        p=v_sb_coord[-1]*h
+
+
+
+    
+
+    try:
+
+        v_=sb_dict1[widget]
+
+    except:
+
+        sb_dict1[widget]=0
+
+
+
+
+
+
+
+    x1,y1,x2,y2=x,y+p, x+sb_sz,y+p+sz
+
+    im=draw_round_rect(5,x1,y1,x2,y2, "#000000","#000000",1)
+
+    sb_dict1[widget]=ImageTk.PhotoImage(im)
+
+
+
+
+
+
+
+
+    if v==0:
+
+        v=sb_widget.create_image(x,y+p, image=sb_dict1[widget],anchor="nw")
+
+
+        _scroll_[widget]["v"]=v
+
+    else:
+
+        sb_widget.coords(_scroll_[widget]["v"],x,y+p)
+
+
+
+        x1,y1,x2,y2=x,y+p, x+sb_sz,y+p+sz
+
+        im=draw_round_rect(5,x1,y1,x2,y2,"#000000","#000000",1)
+
+        sb_dict1[widget]=ImageTk.PhotoImage(im)
+
+
+        sb_widget.itemconfig(_scroll_[widget]["v"],image=sb_dict1[widget])
+
+
+
+    widget_.yview_moveto(v_sb_coord[-1])
+
+
+    return [p,p+sz]
+
+
+def draw_h_sb(widget):
+
+    global _scroll_
+    global can,can2,can3
+    global h_sb
+    global sb_dict2
+
+
+    widget_=_scroll_[widget]["widget"]
+    sb_widget=_scroll_[widget]["sb_widget"]
+    sb_sz=_scroll_[widget]["sb_sz"]
+    v_sb_coord=_scroll_[widget]["v_sb_coord"]
+    h_sb_coord=_scroll_[widget]["h_sb_coord"]
+    _y=_scroll_[widget]["_y"]
+    h_=_scroll_[widget]["h_"]
+    w=_scroll_[widget]["w"]
+    h=_scroll_[widget]["h"]
+    _x2=_scroll_[widget]["_x2"]
+
+    y=h_sb_coord[0][2]
+    x=h_sb_coord[0][0]
+
+
+    p=h_sb_coord[-1]*w
+    sz=w*w/_x2
+
+
+
+    if p+sz>h_sb_coord[0][1]-x:
+
+
+        h_sb_coord[-1]=(h_sb_coord[0][1]-(h_sb_coord[0][1]-sz))/w
+        h_sb_coord[-1]=1-h_sb_coord[-1]
+
+        _scroll_[widget]["h_sb_coord"]=h_sb_coord
+
+
+        p=h_sb_coord[-1]*w
+
+
+
+
+
+    try:
+
+        v=sb_dict2[widget]
+
+    except:
+
+        sb_dict2[widget]=0
+
+
+
+    x1,y1,x2,y2=x+p,y, x+p+sz,y+sb_sz
+
+    im=draw_round_rect(5,x1,y1,x2,y2,"#000000","#000000",1)
+
+    sb_dict2[widget]=ImageTk.PhotoImage(im)
+
+
+
+    if _scroll_[widget]["h_"]==0:
+
+        _scroll_[widget]["h_"]=sb_widget.create_image(x+p,y, image=sb_dict2[widget],anchor="nw")
+    else:
+
+        sb_widget.coords(_scroll_[widget]["h_"],x+p,y)
+
+
+        x1,y1,x2,y2=x+p,y, x+p+sz,y+sb_sz
+
+        im=draw_round_rect(5,x1,y1,x2,y2, "#000000","#000000",1)
+
+        sb_dict2[widget]=ImageTk.PhotoImage(im)
+
+
+        sb_widget.itemconfig(_scroll_[widget]["h_"],image=sb_dict2[widget])
+
+
+
+
+    widget_.xview_moveto(h_sb_coord[-1])
+
+
+
+    return [p,p+sz]
+
+
+
+
+def can_b1_sb(widget,_x_,_y_):
+
+    global _scroll_
+
+
+
+    #terminal
+
+
+    #vertical scroll
+
+    if _scroll_[widget]["sb_st"]=="vertical" or _scroll_[widget]["sb_st"]=="both":
+
+
+	    
+	    x1=_scroll_[widget]["v_sb_coord"][0][2]
+	    y1=_scroll_[widget]["v_sb_coord"][0][0]
+
+	    x2,y2=x1+_scroll_[widget]["sb_sz"],y1+_scroll_[widget]["h"]
+
+	    var=draw_v_sb(widget)
+
+
+
+
+	    
+
+	    if x1<=_x_<=x2:
+
+	        if y1<=_y_<=y2:
+
+	            _scroll_[widget]["v_drag_st"]=1
+
+
+	            y=_y_-_scroll_[widget]["v_sb_coord"][0][0]
+
+	            if var[0]<=y<=var[1]:
+	                _scroll_[widget]["v_var"]=y-var[0]
+
+	                return
+
+	            
+
+	            _scroll_[widget]["v_sb_coord"][-1]=y/_scroll_[widget]["h"]
+
+
+	            draw_v_sb(widget)
+
+	            return
+
+
+    #horizontal
+
+    if _scroll_[widget]["sb_st"]=="horizontal" or _scroll_[widget]["sb_st"]=="both":
+
+	    var=draw_h_sb(widget)
+
+
+
+	    x1=_scroll_[widget]["h_sb_coord"][0][0]
+	    y1=_scroll_[widget]["h_sb_coord"][0][2]
+
+	    x2,y2=x1+_scroll_[widget]["w"],y1+4+_scroll_[widget]["sb_sz"]
+
+	    if x1<=_x_<=x2:
+
+	        if y1<=_y_<=y2:
+
+	            _scroll_[widget]["h_drag_st"]=1
+
+	            x=_x_-_scroll_[widget]["h_sb_coord"][0][0]
+
+	            if var[0]<=x<=var[1]:
+
+	                _scroll_[widget]["h_var"]=x-var[0]
+	                return
+
+	            _scroll_[widget]["h_sb_coord"][-1]=x/_scroll_[widget]["w"]
+
+
+	            draw_h_sb(widget)
+
+	            return
+
+
+
+def sb_drag(widget,_x_,_y_):
+
+
+
+    global _scroll_
+
+
+
+    #terminal
+
+
+    #vertical scroll
+
+    if _scroll_[widget]["sb_st"]=="vertical" or _scroll_[widget]["sb_st"]=="both":
+
+	    if _scroll_[widget]["v_drag_st"]==1:
+	    
+	        x1=_scroll_[widget]["v_sb_coord"][0][2]
+	        y1=_scroll_[widget]["v_sb_coord"][0][0]
+
+	        x2,y2=x1+_scroll_[widget]["sb_sz"],y1+_scroll_[widget]["h"]
+
+	        #if x1<=_x_<=x2:
+
+	        
+
+
+
+	        if y1<=_y_<=y2:
+
+
+
+
+	            if y1<=_y_-_scroll_[widget]["v_var"]<=y2:
+
+	                y=_y_-_scroll_[widget]["v_sb_coord"][0][0]-_scroll_[widget]["v_var"]
+
+
+	            
+
+	                _scroll_[widget]["v_sb_coord"][-1]=y/_scroll_[widget]["h"]
+
+
+	                draw_v_sb(widget)
+
+	                return
+
+	        elif y1-10<_y_<y1:
+
+
+	            _scroll_[widget]["v_sb_coord"][-1]=0
+
+
+	            draw_v_sb(widget)
+
+	            return
+
+	        elif y2+10>_y_>y2:
+
+
+	            _scroll_[widget]["v_sb_coord"][-1]=1
+
+
+	            draw_v_sb(widget)
+
+	            return
+
+    #horizontal
+
+    if _scroll_[widget]["sb_st"]=="horizontal" or _scroll_[widget]["sb_st"]=="both":
+
+
+
+	    if _scroll_[widget]["h_drag_st"]==1:
+
+
+
+
+
+	        x1=_scroll_[widget]["h_sb_coord"][0][0]
+	        y1=_scroll_[widget]["h_sb_coord"][0][2]
+
+	        x2,y2=x1+_scroll_[widget]["w"],y1+4+_scroll_[widget]["sb_sz"]
+
+	        
+
+	        #if y1<=_y_<=y2:
+
+	        if x1<=_x_<=x2:
+
+	            if x1<=_x_-_scroll_[widget]["h_var"]<=x2:
+
+
+
+	                x=_x_-_scroll_[widget]["h_sb_coord"][0][0]-_scroll_[widget]["h_var"]
+
+	                _scroll_[widget]["h_sb_coord"][-1]=x/_scroll_[widget]["w"]
+
+
+	                draw_h_sb(widget)
+
+
+	                return
+
+	        elif x1-10<_x_<x1:
+
+
+
+	            _scroll_[widget]["h_sb_coord"][-1]=0
+
+
+	            draw_h_sb(widget)
+
+	            return
+
+	        elif x2+10>_x_>x2:
+
+
+
+	            _scroll_[widget]["h_sb_coord"][-1]=1
+
+
+	            draw_h_sb(widget)
+
+	            return
+
+
 
 
 
@@ -435,7 +1489,7 @@ delete=0
 crop1,crop2=0,0
 refresh=0
 
-
+quit=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -445,6 +1499,7 @@ def load_im():
 	global delete
 	global crop1,crop2
 	global refresh
+	global quit
 
 
 	#db
@@ -561,6 +1616,12 @@ def load_im():
 	im=im.resize((25,25))
 	refresh=ImageTk.PhotoImage(im)
 
+
+	#quit
+
+	im=Image.open("data/icons/quit.png")
+	im=im.resize((25,25))
+	quit=ImageTk.PhotoImage(im)
 
 
 db_items=[]
@@ -723,7 +1784,7 @@ def login():
 	global can
 	global width,height
 	global login_im1,login_im2,login_im3,login_im4
-	global un,pw1,pw2
+	global ent1,ent2,ent3
 	global un_login_coord,pw1_login_coord
 	global login_coord,register_coord
 	global st_
@@ -731,15 +1792,17 @@ def login():
 	global _show_
 
 
+
+	forget_widgets()
+	delete_widgets()
+	entries_show_reset()
+
+
 	can.delete("all")
-	un.delete(0,tk.END)
-	pw1.delete(0,tk.END)
-	pw2.delete(0,tk.END)
 
 
-	pw1["show"]="*"
+	ent2["show"]="*"
 
-	pw2.place_forget()
 
 	st_="login"
 
@@ -750,6 +1813,8 @@ def login():
 	can["height"]=height
 	can["scrollregion"]=(0,0,width,height)
 	can["bg"]="#000000"
+
+	can.place(in_=root,x=0,y=0)
 
 
 	xx,yy=350,200
@@ -779,7 +1844,7 @@ def login():
 	login_im2=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=login_im2,anchor="nw")
 
-	un.place(in_=root,x=x+150+4.5,y=y+20+15-10)
+	ent1.place(in_=root,x=x+150+4.5,y=y+20+15-10)
 
 
 	un_login_coord=[x1,y1,x2,y2]
@@ -801,7 +1866,7 @@ def login():
 	can.create_image(x1,y1,image=login_im3,anchor="nw")
 
 
-	if pw1["show"]=="*":
+	if ent2["show"]=="*":
 
 		_show_=can.create_image(x2+(34.5-29)/2,y1+((y2-y1)-29)/2,image=show_p,anchor="nw")
 
@@ -813,7 +1878,7 @@ def login():
 
 
 
-	pw1.place(in_=root,x=x+150+4.5,y=y+20+15-10+50)
+	ent2.place(in_=root,x=x+150+4.5,y=y+20+15-10+50)
 
 
 	pw1_login_coord=[x1,y1,x2,y2]
@@ -843,7 +1908,7 @@ def login():
 	register_coord=[x1+xx/2,y1,x2,y2]
 
 
-	un.focus_set()
+	ent1.focus_set()
 
 
 cancel_coord=[]
@@ -858,20 +1923,25 @@ def draw_registration():
 	global can
 	global width,height
 	global login_im1,login_im2,login_im3,login_im4,login_im5
-	global un,pw1,pw2
+	global ent1,ent2,ent3
 	global un_login_coord,pw1_login_coord,pw2_login_coord
 	global cancel_coord,confirm_coord
 	global st_
 	global _show_,show_p,dshow_p
 
 
-	can.delete("all")
-	un.delete(0,tk.END)
-	pw1.delete(0,tk.END)
-	pw2.delete(0,tk.END)
+	forget_widgets()
+	delete_widgets()
+	entries_show_reset()
+	
 
-	pw1["show"]="*"
-	pw2["show"]="*"
+
+	can.delete("all")
+
+	can.place(in_=root,x=0,y=0)
+
+	ent2["show"]="*"
+	ent3["show"]="*"
 
 
 	st_="register"
@@ -912,7 +1982,7 @@ def draw_registration():
 	login_im2=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=login_im2,anchor="nw")
 
-	un.place(in_=root,x=x+150+4.5,y=y+20+15-10)
+	ent1.place(in_=root,x=x+150+4.5,y=y+20+15-10)
 
 
 	un_login_coord=[x1,y1,x2,y2]
@@ -934,7 +2004,7 @@ def draw_registration():
 	can.create_image(x1,y1,image=login_im3,anchor="nw")
 
 
-	if pw1["show"]=="*":
+	if ent2["show"]=="*":
 
 		_show_=can.create_image(x2+(34.5-29)/2,y1+((y2-y1)-29)/2,image=show_p,anchor="nw")
 
@@ -945,7 +2015,7 @@ def draw_registration():
 
 
 
-	pw1.place(in_=root,x=x+150+4.5,y=y+20+15-10+50)
+	ent2.place(in_=root,x=x+150+4.5,y=y+20+15-10+50)
 
 
 	pw1_login_coord=[x1,y1,x2,y2]
@@ -965,7 +2035,7 @@ def draw_registration():
 	login_im5=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=login_im5,anchor="nw")
 
-	pw2.place(in_=root,x=x+150+4.5,y=y+20+15-10+50+50)
+	ent3.place(in_=root,x=x+150+4.5,y=y+20+15-10+50+50)
 
 
 	pw2_login_coord=[x1,y1,x2,y2]
@@ -1004,7 +2074,8 @@ def draw_registration():
 def valdate_login():
 	global can,dashboard
 	global width,height
-	global un,pw1,pw2
+	global ent1,ent2,ent3
+	global st
 
 
 	xx,yy=350,200
@@ -1014,7 +2085,7 @@ def valdate_login():
 	y=(height-yy)/2
 
 
-	if un.get()=="" or pw1.get()=="":
+	if ent1.get()=="" or ent2.get()=="":
 
 		message(0,can,"Fill all fields!",x+xx/2,y+yy+10+15,xx,30)
 
@@ -1030,7 +2101,7 @@ def valdate_login():
 	con=0
 	for row in rows:
 
-		if row[1]==un.get() and row[5]==pw1.get():
+		if row[1]==ent1.get() and row[5]==ent2.get():
 			con=1
 
 	
@@ -1045,9 +2116,8 @@ def valdate_login():
 
 
 
-	un.place_forget()
-	pw1.place_forget()
-	pw2.place_forget()
+	forget_widgets()
+	entries_show_reset()
 
 	can.delete("all")
 	
@@ -1059,6 +2129,8 @@ def valdate_login():
 
 	dashboard.place(in_=root,x=0,y=0)
 
+	st="Sell Items"
+
 	draw_db()
 
 	main()
@@ -1066,7 +2138,7 @@ def valdate_login():
 def validate_registration():
 	global width,height
 	global can
-	global un,pw1,pw2
+	global ent1,ent2,ent3
 
 	xx,yy=350,250
 
@@ -1075,13 +2147,13 @@ def validate_registration():
 	y=(height-yy)/2
 
 
-	if un.get()=="" or pw1.get()=="" or pw2.get()=="":
+	if ent1.get()=="" or ent2.get()=="" or ent3.get()=="":
 
 		message(0,can,"Fill all fields!",x+xx/2,y+yy+10+15,xx,30)
 
 		return
 
-	if pw1.get()!=pw2.get():
+	if ent2.get()!=ent3.get():
 
 		message(0,can,"Password doesn't match!",x+xx/2,y+yy+10+15,xx,30)
 
@@ -1101,7 +2173,7 @@ def validate_registration():
 
 
 	for row in rows:
-		if row[1].lower() == un.get().lower():
+		if row[1].lower() == ent1.get().lower():
 
 			message(0,can,"User name exists!",x+xx/2,y+yy+10+15,xx,30)
 
@@ -1134,7 +2206,7 @@ def validate_registration():
 
 
 
-	cur.execute("INSERT INTO users VALUES("+str(v)+",'"+un.get()+"','""','""',"+str(0)+",'"+str(pw1.get())+"',"+str(0)+")")
+	cur.execute("INSERT INTO users VALUES("+str(v)+",'"+ent1.get()+"','""','""',"+str(0)+",'"+str(ent2.get())+"',"+str(0)+")")
 
 	db_user.commit()
 
@@ -1207,13 +2279,18 @@ root.geometry(f"{width}x{height}+0+0")
 def can_b1(e):
 	global can,dashboard
 	global un_login_coord,	pw1_login_coord
-	global un,pw1,pw2
+	global ent1,ent2,ent3,ent4,text1
 	global login_coord,register_coord
 	global cancel_coord,confirm_coord
 	global st_
 	global _show_,show_p,dshow_p
 	global add_items_coords,add_items_ims,add_item_im
-	global name,bp,sp,qt,desc
+	global items_ar
+	global sel_item
+	global qp
+	global add_c_coord
+	global cart_ar
+
 	
 
 
@@ -1224,11 +2301,11 @@ def can_b1(e):
 		if x<=e.x<=x+29:
 			if y<=e.y<=y+29:
 
-				if pw1["show"]=="*":
-					pw1["show"]=""
+				if ent2["show"]=="*":
+					ent2["show"]=""
 					can.itemconfig(_show_,image=dshow_p)
 				else:
-					pw1["show"]="*"
+					ent2["show"]="*"
 					can.itemconfig(_show_,image=show_p)
 
 
@@ -1240,7 +2317,7 @@ def can_b1(e):
 		if x1<=e.x<=x2:
 			if y1<=e.y<=y2:
 
-				un.focus_set()
+				ent1.focus_set()
 
 				return
 
@@ -1250,7 +2327,7 @@ def can_b1(e):
 		if x1<=e.x<=x2:
 			if y1<=e.y<=y2:
 
-				pw1.focus_set()
+				ent2.focus_set()
 
 				return
 
@@ -1300,13 +2377,13 @@ def can_b1(e):
 		if x<=e.x<=x+29:
 			if y<=e.y<=y+29:
 
-				if pw1["show"]=="*":
-					pw1["show"]=""
-					pw2["show"]=""
+				if ent2["show"]=="*":
+					ent2["show"]=""
+					ent3["show"]=""
 					can.itemconfig(_show_,image=dshow_p)
 				else:
-					pw1["show"]="*"
-					pw2["show"]="*"
+					ent2["show"]="*"
+					ent3["show"]="*"
 					can.itemconfig(_show_,image=show_p)
 
 
@@ -1319,7 +2396,7 @@ def can_b1(e):
 		if x1<=e.x<=x2:
 			if y1<=e.y<=y2:
 
-				un.focus_set()
+				ent1.focus_set()
 
 				return
 
@@ -1329,7 +2406,7 @@ def can_b1(e):
 		if x1<=e.x<=x2:
 			if y1<=e.y<=y2:
 
-				pw1.focus_set()
+				ent2.focus_set()
 
 				return
 
@@ -1341,7 +2418,7 @@ def can_b1(e):
 		if x1<=e.x<=x2:
 			if y1<=e.y<=y2:
 
-				pw2.focus_set()
+				ent3.focus_set()
 
 				return
 
@@ -1390,7 +2467,80 @@ def can_b1(e):
 	elif st_=="main":
 
 
-		if st=="Add Items":
+
+		if st=="Sell Items":
+
+			if sel_item==None:
+
+				for i in items_ar:
+
+					x1,y1,x2,y2=i[1:]
+
+					if x1<=e.x<=x2:
+						if y1<=can.canvasy(e.y)<=y2:
+
+							draw_selected_item(i[0])
+
+							return
+			else:
+
+				x,y=qp
+
+
+				if x<=e.x<=x+25:
+					if y<=can.canvasy(e.y)<=y+25:
+
+
+						sel_item=None
+						qp=None
+
+						main(1)
+
+						return
+
+
+				x1,y1,x2,y2=add_c_coord
+
+				cx,cy=x1+15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+				if r<=15:
+
+					cart_ar.append([sel_item,ent1.get(),ent2.get()])
+
+					sel_item=None
+					qp=None
+
+					main(1)
+
+				cx,cy=x2-15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+				if r<=15:
+
+					cart_ar.append([sel_item,ent1.get(),ent2.get()])
+
+					sel_item=None
+					qp=None
+
+					main(1)
+
+
+				if x1+15<=e.x<=x2-15:
+					if y1<=can.canvasy(e.y)<=y2:
+
+
+						cart_ar.append([sel_item,ent1.get(),ent2.get()])
+
+						sel_item=None
+						qp=None
+
+						main(1)
+
+
+		elif st=="Add Items":
 
 			xx,yy=700,410
 
@@ -1408,14 +2558,14 @@ def can_b1(e):
 
 			if x1<=e.x<=x2:
 				if y1<=e.y<=y2:
-					name.focus_set()
+					ent1.focus_set()
 					return
 
 			x1,y1,x2,y2=add_items_coords["bp"]
 
 			if x1<=e.x<=x2:
-				if y1<=e.y<=y2:
-					bp.focus_set()
+				if y2<=e.y<=y2:
+					ent2.focus_set()
 					return
 
 
@@ -1423,21 +2573,21 @@ def can_b1(e):
 
 			if x1<=e.x<=x2:
 				if y1<=e.y<=y2:
-					sp.focus_set()
+					ent3.focus_set()
 					return
 
 			x1,y1,x2,y2=add_items_coords["q"]
 
 			if x1<=e.x<=x2:
 				if y1<=e.y<=y2:
-					qt.focus_set()
+					ent4.focus_set()
 					return
 
 			x1,y1,x2,y2=add_items_coords["desc"]
 
 			if x1<=e.x<=x2:
 				if y1<=e.y<=y2:
-					desc.focus_set()
+					text1.focus_set()
 					return
 
 			if not add_items_coords["add_image"]==None:
@@ -1518,7 +2668,7 @@ def can_b1(e):
 
 def add_new_item():
 	global can,dashboard
-	global name,bp,sp,qt,desc
+	global ent1,ent2,ent3,ent4,text1
 	global add_items_ims
 
 
@@ -1537,27 +2687,27 @@ def add_new_item():
 
 	
 
-	if name.get()=="" or bp.get()=="" or sp.get()=="" or qt.get()=="":
+	if ent1.get()=="" or ent2.get()=="" or ent3.get()=="" or ent4.get()=="":
 
 		message(0,can,"Fill essential fields!",x+xx/2,y+yy+10+15,350,30)
 
 		return
 
 	try:
-		bp_=int(bp.get())
+		bp_=int(ent2.get())
 	except:
 		message(0,can,"Some fields must be a number!",x+xx/2,y+yy+10+15,350,30)
 		return
 
 
 	try:
-		sp_=int(sp.get())
+		sp_=int(ent3.get())
 	except:
 		message(0,can,"Some fields must be a number!",x+xx/2,y+yy+10+15,350,30)
 		return
 
 	try:
-		q_=int(qt.get())
+		q_=int(ent4.get())
 	except:
 		message(0,can,"Some fields must be a number!",x+xx/2,y+yy+10+15,350,30)
 		return
@@ -1604,11 +2754,11 @@ def add_new_item():
 
 
 	item_id=v
-	name_=name.get()
-	bp_=int(bp.get())
-	sp_=int(sp.get())
-	qt_=int(qt.get())
-	desc_=desc.get("1.0",tk.END)[:-1]
+	name_=ent1.get()
+	bp_=int(ent2.get())
+	sp_=int(ent3.get())
+	qt_=int(ent4.get())
+	desc_=text1.get("1.0",tk.END)[:-1]
 
 
 	if add_items_ims["image"]!=0:
@@ -1633,6 +2783,8 @@ def add_new_item():
 
 		add_items_ims["image"].save(f"data/images/{item_id}.png")
 
+		scale_down_im(f"{item_id}.png",1,140,85)
+
 	main()
 
 	message(1,can,"Item added successfullly!",x+xx/2,y+yy+10+15,350,30)
@@ -1641,10 +2793,50 @@ def add_new_item():
 
 can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can.place(in_=root,x=0,y=0)
-
 can.bind("<Button-1>",can_b1)
 
+can2=tk.Canvas(width=width,height=40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+
+def can3_b1(e):
+	global sel_item
+
+	if sel_item==None:
+
+		can_b1_sb("can",e.x,e.y)
+		can_b1_sb("cart",e.x,e.y)
+
+def can3_b1_motion(e):
+	global sel_item
+
+	if sel_item==None:	
+
+		sb_drag("can",e.x,e.y)
+		sb_drag("cart",e.x,e.y)
+
+def can3_b1_sb_release(widget):
+
+    global _scroll_
+
+
+    _scroll_[widget]["v_drag_st"]=0
+    _scroll_[widget]["h_drag_st"]=0
+
+def can3_b1_release(e):
+
+	can3_b1_sb_release("can")
+	can3_b1_sb_release("cart")
+
+can3=tk.Canvas(width=400,height=height-40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+can3.bind("<Button-1>",can3_b1)
+can3.bind("<B1-Motion>",can3_b1_motion)
+can3.bind("<ButtonRelease-1>",can3_b1_release)
+
+
+
 can["scrollregion"]=(0,0,width,height)
+
+
+can4=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 
 
 db_st=0
@@ -1749,25 +2941,25 @@ dashboard.bind("<Button-1>",dashboard_b1)
 
 dashboard.place(in_=root,x=0,y=0)
 
-def un_r(e):
-	global pw1
+def ent1_r(e):
+	global ent2
 
-	pw1.focus_set()
+	ent2.focus_set()
 
 
-def pw1_r(e):
+def ent2_r(e):
 	global st_
-	global pw2
+	global ent3
 
 	if st_=="login":
 		valdate_login()
 	elif st_=="register":
 
-		pw2.focus_set()
+		ent3.focus_set()
 
-def pw2_r(e):
+def ent3_r(e):
 	global st_
-	global pw2
+	global ent4
 
 	if st_=="register":
 
@@ -1775,23 +2967,27 @@ def pw2_r(e):
 
 
 
-un=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
-un.bind("<Return>",un_r)
+ent1=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent1.bind("<Return>",ent1_r)
 
-pw1=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,show="*",selectbackground="#000000",selectforeground="#ffffff")
-pw1.bind("<Return>",pw1_r)
+ent2=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,show="*",selectbackground="#000000",selectforeground="#ffffff")
+ent2.bind("<Return>",ent2_r)
 
-pw2=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,show="*",selectbackground="#000000",selectforeground="#ffffff")
-pw2.bind("<Return>",pw2_r)
+ent3=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,show="*",selectbackground="#000000",selectforeground="#ffffff")
+ent3.bind("<Return>",ent3_r)
 
 
-name=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
-bp=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
-sp=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
-qt=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent4=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent5=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent6=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent7=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 
-desc=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+text1=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 
+
+t_widgets={"entries":[ent1,ent2,ent3,ent4],
+			"text":[text1],
+			"canvas":[dashboard,can,can2,can3,can4]}
 
 load_im()
 
@@ -1840,6 +3036,56 @@ except:
 	pass
 
 
+def scale_down_im(im_,con,x,y,save_path="data/images"):
+
+	x1_,y1_,x2_,y2_=0,0,x,y
+
+
+	im=Image.open(f"data/images/{im_}")
+	_x,_y=im.size
+
+	if _x/_y>(x2_-x1_)/(y2_-y1_):
+
+		x_=(x2_-x1_)
+		y_=x_*_y/_x
+
+	elif _x/_y<(x2_-x1_)/(y2_-y1_):
+
+		y_=(y2_-y1_)
+		x_=y_*_x/_y
+
+	else:
+
+		y_=(x2_-x1_)
+		x_=(y2_-y1_)
+
+	x_=int(x_)
+	y_=int(y_)
+
+	im=im.resize((x_,y_))
+
+	im.save(f"{save_path}/{im_.replace(".png",f"_{con}.png")}")
+
+
+"""
+
+db_items=database.connect("data/items.db")
+cur=db_items.cursor()
+
+
+cur.execute("SELECT * FROM items")
+rows=cur.fetchall()
+
+
+
+for row in rows:
+
+	if row[6]!="":
+	
+		scale_down_im(row[6],1,140,85)
+
+
+"""
 
 st="Sell Items"
 
