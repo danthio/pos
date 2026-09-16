@@ -48,6 +48,8 @@ def check_root_sz():
 		width,height=w,h
 
 		if st_=="main":
+
+			print("ok")
 			draw_db()
 			main(1)
 
@@ -428,13 +430,16 @@ items_ar=[]
 sel_item=None
 
 cart_buttons_coords={}
+
+search_val=""
+search_coords=[]
 def main(con=0):
 
 	global st,st_
 	global can,can2,can3
 	global add_items_ims
 	global dashboard
-	global ent1,ent2,ent3,ent4,text1
+	global ent1,ent2,ent3,ent4,ent_search,text1
 	global delete,crop1,crop2,refresh
 	global add_items_coords
 	global add_item_im
@@ -450,6 +455,11 @@ def main(con=0):
 	global cart_im,clear_cart
 	global cart_buttons_coords
 	global mpesa_logo
+	global search
+	global search_val,search_focus,search_coords
+	global user_id
+	global no_profile_im
+	global no_record
 
 	st_="main"
 
@@ -548,6 +558,82 @@ def main(con=0):
 		can3.delete("all")
 		can3.place(in_=root,x=width-400,y=40)
 
+		v=0
+
+
+		_x_=400-10
+
+
+
+		if int(dashboard.place_info()["x"])<0:
+			_x=5+25+5
+		else:
+			_x=int(dashboard["width"])
+		x_=_x+(int(can["width"])-_x-_x_)/2
+
+		x1,y1,x2,y2=x_,5,x_+_x_,5+30
+
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+		ent_search["width"]=40
+
+		if search_focus==False:
+			if search_val=="":
+
+				can2.create_text(x1+15,y1+15,text="Search",font=("FreeMono",13),fill="#000000",anchor="w")
+
+				can2.create_image(x1+15+f.measure("Search")+10,y1+2.5,image=search,anchor="nw")
+
+			else:
+
+				can2.create_text(x1+15+1,y1+15,text=search_val,font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		can2.create_image(x2+5,y1+2.5,image=quit,anchor="nw")
+
+
+
+		search_coords=[x1,y1,x2,y2,[x2+5,y1+2.5]]
+
+		if search_focus==True:
+
+
+			ent_search.place(in_=root,x=x1+15,y=y1+4.5)
+
+			ent_search.focus_set()
+
+
+
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+
+		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+		if row[4]=="":
+
+			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+
+
+		else:
+
+			#process profile picture
+			pass
+
+
+
+
 
 		
 
@@ -560,6 +646,8 @@ def main(con=0):
 		cur.execute("SELECT * FROM items")
 
 		rows=cur.fetchall()
+
+		
 
 
 		x=int(dashboard.place_info()["x"])+int(dashboard["width"])
@@ -615,11 +703,13 @@ def main(con=0):
 
 
 
+
+
+
 		y=20
 
 
-
-		v=0
+		v+=1
 
 		_x_=x
 
@@ -629,7 +719,16 @@ def main(con=0):
 
 		rc=1
 
+		con_=0
+
 		for row in rows:
+
+
+			if row[1].lower().find(search_val.lower())==-1 and row[5].lower().find(search_val.lower())==-1:
+
+				continue
+
+			con_=1
 
 
 
@@ -704,6 +803,27 @@ def main(con=0):
 
 				rc+=1
 
+
+		if con_==0:
+
+			im=no_record
+
+			im=im.resize((250,250))
+
+			v+=1
+
+			sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			x_=_x+(int(can["width"])-_x)/2
+
+			can.create_image(x_,int(can["height"])/2,image=sell_items_ims[v],anchor="c")
+
+			can.create_text(x_,int(can["height"])/2+250/2+10+15,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
 
 
 
@@ -816,7 +936,11 @@ def main(con=0):
 		discount=0
 		no_items=0
 
+		con2_=0
+
 		for i in cart_ar:
+
+			con2_=1
 
 			id_,sold_at,quantity=i
 
@@ -854,6 +978,24 @@ def main(con=0):
 			total+=int(sold_at)*int(quantity)
 			discount+=(int(sp)-int(sold_at))*int(quantity)
 		y+=10
+
+
+
+		if con2_==0:
+
+			im=no_record
+
+			im=im.resize((100,100))
+
+			v+=1
+
+			sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can4.create_image(int(can4["width"])/2,int(can4["height"])/2,image=sell_items_ims[v],anchor="c")
+
+			can4.create_text(int(can4["width"])/2,int(can4["height"])/2+50+10+15,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+
+
 
 
 		if y<=int(can4["height"]):
@@ -981,6 +1123,8 @@ def main(con=0):
 
 
 	elif st=="Add Items":
+
+		search_val=""
 
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
@@ -1712,6 +1856,9 @@ added=0
 cart_im=0
 clear_cart=0
 mpesa_logo=0
+search=0
+no_profile_im=0
+no_record=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -1725,6 +1872,9 @@ def load_im():
 	global added
 	global cart_im,clear_cart
 	global mpesa_logo
+	global search
+	global no_profile_im
+	global no_record
 
 
 	#db
@@ -1873,6 +2023,23 @@ def load_im():
 
 	mpesa_logo=Image.open("data/mpesa_logo.png")
 
+
+
+	#search
+
+	im=Image.open("data/icons/search.png")
+	im=im.resize((25,25))
+	search=ImageTk.PhotoImage(im)
+
+
+	#no_profile_im
+
+	im=Image.open("data/icons/no_profile_im.png")
+	im=im.resize((25,25))
+	no_profile_im=ImageTk.PhotoImage(im)
+
+	#no_record
+	no_record=Image.open("data/icons/no_record.png")
 
 db_items=[]
 def draw_db():
@@ -2339,11 +2506,14 @@ def draw_registration(con=0):
 	ent1.focus_set()
 
 
+user_id=None
+
 def valdate_login():
 	global can,dashboard
 	global width,height
 	global ent1,ent2,ent3
 	global st
+	global user_id
 
 
 	xx,yy=350,200
@@ -2370,6 +2540,7 @@ def valdate_login():
 	for row in rows:
 
 		if row[1]==ent1.get() and row[5]==ent2.get():
+			user_id=row[0]
 			con=1
 
 	
@@ -2474,7 +2645,7 @@ def validate_registration():
 
 
 
-	cur.execute("INSERT INTO users VALUES("+str(v)+",'"+ent1.get()+"','""','""',"+str(0)+",'"+str(ent2.get())+"',"+str(0)+")")
+	cur.execute("INSERT INTO users VALUES("+str(v)+",'"+ent1.get()+"','""','""','""','"+str(ent2.get())+"',"+str(0)+")")
 
 	db_user.commit()
 
@@ -2581,6 +2752,17 @@ def can_b1(e):
 	global qp
 	global add_c_coord
 	global cart_ar
+	global search_focus
+
+
+	if st_=="main" and st=="Sell Items" and search_focus==True:
+
+		search_focus=False
+
+		main(1)
+
+
+
 
 	
 
@@ -2756,6 +2938,8 @@ def can_b1(e):
 				validate_registration()
 
 	elif st_=="main":
+
+		
 
 
 
@@ -3145,13 +3329,106 @@ can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthic
 can.place(in_=root,x=0,y=0)
 can.bind("<Button-1>",can_b1)
 
-can2=tk.Canvas(width=width,height=40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 
+def can2_b1(e):
+	global search_coords
+	global search_focus
+	global sel_item
+	global search_val
+	global st_,st
+
+	if sel_item==None and st_=="main":
+
+		if search_focus==False:
+
+
+			x1,y1,x2,y2=search_coords[:-1]
+
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+
+				search_focus=True
+
+				main(1)
+
+				return
+
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+
+				search_focus=True
+
+				main(1)
+
+				return
+
+
+			if x1+15<=e.x<=x2-15:
+
+				if y1<=e.y<=y2:
+
+
+
+					search_focus=True
+
+					main(1)
+
+					return
+
+
+
+
+		if search_val!="":
+			x,y=search_coords[-1]
+
+
+			if x<=e.x<=x+25:
+				if y<=e.y<=y+25:
+
+					search_val=""
+					ent_search.delete(0,tk.END)
+					search_focus=False
+
+					main(1)
+
+					return
+
+		if search_focus==True:			
+
+				search_focus=False
+
+				main(1)
+
+
+
+
+can2=tk.Canvas(width=width,height=40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+can2.bind("<Button-1>",can2_b1)
 def can3_b1(e):
 	global sel_item
 	global cart_ar
 	global cart_buttons_coords
 	global can,dashboard
+	global search_focus
+	global st_,st
+
+	if st_=="main" and st=="Sell Items" and search_focus==True:
+
+		search_focus=False
+
+		main(1)
+
 
 	if sel_item==None:
 
@@ -3170,7 +3447,6 @@ def can3_b1(e):
 				_x=int(dashboard["width"])
 			x_=_x+(int(can["width"])-_x)/2
 
-			print(x_,int(can["width"]))
 
 
 			x1,y1,x2,y2=cart_buttons_coords["clear_cart"]
@@ -3248,6 +3524,8 @@ def dashboard_b1(e):
 	global db_st
 	global db_items
 	global st
+	global search_val
+	global cart_ar
 
 	if int(dashboard["width"])-5-25<=e.x<=int(dashboard["width"])-5:
 		if 5<=e.y<=5+25:
@@ -3281,6 +3559,9 @@ def dashboard_b1(e):
 
 
 		dashboard.place_forget()
+
+		search_val=""
+		cart_ar=[]
 
 		login()
 
@@ -3385,10 +3666,39 @@ ent5=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highligh
 ent6=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 ent7=tk.Entry(width=17, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 
+search_focus=False
+def search_b1(e):
+	global search_focus
+
+	search_focus=True
+
+	main(1)
+
+
+def check_search_entry():
+
+	global search_focus
+	global search_val
+
+	if search_focus==True:
+
+		if search_val!=ent_search.get():
+
+			search_val=ent_search.get()
+
+			main(1)
+
+	root.after(1,check_search_entry)
+
+
+
+ent_search=tk.Entry(width=25, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
+ent_search.bind("<Button-1>",search_b1)
+
 text1=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 
 
-t_widgets={"entries":[ent1,ent2,ent3,ent4],
+t_widgets={"entries":[ent1,ent2,ent3,ent4,ent_search],
 			"text":[text1],
 			"canvas":[dashboard,can,can2,can3,can4]}
 
@@ -3413,7 +3723,7 @@ try:
 		name VARCHAR(255),
 		email VARCHAR(255),
 		contact VARCHAR(255),
-		pic INT,
+		pic VARCHAR(255),
 		password VARCHAR(255),
 		admin INT);""")
 
@@ -3494,4 +3804,5 @@ st="Sell Items"
 
 check_root_sz()
 check_sel_item()
+check_search_entry()
 root.mainloop()
