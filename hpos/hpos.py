@@ -33,6 +33,35 @@ for row in rows:
 
 """
 
+
+def check_root_sz():
+	global width,height
+	global cur_sz
+	global st_
+
+
+	sz=root.geometry().split("+")[0].split("x")
+	w,h=int(sz[0]),int(sz[1])
+
+	if not cur_sz==[w,h]:
+
+		width,height=w,h
+
+		if st_=="main":
+			draw_db()
+			main(1)
+
+		elif st_=="login":
+			login(1)
+		elif st_=="register":
+			draw_registration(1)
+
+		cur_sz=[w,h]
+
+
+	root.after(1,check_root_sz)
+
+
 def forget_widgets(except_=None):
 	global t_widgets
 
@@ -84,6 +113,67 @@ def entries_show_reset():
 
 		e["show"]=""
 
+
+sel_item_ent_d=[]
+def check_sel_item():
+	global can
+	global st_,sel_item
+	global sel_err1,sel_err2
+	global sel_total
+	global sel_item_ent_d
+	global ent1,ent2
+
+	if sel_item!=None and st_=="main":
+
+		data=[ent1.get(),ent2.get()]
+
+		if sel_item_ent_d!=data:
+
+			con=0
+
+			try:
+				v1=int(ent1.get())
+
+				can.itemconfig(sel_err1,text="")
+
+			except:
+				con=1
+				can.itemconfig(sel_err1,text="error")
+
+
+
+			try:
+				v2=int(ent2.get())
+
+				can.itemconfig(sel_err2,text="")
+
+			except:
+				con=1
+				can.itemconfig(sel_err2,text="error")
+
+
+
+			
+			if con==1:
+				can.itemconfig(sel_total,text="Invalid")
+			elif con==0:
+				can.itemconfig(sel_total,text=f"Ksh.{v1*v2}")
+
+
+			sel_item_ent_d=data
+
+	root.after(1,check_sel_item)
+
+
+
+		
+
+
+
+
+sel_err1=0
+sel_err2=0
+sel_total=0
 qp=None
 add_c_coord=[]
 def draw_selected_item(id_):
@@ -92,6 +182,8 @@ def draw_selected_item(id_):
 	global quit,qp
 	global ent1,ent2
 	global add_c_coord
+	global sel_err1,sel_err2,sel_total
+	global sel_item_ent_d
 
 	f=font.Font(family="FreeMono",size=13)
 
@@ -128,13 +220,17 @@ def draw_selected_item(id_):
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-	xx,yy=730,400
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+
 
 
 
 
 	x=x+((int(can["width"])-x)-xx)/2
 	y=can.canvasy(40+((int(can["height"])-40)-yy)/2)
+
+
+
 
 	v=len(sell_items_ims)+1
 
@@ -172,7 +268,7 @@ def draw_selected_item(id_):
 
 
 
-	can.create_text(x1+((x2-270)-x1)/2,y1+15,text=name,font=("FreeMono",13),fill="#000000",anchor="c")
+	can.create_text(x1+((x2-270)-x1)/2,y1+15,text=name,font=("FreeMono",13),fill="#0000ff",anchor="c")
 
 	can.create_line(x2-270, y1+10, x2-270,y2-10,fill="#000000")
 	
@@ -223,19 +319,29 @@ def draw_selected_item(id_):
 
 
 	can.create_text(x2-270+10,y1+30+30, text="Selling Price", font=("FreeMono",13),fill="#000000",anchor="w")
-	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30,text=f"Ksh. {sp}", font=("FreeMono",13),fill="#0000ff",anchor="w")
+	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30,text=f"Ksh.{sp}", font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
 	can.create_text(x2-270+10,y1+30+30+40, text="Items Left", font=("FreeMono",13),fill="#000000",anchor="w")
 	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30+40,text=str(qt), font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
-	can.create_text(x2-270+10,y1+30+30+40*3, text="Sold at", font=("FreeMono",13),fill="#000000",anchor="w")
-
-
+	yy1=y1+30+30+40
 
 	
-	x1,y1,x2,y2=x2-270+10+f.measure("Sold at")+30,y1+30+30+40*3-15.5, x2-270+10+f.measure("Sold at")+30+166,y1+30+30+40*3+15.5,
+
+
+
+	yy2=y2-10-30-10-30
+
+	yy3=31+10+31
+
+
+	_y_=yy1+((yy2-yy1)-yy3)/2
+	
+	x1,y1,x2,y2=x2-270+10+f.measure("Sold at")+30,_y_, x2-270+10+f.measure("Sold at")+30+166,_y_+31,
+
+	can.create_text(x+xx-270+10,y1+31/2, text="Sold at", font=("FreeMono",13),fill="#000000",anchor="w")
 
 	v+=1
 
@@ -247,7 +353,9 @@ def draw_selected_item(id_):
 	ent1.insert(tk.END,str(sp))
 
 
-	ent1.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0))
+	ent1.place(in_=root,x=x1+5,y=_y_+5+40-can.canvasy(0))
+
+	sel_err1=can.create_text(x1,y2+5,text="",fill="#ff0000",font=("FreeMono",9),anchor="w")
 
 
 
@@ -255,30 +363,42 @@ def draw_selected_item(id_):
 
 	v+=1
 
-	im=draw_round_rect(5,x1,y1+40,x2,y2+40, "#000000",alpha=1,width=1)
+	im=draw_round_rect(5,x1,y1+40+10,x2,y2+40+10, "#000000",alpha=1,width=1)
 	sell_items_ims[v]=ImageTk.PhotoImage(im)
-	can.create_image(x1,y1+40,image=sell_items_ims[v],anchor="nw")
+	can.create_image(x1,y1+40+10,image=sell_items_ims[v],anchor="nw")
 
 	ent2.delete(0,tk.END)
 	ent2.insert(tk.END,str(1))
 
 
-	ent2.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0)+40)
+	ent2.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0)+40+10)
+
+	sel_err2=can.create_text(x1,y2+40+10+5,text="",fill="#ff0000",font=("FreeMono",9),anchor="w")
+
+	can.create_text(x+xx-270+10,y1+40+10+31/2, text="Quantity", font=("FreeMono",13),fill="#000000",anchor="w")
+
+	sel_item_ent_d=[ent1.get(),ent2.get()]
+
+
 
 
 	x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
 
-	can.create_text(x2-270+10,y1+30+30+40*4, text="Quantity", font=("FreeMono",13),fill="#000000",anchor="w")
+	
 
 
-	#can.create_text(x2-270+10,y2-10-30-10-30, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
 
+
+	can.create_text(x2-270+10,y2-10-30-10-30, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+	sel_total=can.create_text(x2-10,y2-10-30-10-30, text=f"Ksh.{int(ent1.get())*int(ent2.get())}", font=("FreeMono",13),fill="#ff0000",anchor="e")
 
 
 
 	v+=1
 
-	x1,y1,x2,y2=x,y-20, x+xx,y+yy-20
+	
 
 	x1,y1,x2,y2=x2-270+10, y2-10-30, x2-10,y2-10
 
@@ -306,6 +426,8 @@ v2,h2=0,0
 cart_ar=[]
 items_ar=[]
 sel_item=None
+
+cart_buttons_coords={}
 def main(con=0):
 
 	global st,st_
@@ -323,6 +445,11 @@ def main(con=0):
 	global cart_ar
 	global items_ar
 	global sel_item
+	global added
+	global width,height
+	global cart_im,clear_cart
+	global cart_buttons_coords
+	global mpesa_logo
 
 	st_="main"
 
@@ -330,21 +457,25 @@ def main(con=0):
 
 	if st=="Sell Items":
 
+
+
 		items_ar=[]
+
+		cart_buttons_coords={}
 
 
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
 		if con==0:
-			cart_ar=[]
+			#cart_ar=[]
 			delete_widgets()
 
-		can["width"]=width-300
+		can["width"]=width-400
 		can["height"]=height-40
 		can["scrollregion"]=(0,0,width,height-40)
 		can["bg"]="#ffffff"
 
-		can["scrollregion"]=(0,0,width-300,height-40)
+		can["scrollregion"]=(0,0,width-400,height-40)
 
 
 		if con==0:
@@ -359,8 +490,8 @@ def main(con=0):
 					"h_":h1,
 					"w":int(can["width"]),
 					"h":int(can["height"]),
-					"_x":width-300,
-					"_x2":width-300,
+					"_x":width-400,
+					"_x2":width-400,
 					"scrollregion":can["scrollregion"],
 					"v_drag_st":0,
 					"h_drag_st":0,
@@ -382,8 +513,8 @@ def main(con=0):
 					"h_":h1,
 					"w":int(can["width"]),
 					"h":int(can["height"]),
-					"_x":width-300,
-					"_x2":width-300,
+					"_x":width-400,
+					"_x2":width-400,
 					"scrollregion":can["scrollregion"],
 					"v_drag_st":0,
 					"h_drag_st":0,
@@ -400,17 +531,22 @@ def main(con=0):
 
 		can2["width"]=width
 		can2["height"]=40
+		can2["bg"]="#ffffff"
 
 		can2.delete("all")
+
+		can2.create_line(0,0,width,0,fill="#000000")
+		#can2.create_line(0,39,width,39,fill="#dddddd")
+
 		can2.place(in_=root,x=0,y=0)
 
 
-		can3["width"]=300
+		can3["width"]=400
 		can3["height"]=height-40
 		can3["bg"]="#ffffff"
 
 		can3.delete("all")
-		can3.place(in_=root,x=width-300,y=40)
+		can3.place(in_=root,x=width-400,y=40)
 
 
 		
@@ -447,7 +583,7 @@ def main(con=0):
 
 			xv=(_x_-(n_*xx))/(n_+1)
 
-			if xv<20:
+			if xv<30:
 				n_-=1
 				con_n=1
 			else:
@@ -456,8 +592,24 @@ def main(con=0):
 
 				break
 
-			if con_n==0:
-				_n_=[n,20]
+		if con_n==0:
+			_n_=[n,20]
+
+
+		def det_selected(id_):
+			global cart_ar
+
+			con=0
+
+			for i in cart_ar:
+
+
+				if i[0]==id_:
+
+					con=1
+					break
+
+			return con
 
 
 
@@ -479,13 +631,22 @@ def main(con=0):
 
 		for row in rows:
 
+
+
+
 			x1,y1,x2,y2=_x_,y,_x_+xx,y+yy
+
+			col="#000000"
+
+			if det_selected(row[0])==1:
+				col="#ff0000"
+				can.create_image(x2+5,y1,image=added,anchor="nw")
 
 
 			items_ar.append([row[0],x1,y1,x2,y2])
 
 
-			im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+			im=draw_round_rect(15,x1,y1,x2,y2, col,"#ffffff",alpha=1,width=1)
 
 			sell_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -523,8 +684,8 @@ def main(con=0):
 
 
 
-			can.create_text(x1+10,y2-25-25-25, text=f"{row[1]}",font=("FreeMono",13),fill="#ff0000",anchor="w")
-			can.create_text(x1+10,y2-25-25, text=f"Ksh. {row[3]}",font=("FreeMono",13),fill="#000000",anchor="w")
+			can.create_text(x1+10,y2-25-25-25, text=f"{row[1]}",font=("FreeMono",13),fill="#0000ff",anchor="w")
+			can.create_text(x1+10,y2-25-25, text=f"Ksh.{row[3]}",font=("FreeMono",13),fill="#000000",anchor="w")
 			can.create_text(x1+10,y2-25, text=f"{row[4]} items left",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
@@ -576,22 +737,25 @@ def main(con=0):
 
 		x1,y1,x2,y2=10+5,5,int(can3["width"])-5,int(can3["height"])-5
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#dddddd",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
 
 
+		_x=(int(can3["width"])-(10+25+f.measure("Cart")))/2
+		can3.create_image(_x,5+35/2,image=cart_im,anchor="w")
+		can3.create_text(_x+25+10,5+35/2, text="Cart", font=("FreeMono",13),fill="#000000",anchor="w")
 
-		can3.create_text(int(can3["width"])/2,20, text="Cart", font=("FreeMono",13),fill="#000000",anchor="c")
+
 
 
 
 		v+=1
 
-		x1,y1,x2,y2=10+5+10,40,int(can3["width"])-5-10,int(can3["height"])-10-30-(10+30)*4-30
+		x1,y1,x2,y2=10+5+10,40,int(can3["width"])-4-10-4-5,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30-10-4-10
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
@@ -599,8 +763,8 @@ def main(con=0):
 
 		#cart
 
-		can4["width"]=(x2-x1)-5-4-10-4
-		can4["height"]=(y2-y1)-15-15-4-10-4
+		can4["width"]=(x2-x1)-2
+		can4["height"]=(y2-y1)-15-15
 
 		can4["bg"]="#ffffff"
 
@@ -608,7 +772,7 @@ def main(con=0):
 
 		_x=int(can3.place_info()["x"])
 
-		can4.place(in_=root,x=_x+x1+5,y=y1+40+15)
+		can4.place(in_=root,x=_x+x1+1,y=y1+40+15)
 
 		can4["scrollregion"]=(0,0,int(can4["width"]),int(can4["height"]))
 
@@ -618,8 +782,8 @@ def main(con=0):
 				"sb_widget":can3,
 				"sb_st":"both",
 				"sb_sz":10,
-				"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x1+5+int(can4["width"])+4,x1+5+int(can4["width"])+4+10),0],
-				"h_sb_coord":[(x1+5,x1+5+int(can4["width"]),y2-15-4-10,y2-15-4),0],
+				"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x2+4,x2+4+10,0),0],
+				"h_sb_coord":[(x1+1,x1+1+int(can4["width"]),y2+4,y2+4+10),0],
 				"_y":int(can4["height"]),
 				"v":v2,
 				"h_":h2,
@@ -645,7 +809,7 @@ def main(con=0):
 
 		y=0
 
-		can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
+		#can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
 
 
 		total=0
@@ -670,10 +834,17 @@ def main(con=0):
 				sp=row[3]
 
 
-			can4.create_text(5,y+15,text=name,font=("FreeMono",13),fill="#ff0000",anchor="w")
-			can4.create_text(5,y+15+30+10,text=f"Units {quantity}",font=("FreeMono",13),fill="#000000",anchor="w")
-			can4.create_text(5,y+15+30+10+30,text=f"Total Ksh. {int(sold_at)*int(quantity)}",font=("FreeMono",13),fill="#000000",anchor="w")
+			can4.create_text(5,y+15,text=name,font=("FreeMono",13),fill="#0000ff",anchor="w")
 
+			if int(quantity)==1:
+				q="Unit"
+			else:
+				q="Units"
+			can4.create_text(5,y+15+30+10,text=q,font=("FreeMono",13),fill="#000000",anchor="w")
+			can4.create_text(5+f.measure("Total")+20,y+15+30+10,text=str(quantity),font=("FreeMono",13),fill="#ff0000",anchor="w")
+			can4.create_text(5,y+15+30+10+30,text="Total",font=("FreeMono",13),fill="#000000",anchor="w")
+			can4.create_text(5+f.measure("Total")+20,y+15+30+10+30,text=f"Ksh.{int(sold_at)*int(quantity)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+	
 			y+=15+30+10+30+20
 
 			can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
@@ -681,7 +852,8 @@ def main(con=0):
 
 			no_items+=int(quantity)
 			total+=int(sold_at)*int(quantity)
-			discount+=int(sp)-int(sold_at)
+			discount+=(int(sp)-int(sold_at))*int(quantity)
+		y+=10
 
 
 		if y<=int(can4["height"]):
@@ -712,20 +884,40 @@ def main(con=0):
 
 
 
-		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*4, text="Items", font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*4, text=str(no_items), font=("FreeMono",13),fill="#000000",anchor="e")		
+		v+=1
 
-		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*3, text="Discount", font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*3, text=f"Ksh. {discount}", font=("FreeMono",13),fill="#000000",anchor="e")		
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30,10+5+10+15+25+10+f.measure("Clear Cart")+15,int(can3["height"])-10-30-(10+30)*2-30*2-15-10
 
-		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10, int(can3["height"])-10-30-(10+30)*2, text=f"Ksh. {total}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
+		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000","#ff0000",alpha=1,width=1)
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
+		can3.create_image(x1+15,y1+2.5,image=clear_cart,anchor="nw")
+		can3.create_text(x1+15+25+10,y1+15, text="Clear Cart",fill="#ffffff",font=("FreeMono",13),anchor="w")
+
+
+		cart_buttons_coords["clear_cart"]=[x1,y1,x2,y2]
+
+
+		if int(no_items)==1:
+			i="Item"
+		else:
+			i="Items"
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2-30*2, text=i, font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30*2, text=str(no_items), font=("FreeMono",13),fill="#ff0000",anchor="e")		
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2-30, text="Discount", font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30, text=f"Ksh.{discount}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
+
+		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2, text="Sub Total", font=("FreeMono",13),fill="#000000",anchor="w")
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2, text=f"Ksh.{total}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
 
 
 
 		v+=1
 
-		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-10-30,int(can3["width"])-5-10,int(can3["height"])-10-10-30
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-10-30-5,int(can3["width"])-5-10,int(can3["height"])-10-10-30-5
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
@@ -735,24 +927,50 @@ def main(con=0):
 		can3.create_text(x1+(x2-x1)/2, y1+15, text="Pay with Cash", font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
-			
+		
 
 
-
+		cart_buttons_coords["pay_with_cash"]=[x1,y1,x2,y2]
 
 
 
 		v+=1
 
-		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30,int(can3["width"])-5-10,int(can3["height"])-10
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-5,int(can3["width"])-5-10,int(can3["height"])-10-5
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#0fb621","#0fb621",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
 
-		can3.create_text(x1+(x2-x1)/2, y1+15, text="Pay with MPESA", font=("FreeMono",13),fill="#ffffff",anchor="c")
 
+		im=mpesa_logo
+
+		w,h=im.size
+
+
+
+		h_=25
+		w_=int(round(h_*w/h,0))
+
+		im=im.resize((w_,h_))
+
+		w,h=im.size
+
+		x_=x1+15+((x2-x1)-(f.measure("Pay with")+w+10+30))/2
+
+
+		can3.create_text(x_, y1+15, text="Pay with", font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+		v+=1
+
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can3.create_image(x_+f.measure("Pay with")+10,y1+2.5,image=sell_items_ims[v],anchor="nw")
+
+
+
+		cart_buttons_coords["pay_with_mpesa"]=[x1,y1,x2,y2]
 
 		if sel_item!=None:
 
@@ -1490,6 +1708,10 @@ crop1,crop2=0,0
 refresh=0
 
 quit=0
+added=0
+cart_im=0
+clear_cart=0
+mpesa_logo=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -1500,6 +1722,9 @@ def load_im():
 	global crop1,crop2
 	global refresh
 	global quit
+	global added
+	global cart_im,clear_cart
+	global mpesa_logo
 
 
 	#db
@@ -1624,6 +1849,31 @@ def load_im():
 	quit=ImageTk.PhotoImage(im)
 
 
+	#added
+
+	im=Image.open("data/icons/added.png")
+	im=im.resize((20,20))
+	added=ImageTk.PhotoImage(im)
+
+
+	#quit
+
+	im=Image.open("data/icons/cart.png")
+	im=im.resize((25,25))
+	cart_im=ImageTk.PhotoImage(im)
+
+
+	#clear_cart
+
+	im=Image.open("data/icons/clear_cart.png")
+	im=im.resize((25,25))
+	clear_cart=ImageTk.PhotoImage(im)
+
+	#mpesa logo
+
+	mpesa_logo=Image.open("data/mpesa_logo.png")
+
+
 db_items=[]
 def draw_db():
 	global dashboard
@@ -1634,6 +1884,10 @@ def draw_db():
 	global width,height
 	global st
 	global db_items
+
+
+	dashboard["width"]=200
+	dashboard["height"]=height
 
 	dashboard.delete("all")
 
@@ -1676,6 +1930,17 @@ def draw_db():
 
 	dashboard.create_text(10,height-20,text="Log Out", font=("FreeMono",13),fill="#ffffff",anchor="w")
 	dashboard.create_image(int(dashboard["width"])-5-25,height-40+7.5, image=log_out_im,anchor="nw")
+
+
+	if int(dashboard.place_info()["x"])<0:
+
+		x=-int(dashboard["width"])+5+25+5
+
+	else:
+		x=0
+
+
+	dashboard.place(in_=root,x=x,y=0)
 
 
 
@@ -1780,7 +2045,7 @@ register_coord=[]
 st_=None
 _show_=0
 
-def login():
+def login(con=0):
 	global can
 	global width,height
 	global login_im1,login_im2,login_im3,login_im4
@@ -1794,14 +2059,15 @@ def login():
 
 
 	forget_widgets()
-	delete_widgets()
-	entries_show_reset()
 
+	if con==0:
+		delete_widgets()
+		entries_show_reset()
+		ent2["show"]="*"
 
 	can.delete("all")
 
 
-	ent2["show"]="*"
 
 
 	st_="login"
@@ -1918,7 +2184,7 @@ confirm_coord=[]
 login_im5=0
 
 pw2_login_coord=[]
-def draw_registration():
+def draw_registration(con=0):
 
 	global can
 	global width,height
@@ -1931,17 +2197,19 @@ def draw_registration():
 
 
 	forget_widgets()
-	delete_widgets()
-	entries_show_reset()
-	
+
+	if con==0:
+		delete_widgets()
+		entries_show_reset()
+		ent2["show"]="*"
+		ent3["show"]="*"	
 
 
 	can.delete("all")
 
 	can.place(in_=root,x=0,y=0)
 
-	ent2["show"]="*"
-	ent3["show"]="*"
+
 
 
 	st_="register"
@@ -2068,7 +2336,7 @@ def draw_registration():
 	confirm_coord=[x1+xx/2,y1,x2,y2]
 
 
-	un.focus_set()
+	ent1.focus_set()
 
 
 def valdate_login():
@@ -2245,12 +2513,28 @@ mess_con=False
 def message(con,_can_,mess,cx,cy,w,h):
 	global mess_im
 	global mess_con
+	global mess_v
+
+	try:
+
+
+		mess_v[3].delete(mess_v[1])
+		mess_v[3].delete(mess_v[2])
+
+		mess_v=[0,0,0,0,0]
+
+		mess_con=False
+
+	except:
+		pass
 
 
 	if con==0:
 		col="#ff0000"
+		col2="#000000"
 	elif con==1:
 		col="#00ff00"
+		col2="#000000"
 
 
 	x1,y1,x2,y2=cx-w/2,cy-h/2, cx+w/2,cy+h/2
@@ -2260,7 +2544,7 @@ def message(con,_can_,mess,cx,cy,w,h):
 	im=draw_round_rect(15,x1,y1,x2,y2, col,col2=col,alpha=1,width=1)
 	mess_v[0]=ImageTk.PhotoImage(im)
 	mess_v[1]=_can_.create_image(cx,cy,image=mess_v[0],anchor="c")
-	mess_v[2]=_can_.create_text(cx,cy,text=mess,font=("FreeMono",13),fill="#000000")
+	mess_v[2]=_can_.create_text(cx,cy,text=mess,font=("FreeMono",13),fill=col2)
 
 	mess_v[3]=_can_
 	mess_v[4]=time.time()
@@ -2271,10 +2555,17 @@ def message(con,_can_,mess,cx,cy,w,h):
 root=tk.Tk()
 
 
-width,height=root.winfo_screenwidth()-80,root.winfo_screenheight()-100
+width_,height_=root.winfo_screenwidth(),root.winfo_screenheight()
+width,height=width_-80,height_-100
 
 root.geometry(f"{width}x{height}+0+0")
 
+root.minsize(width,height)
+root.maxsize(width_,height_)
+
+sz=root.geometry().split("+")[0].split("x")
+w,h=int(sz[0]),int(sz[1])
+cur_sz=[w,h]
 
 def can_b1(e):
 	global can,dashboard
@@ -2499,45 +2790,104 @@ def can_b1(e):
 						return
 
 
+
+				x=int(dashboard.place_info()["x"])+int(dashboard["width"])
+
+
+				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+
+
+				x=x+((int(can["width"])-x)-xx)/2
+				y=can.canvasy(40+((int(can["height"])-40)-yy)/2)-20
+
+
+
 				x1,y1,x2,y2=add_c_coord
 
 				cx,cy=x1+15,y1+15
 
-				r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
 
 				if r<=15:
 
+					try:
+						v1=int(ent1.get())
+						v2=int(ent2.get())
+
+					except:
+
+						message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
 					cart_ar.append([sel_item,ent1.get(),ent2.get()])
 
-					sel_item=None
-					qp=None
+					#sel_item=None
+					#qp=None
 
 					main(1)
+
+					message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
+
+					return
 
 				cx,cy=x2-15,y1+15
 
-				r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
 
 				if r<=15:
 
+
+					try:
+						v1=int(ent1.get())
+						v2=int(ent2.get())
+
+					except:
+
+						message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
 					cart_ar.append([sel_item,ent1.get(),ent2.get()])
 
-					sel_item=None
-					qp=None
+					#sel_item=None
+					#qp=None
 
 					main(1)
+
+					message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
+
+					return
 
 
 				if x1+15<=e.x<=x2-15:
 					if y1<=can.canvasy(e.y)<=y2:
 
 
+						try:
+							v1=int(ent1.get())
+							v2=int(ent2.get())
+
+						except:
+
+							message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+
 						cart_ar.append([sel_item,ent1.get(),ent2.get()])
 
-						sel_item=None
-						qp=None
+						#sel_item=None
+						#qp=None
 
 						main(1)
+
+						message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
+
+
+						return
 
 
 		elif st=="Add Items":
@@ -2799,11 +3149,64 @@ can2=tk.Canvas(width=width,height=40,relief="flat",bg="#ffffff",highlightthickne
 
 def can3_b1(e):
 	global sel_item
+	global cart_ar
+	global cart_buttons_coords
+	global can,dashboard
 
 	if sel_item==None:
 
 		can_b1_sb("can",e.x,e.y)
 		can_b1_sb("cart",e.x,e.y)
+
+
+		#clear cart
+
+		if len(cart_ar)>0:
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			x_=_x+(int(can["width"])-_x)/2
+
+			print(x_,int(can["width"]))
+
+
+			x1,y1,x2,y2=cart_buttons_coords["clear_cart"]
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				cart_ar=[]
+				main(1)
+
+
+
+				message(1,can,"Cart Cleared!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+				return
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				cart_ar=[]
+				main(1)
+				message(1,can,"Cart Cleared!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+				return
+
+			if x1+15<=e.x<=x2-15:
+				if y1<=e.y<=y2:
+					cart_ar=[]
+					main(1)
+					message(1,can,"Cart Cleared!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+					return
+
 
 def can3_b1_motion(e):
 	global sel_item
@@ -3089,6 +3492,6 @@ for row in rows:
 
 st="Sell Items"
 
-
-
+check_root_sz()
+check_sel_item()
 root.mainloop()
