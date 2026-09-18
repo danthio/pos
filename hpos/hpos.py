@@ -34,6 +34,64 @@ for row in rows:
 	print(row)
 
 """
+def formart_number(no,x,con=0):
+
+	f=font.Font(family="FreeMono",size=13)
+
+	if con==1:
+
+		l=f.measure(str(no))+f.measure("Ksh.")
+	else:
+		l=f.measure(str(no))
+
+	if l>x:
+
+
+		no=int(no)
+
+
+		if no>=1000000000:
+
+			return f"{round(no/1000000000,3)} B"
+
+		elif no>=1000000:
+			return f"{round(no/1000000,3)} B"
+
+		elif no>=1000:
+			return f"{round(no/1000,3)} K"
+
+		else:
+			return f"{no}"
+
+	else:
+		return f"{no}"
+
+
+def format_text(txt,x):
+
+	f=font.Font(family="FreeMono",size=13)
+
+
+	if f.measure(txt)<=x:
+
+		return txt
+
+
+	else:
+
+		_txt_=""
+
+		for t in txt:
+
+
+			if f.measure(_txt_+"...")>x:
+
+
+				return _txt_[:-1]+"..."
+
+			else:
+
+				_txt_+=t
 
 
 def check_root_sz():
@@ -126,6 +184,7 @@ def check_sel_item():
 	global sel_total
 	global sel_item_ent_d
 	global ent1,ent2
+	global sel_totalx
 
 	if sel_item!=None and st_=="main":
 
@@ -161,7 +220,7 @@ def check_sel_item():
 			if con==1:
 				can.itemconfig(sel_total,text="Invalid")
 			elif con==0:
-				can.itemconfig(sel_total,text=f"Ksh.{v1*v2}")
+				can.itemconfig(sel_total,text=f"Ksh.{formart_number(v1*v2,sel_totalx,1)}")
 
 
 			sel_item_ent_d=data
@@ -180,6 +239,7 @@ sel_err2=0
 sel_total=0
 qp=None
 add_c_coord=[]
+sel_totalx=0
 def draw_selected_item(id_):
 	global can,sel_item,sell_items_ims
 	global dashboard,can,can2,can3,can4
@@ -188,6 +248,7 @@ def draw_selected_item(id_):
 	global add_c_coord
 	global sel_err1,sel_err2,sel_total
 	global sel_item_ent_d
+	global sel_totalx
 
 	f=font.Font(family="FreeMono",size=13)
 
@@ -272,12 +333,12 @@ def draw_selected_item(id_):
 
 
 
-	can.create_text(x1+((x2-270)-x1)/2,y1+15,text=name,font=("FreeMono",13),fill="#0000ff",anchor="c")
+	can.create_text(x1+((x2-270)-x1)/2,y1+20,text=format_text(name,(x2-270)-x1-20),font=("FreeMono",13),fill="#0000ff",anchor="c")
 
 	can.create_line(x2-270, y1+10, x2-270,y2-10,fill="#000000")
 	
 
-	x1_,y1_,x2_,y2_=x1+10,y1+30,x2-270-10,y2-50
+	x1_,y1_,x2_,y2_=x1+10,y1+40,x2-270-10,y2-50
 
 	#can.create_rectangle(x1_,y1_,x2_,y2_, outline="#aaaaaa")
 
@@ -317,17 +378,17 @@ def draw_selected_item(id_):
 	else:
 		can.create_text(x1_+(x2_-x1_)/2,y1_+(y2_-y1_)/2,text="No Image",font=("FreeMono",13),fill="#000000",anchor="c")
 
-	can.create_text(x1+((x2-270)-x1)/2,y2-25,text=desc,fill="#000000",font=("FreeMono",13),anchor="c")
+	can.create_text(x1+((x2-270)-x1)/2,y2-25,text=format_text(desc.replace("\n",""),(x2-270)-x1-20),fill="#000000",font=("FreeMono",13),anchor="c")
 
 
 
 
 	can.create_text(x2-270+10,y1+30+30, text="Selling Price", font=("FreeMono",13),fill="#000000",anchor="w")
-	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30,text=f"Ksh.{sp}", font=("FreeMono",13),fill="#ff0000",anchor="w")
+	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30,text=f"Ksh.{formart_number(sp,((x2-10)-(x2-270+10+f.measure("Selling Price")+30)),1)}", font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
 	can.create_text(x2-270+10,y1+30+30+40, text="Items Left", font=("FreeMono",13),fill="#000000",anchor="w")
-	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30+40,text=str(qt), font=("FreeMono",13),fill="#ff0000",anchor="w")
+	can.create_text(x2-270+10+f.measure("Selling Price")+30,y1+30+30+40,text=str(formart_number(qt,((x2-10)-(x2-270+10+f.measure("Selling Price")+30)))), font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
 	yy1=y1+30+30+40
@@ -396,8 +457,9 @@ def draw_selected_item(id_):
 	can.create_text(x2-270+10,y2-10-30-10-30, text="Total", font=("FreeMono",13),fill="#000000",anchor="w")
 
 
-	sel_total=can.create_text(x2-10,y2-10-30-10-30, text=f"Ksh.{int(ent1.get())*int(ent2.get())}", font=("FreeMono",13),fill="#ff0000",anchor="e")
+	sel_total=can.create_text(x2-10,y2-10-30-10-30, text=f"Ksh.{formart_number(int(ent1.get())*int(ent2.get()),((x2-10)-(x2-270+10+f.measure("Total")+30)),1)}", font=("FreeMono",13),fill="#ff0000",anchor="e")
 
+	sel_totalx=((x2-10)-(x2-270+10+f.measure("Total")+30))
 
 
 	v+=1
@@ -474,7 +536,7 @@ def man_items_save():
 
 
 
-	desc=text1.get("1.0",tk.END).replace("\n"," ")
+	desc=text1.get("1.0",tk.END)
 
 	db_items=database.connect("data/items.db")
 	cur=db_items.cursor()
@@ -538,6 +600,10 @@ def draw_manage_item(id_,con):
 	global can,dashboard
 	global man_items_ims,man_items_coords
 	global qp
+	global save_im,delete2,reset_im
+	global man_item_crop_v
+	global man_item_crop_coord_norm
+
 
 
 	f=font.Font(family="FreeMono",size=13)
@@ -777,7 +843,7 @@ def draw_manage_item(id_,con):
 	can.create_image(x1,y1,image=man_items_ims[v],anchor="nw")
 
 
-	can.create_rectangle(x1+15,y1+15, x2-15,y2-15,outline="#aaaaaa")
+	
 
 	man_items_coords["imagep"]=[x1+15,y1+15, x2-15,y2-15]
 
@@ -788,7 +854,31 @@ def draw_manage_item(id_,con):
 
 	can.create_image(x2-25,y2+5,image=delete,anchor="nw")
 	man_items_coords["delete"]=[x2-25,y2+5]
-	can.create_image(x2-25-10-25,y2+5,image=crop2,anchor="nw")
+
+
+
+	if man_item_crop_v[0]==False:
+	
+
+		can.create_image(x2-25-10-25,y2+5,image=crop2,anchor="nw")
+
+	elif man_item_crop_v[0]==True:
+
+		if len(man_item_crop_v[1])>0:
+
+			if len(man_item_crop_v[1][-1])==2:
+
+				x_,y_=man_item_crop_coord_norm
+
+				x_+=x
+				y_+=y
+				man_item_crop_v[1][-1]=[x_,y_]
+
+
+
+		can.create_image(x2-25-10-25,y2+5,image=crop1,anchor="nw")
+
+
 	man_items_coords["crop"]=[x2-25-10-25,y2+5]
 	can.create_image(x2-25-10-25-10-25,y2+5,image=refresh,anchor="nw")
 	man_items_coords["refresh"]=[x2-25-10-25-10-25,y2+5]
@@ -801,10 +891,14 @@ def draw_manage_item(id_,con):
 
 
 			man_items_ims["image"]=Image.open(f"data/images/{im_}")
+			man_items_ims["_image_"]=man_items_ims["image"]
 
 		else:
 
 			man_items_ims["image"]=0
+
+
+		man_item_crop_v=[False,[]]
 
 
 	if not man_items_ims["image"]==0:
@@ -818,7 +912,7 @@ def draw_manage_item(id_,con):
 
 		v+=1
 
-		cx,cy=x1+(x2-x1)/2,y1+(y2-y1)/2
+		cx,cy=x1+(x2-x1)/2,y1+(y2-y1-80-20-15)/2+40
 
 		x1,y1,x2,y2=cx-40,cy-40, cx+40,cy+40,
 
@@ -832,6 +926,9 @@ def draw_manage_item(id_,con):
 		can.create_text(cx,cy+40+20,text="Add Image", font=("FreeMono",13),fill="#000000",anchor="c")
 
 		man_items_coords["add_image"]=[cx,cy]
+
+
+	can.create_rectangle(man_items_coords["imagep"],outline="#aaaaaa")
 
 
 
@@ -848,7 +945,11 @@ def draw_manage_item(id_,con):
 	man_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=man_items_ims[v],anchor="nw")
 
-	can.create_text(x1+(x2-x1)/2, y+yy-10-15-20, text="Reset", font=("FreeMono",13),fill="#ffffff",anchor="c")
+	_x=x1+((x2-x1)-(20+10+f.measure("Reset")))/2
+
+	can.create_image(_x,y+yy-10-15-20-10,image=reset_im,anchor="nw")
+
+	can.create_text(_x+20+10, y+yy-10-15-20, text="Reset", font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 	man_items_coords["reset"]=[x1,y1,x2,y2]
 
@@ -861,7 +962,12 @@ def draw_manage_item(id_,con):
 	man_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=man_items_ims[v],anchor="nw")
 
-	can.create_text(x1+(x2-x1)/2, y+yy-10-15-20, text="Delete", font=("FreeMono",13),fill="#ffffff",anchor="c")
+	_x=x1+((x2-x1)-(20+10+f.measure("Delete")))/2
+
+	can.create_image(_x,y+yy-10-15-20-10,image=delete2,anchor="nw")
+
+
+	can.create_text(_x+20+10, y+yy-10-15-20, text="Delete", font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 	man_items_coords["_delete_"]=[x1,y1,x2,y2]
 
@@ -875,7 +981,12 @@ def draw_manage_item(id_,con):
 	man_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=man_items_ims[v],anchor="nw")
 
-	can.create_text(x1+(x2-x1)/2, y+yy-10-15-20, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+	_x=x1+((x2-x1)-(20+10+f.measure("Save")))/2
+
+	can.create_image(_x,y+yy-10-15-20-10,image=save_im,anchor="nw")
+
+	can.create_text(_x+20+10, y+yy-10-15-20, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 	man_items_coords["save"]=[x1,y1,x2,y2]
 
@@ -902,10 +1013,14 @@ search_val=""
 search_coords=[]
 
 man_reset_st=False
+add_item_crop_v=[False,[]]
+add_item_crop_coord_norm=[]
+man_item_crop_v=[False,[]]
+man_item_crop_coord_norm=[]
 def main(con=0):
 
 	global st,st_
-	global can,can2,can3
+	global can,can2,can3,can4
 	global add_items_ims
 	global dashboard
 	global ent1,ent2,ent3,ent4,ent_search,text1
@@ -932,8 +1047,15 @@ def main(con=0):
 	global man_items_ims
 	global man_item
 	global man_reset_st
+	global sel_sb
+	global add_item_crop_v,man_item_crop_v
+	global add_item_crop_coord_norm,man_item_crop_coord_norm
 
 	st_="main"
+
+	if con==0:
+
+		sel_sb=None
 
 	f=font.Font(family="FreeMono",size=13)
 
@@ -1008,6 +1130,8 @@ def main(con=0):
 					}			
 
 		_scroll_["can"]=dict_
+
+		sel_sb=["can","vertical"]
 
 
 		can.place(in_=root,x=0,y=40)
@@ -1256,9 +1380,9 @@ def main(con=0):
 
 
 
-			can.create_text(x1+10,y2-25-25-25, text=f"{row[1]}",font=("FreeMono",13),fill="#0000ff",anchor="w")
-			can.create_text(x1+10,y2-25-25, text=f"Ksh.{row[3]}",font=("FreeMono",13),fill="#000000",anchor="w")
-			can.create_text(x1+10,y2-25, text=f"{row[4]} items left",font=("FreeMono",13),fill="#000000",anchor="w")
+			can.create_text(x1+10,y2-25-25-25, text=format_text(f"{row[1]}",x2-x1-20),font=("FreeMono",13),fill="#0000ff",anchor="w")
+			can.create_text(x1+10,y2-25-25, text=f"Ksh.{formart_number(row[3],x2-x1-20,1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+			can.create_text(x1+10,y2-25, text=f"{formart_number(row[4],x2-x1-20)} items left",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
 			v+=1
@@ -1330,7 +1454,7 @@ def main(con=0):
 
 		x1,y1,x2,y2=10+5,5,int(can3["width"])-5,int(can3["height"])-5
 
-		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#00fffff",alpha=1,width=1)
+		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#eeeeee",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
@@ -1438,9 +1562,9 @@ def main(con=0):
 			else:
 				q="Units"
 			can4.create_text(5,y+15+30+10,text=q,font=("FreeMono",13),fill="#000000",anchor="w")
-			can4.create_text(5+f.measure("Total")+20,y+15+30+10,text=str(quantity),font=("FreeMono",13),fill="#ff0000",anchor="w")
+			can4.create_text(5+f.measure("Total")+20,y+15+30+10,text=str(formart_number(quantity,(int(can4["width"]))-(5+f.measure("Total")+20))),font=("FreeMono",13),fill="#ff0000",anchor="w")
 			can4.create_text(5,y+15+30+10+30,text="Total",font=("FreeMono",13),fill="#000000",anchor="w")
-			can4.create_text(5+f.measure("Total")+20,y+15+30+10+30,text=f"Ksh.{int(sold_at)*int(quantity)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+			can4.create_text(5+f.measure("Total")+20,y+15+30+10+30,text=f"Ksh.{formart_number(int(sold_at)*int(quantity),(int(can4["width"]))-(5+f.measure("Total")+20),1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
 	
 			y+=15+30+10+30+20
 
@@ -1520,13 +1644,13 @@ def main(con=0):
 			i="Items"
 
 		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2-30*2, text=i, font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30*2, text=str(no_items), font=("FreeMono",13),fill="#ff0000",anchor="e")		
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30*2, text=str(formart_number(no_items,(int(can3["width"])-10-5)-(10+5+10+f.measure("Sub Total")))), font=("FreeMono",13),fill="#ff0000",anchor="e")		
 
 		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2-30, text="Discount", font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30, text=f"Ksh.{discount}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2-30, text=f"Ksh.{formart_number(discount,(int(can3["width"])-10-5)-(10+5+10+f.measure("Sub Total")),1)}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
 
 		can3.create_text(10+5+10, int(can3["height"])-10-30-(10+30)*2, text="Sub Total", font=("FreeMono",13),fill="#000000",anchor="w")
-		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2, text=f"Ksh.{total}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
+		can3.create_text(int(can3["width"])-10-5, int(can3["height"])-10-30-(10+30)*2, text=f"Ksh.{formart_number(total,(int(can3["width"])-10-5)-(10+5+10+f.measure("Sub Total")),1)}", font=("FreeMono",13),fill="#ff0000",anchor="e")		
 
 
 
@@ -1659,6 +1783,8 @@ def main(con=0):
 					}			
 
 		_scroll_["can"]=dict_
+
+		sel_sb=["can","vertical"]
 
 
 		can.place(in_=root,x=0,y=40)
@@ -1889,9 +2015,9 @@ def main(con=0):
 
 
 
-			can.create_text(x1+10,y2-25-25-25, text=f"{row[1]}",font=("FreeMono",13),fill="#0000ff",anchor="w")
-			can.create_text(x1+10,y2-25-25, text=f"Ksh.{row[3]}",font=("FreeMono",13),fill="#000000",anchor="w")
-			can.create_text(x1+10,y2-25, text=f"{row[4]} items left",font=("FreeMono",13),fill="#000000",anchor="w")
+			can.create_text(x1+10,y2-25-25-25, text=f"{format_text(row[1],x2-x1-20)}",font=("FreeMono",13),fill="#0000ff",anchor="w")
+			can.create_text(x1+10,y2-25-25, text=f"Ksh.{formart_number(row[3],x2-x1-20,1)}",font=("FreeMono",13),fill="#000000",anchor="w")
+			can.create_text(x1+10,y2-25, text=f"{formart_number(row[4],x2-x1-20)} items left",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
 			v+=1
@@ -2166,7 +2292,7 @@ def main(con=0):
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
 
-		can.create_rectangle(x1+15,y1+15, x2-15,y2-15,outline="#aaaaaa")
+		
 
 		add_items_coords["imagep"]=[x1+15,y1+15, x2-15,y2-15]
 
@@ -2177,7 +2303,27 @@ def main(con=0):
 
 		can.create_image(x2-25,y2+5,image=delete,anchor="nw")
 		add_items_coords["delete"]=[x2-25,y2+5]
-		can.create_image(x2-25-10-25,y2+5,image=crop2,anchor="nw")
+
+		if add_item_crop_v[0]==False:
+			can.create_image(x2-25-10-25,y2+5,image=crop2,anchor="nw")
+		elif add_item_crop_v[0]==True:
+
+
+
+			if len(add_item_crop_v[1])>0:
+
+				if len(add_item_crop_v[1][-1])==2:
+
+					x_,y_=add_item_crop_coord_norm
+
+					x_+=x
+					y_+=y
+					add_item_crop_v[1][-1]=[x_,y_]
+
+
+
+			can.create_image(x2-25-10-25,y2+5,image=crop1,anchor="nw")
+
 		add_items_coords["crop"]=[x2-25-10-25,y2+5]
 		can.create_image(x2-25-10-25-10-25,y2+5,image=refresh,anchor="nw")
 		add_items_coords["refresh"]=[x2-25-10-25-10-25,y2+5]
@@ -2191,6 +2337,8 @@ def main(con=0):
 		if con==0:
 			add_items_ims["image"]=0
 
+			add_item_crop_v=[False,[]]
+
 
 		if not add_items_ims["image"]==0:
 
@@ -2203,7 +2351,7 @@ def main(con=0):
 
 			v+=1
 
-			cx,cy=x1+(x2-x1)/2,y1+(y2-y1)/2
+			cx,cy=x1+(x2-x1)/2,y1+(y2-y1-80-20-15)/2+40
 
 			x1,y1,x2,y2=cx-40,cy-40, cx+40,cy+40,
 
@@ -2218,7 +2366,7 @@ def main(con=0):
 
 			add_items_coords["add_image"]=[cx,cy]
 
-
+		can.create_rectangle(add_items_coords["imagep"],outline="#aaaaaa")
 
 
 		v+=1
@@ -2438,8 +2586,9 @@ def draw_h_sb(widget):
 
 
 def can_b1_sb(widget,_x_,_y_):
-
     global _scroll_
+    global sel_sb
+    global can3
 
 
 
@@ -2451,7 +2600,8 @@ def can_b1_sb(widget,_x_,_y_):
     if _scroll_[widget]["sb_st"]=="vertical" or _scroll_[widget]["sb_st"]=="both":
 
 
-	    
+	    can3.focus_set()
+
 	    x1=_scroll_[widget]["v_sb_coord"][0][2]
 	    y1=_scroll_[widget]["v_sb_coord"][0][0]
 
@@ -2462,13 +2612,20 @@ def can_b1_sb(widget,_x_,_y_):
 
 
 
+
+
 	    
 
 	    if x1<=_x_<=x2:
 
 	        if y1<=_y_<=y2:
-
+	            sel_sb=[widget,"vertical"]	   
+	            can3.focus_set()
+	            print(sel_sb)
 	            _scroll_[widget]["v_drag_st"]=1
+
+
+
 
 
 	            y=_y_-_scroll_[widget]["v_sb_coord"][0][0]
@@ -2486,15 +2643,18 @@ def can_b1_sb(widget,_x_,_y_):
 	            draw_v_sb(widget)
 
 	            return
+    	
 
+    	
 
     #horizontal
 
     if _scroll_[widget]["sb_st"]=="horizontal" or _scroll_[widget]["sb_st"]=="both":
 
+	    
+	    
+
 	    var=draw_h_sb(widget)
-
-
 
 	    x1=_scroll_[widget]["h_sb_coord"][0][0]
 	    y1=_scroll_[widget]["h_sb_coord"][0][2]
@@ -2505,7 +2665,12 @@ def can_b1_sb(widget,_x_,_y_):
 
 	        if y1<=_y_<=y2:
 
+
+	            sel_sb=[widget,"horizontal"]
+	            can3.focus_set()
+	            print(sel_sb)
 	            _scroll_[widget]["h_drag_st"]=1
+
 
 	            x=_x_-_scroll_[widget]["h_sb_coord"][0][0]
 
@@ -2681,6 +2846,8 @@ def process_add_item_im(im):
 
 	im=im.resize((x_,y_))
 
+	x,y=im.size
+
 	add_items_ims["image_"]=ImageTk.PhotoImage(im)
 
 	can.delete(add_item_im)
@@ -2689,6 +2856,8 @@ def process_add_item_im(im):
 	__y=((y2-y1)-y_)/2
 
 	add_item_im=can.create_image(x1+__x,y1+__y,image=add_items_ims["image_"],anchor="nw")
+
+	add_items_coords["imagep_"]=[x1+__x,y1+__y,x1+__x+x,y1+__y+y]
 
 
 man_item_im=0
@@ -2720,6 +2889,8 @@ def process_man_item_im(im):
 
 	im=im.resize((x_,y_))
 
+	x,y=im.size
+
 	man_items_ims["image_"]=ImageTk.PhotoImage(im)
 
 	can.delete(man_item_im)
@@ -2728,6 +2899,8 @@ def process_man_item_im(im):
 	__y=((y2-y1)-y_)/2
 
 	man_item_im=can.create_image(x1+__x,y1+__y,image=man_items_ims["image_"],anchor="nw")
+
+	man_items_coords["imagep_"]=[x1+__x,y1+__y,x1+__x+x,y1+__y+y]
 
 
 
@@ -2763,6 +2936,11 @@ mpesa_logo=0
 search=0
 no_profile_im=0
 no_record=0
+
+
+save_im=0
+delete2=0
+reset_im=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -2779,6 +2957,7 @@ def load_im():
 	global search
 	global no_profile_im
 	global no_record
+	global save_im,delete2,reset_im
 
 
 	#db
@@ -2945,7 +3124,26 @@ def load_im():
 	#no_record
 	no_record=Image.open("data/icons/no_record.png")
 
-db_items=[]
+
+	#save
+
+	im=Image.open("data/icons/save.png")
+	im=im.resize((20,20))
+	save_im=ImageTk.PhotoImage(im)
+
+	#delete2
+
+	im=Image.open("data/icons/delete2.png")
+	im=im.resize((20,20))
+	delete2=ImageTk.PhotoImage(im)
+
+	#reset
+
+	im=Image.open("data/icons/reset.png")
+	im=im.resize((20,20))
+	reset_im=ImageTk.PhotoImage(im)
+
+db_items_=[]
 def draw_db():
 	global dashboard
 	global db
@@ -2954,7 +3152,7 @@ def draw_db():
 	global log_out_im
 	global width,height
 	global st
-	global db_items
+	global db_items_
 
 
 	dashboard["width"]=200
@@ -2980,22 +3178,22 @@ def draw_db():
 
 		if st==i[0]:
 
-			dashboard.create_rectangle(0,y, int(dashboard["width"]),y+40, fill="#ffffff",outline="#ffffff")
+			dashboard.create_rectangle(0,y, int(dashboard["width"]),y+50, fill="#ffffff",outline="#ffffff")
 
-			dashboard.create_text(10,y+20,text=i[0],font=("FreeMono",13),fill="#000000",anchor="w")
+			dashboard.create_text(10,y+25,text=i[0],font=("FreeMono",13),fill="#000000",anchor="w")
 
-			dashboard.create_image(int(dashboard["width"])-5-25,y+7.5, image=i[2],anchor="nw")
+			dashboard.create_image(int(dashboard["width"])-5-25,y+12.5, image=i[2],anchor="nw")
  
 		else:
 
 
-			dashboard.create_text(10,y+20,text=i[0],font=("FreeMono",13),fill="#ffffff",anchor="w")
+			dashboard.create_text(10,y+25,text=i[0],font=("FreeMono",13),fill="#ffffff",anchor="w")
 
-			dashboard.create_image(int(dashboard["width"])-5-25,y+7.5, image=i[1],anchor="nw")
+			dashboard.create_image(int(dashboard["width"])-5-25,y+12.5, image=i[1],anchor="nw")
 
-		db_items.append([i[0],y])
+		db_items_.append([i[0],y])
 
-		y+=40
+		y+=50
 
 
 
@@ -3606,7 +3804,7 @@ def message(con,_can_,mess,cx,cy,w,h):
 
 	if con==0:
 		col="#ff0000"
-		col2="#000000"
+		col2="#ffffff"
 	elif con==1:
 		col="#00ff00"
 		col2="#000000"
@@ -3616,7 +3814,7 @@ def message(con,_can_,mess,cx,cy,w,h):
 
 
 
-	im=draw_round_rect(15,x1,y1,x2,y2, col,col2=col,alpha=1,width=1)
+	im=draw_round_rect(15,x1,y1,x2,y2, "#000000",col2=col,alpha=1,width=1)
 	mess_v[0]=ImageTk.PhotoImage(im)
 	mess_v[1]=_can_.create_image(cx,cy,image=mess_v[0],anchor="c")
 	mess_v[2]=_can_.create_text(cx,cy,text=mess,font=("FreeMono",13),fill=col2)
@@ -3659,7 +3857,12 @@ def can_b1(e):
 	global cart_ar
 	global search_focus
 	global man_reset_st
+	global sel_sb
+	global add_item_crop_v,add_item_crop_coord_norm
+	global man_item_crop_v,man_item_crop_coord_norm
 
+
+	#sel_sb=None
 
 	if st_=="main" and search_focus==True:
 
@@ -3901,6 +4104,13 @@ def can_b1(e):
 
 				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
 
+				db_items=database.connect("data/items.db")
+				cur=db_items.cursor()
+
+				cur.execute(f"SELECT * FROM items WHERE item_id={sel_item}")
+
+				sp=float(cur.fetchall()[0][3])
+
 				if r<=15:
 
 					try:
@@ -3910,6 +4120,11 @@ def can_b1(e):
 					except:
 
 						message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+					if int(ent1.get())>sp:
+						message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
 
 						return
 
@@ -3942,6 +4157,12 @@ def can_b1(e):
 
 						return
 
+					if int(ent1.get())>sp:
+						message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
 
 					cart_ar.append([sel_item,ent1.get(),ent2.get()])
 
@@ -3966,6 +4187,11 @@ def can_b1(e):
 						except:
 
 							message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+						if int(ent1.get())>sp:
+							message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
 
 							return
 
@@ -4011,6 +4237,9 @@ def can_b1(e):
 						man_item=None
 						qp=None
 
+						man_item_crop_v=[False,[]]
+
+
 						main(1)
 
 						return
@@ -4030,14 +4259,14 @@ def can_b1(e):
 				x1,y1,x2,y2=man_items_coords["item name"]
 
 				if x1<=e.x<=x2:
-					if y1<=e.y<=y2:
+					if y1<=can.canvasy(e.y)<=y2:
 						ent1.focus_set()
 						return
 
 				x1,y1,x2,y2=man_items_coords["bp"]
 
 				if x1<=e.x<=x2:
-					if y2<=e.y<=y2:
+					if y2<=can.canvasy(e.y)<=y2:
 						ent2.focus_set()
 						return
 
@@ -4045,21 +4274,21 @@ def can_b1(e):
 				x1,y1,x2,y2=man_items_coords["sp"]
 
 				if x1<=e.x<=x2:
-					if y1<=e.y<=y2:
+					if y1<=can.canvasy(e.y)<=y2:
 						ent3.focus_set()
 						return
 
 				x1,y1,x2,y2=man_items_coords["q"]
 
 				if x1<=e.x<=x2:
-					if y1<=e.y<=y2:
+					if y1<=can.canvasy(e.y)<=y2:
 						ent4.focus_set()
 						return
 
 				x1,y1,x2,y2=man_items_coords["desc"]
 
 				if x1<=e.x<=x2:
-					if y1<=e.y<=y2:
+					if y1<=can.canvasy(e.y)<=y2:
 						text1.focus_set()
 						return
 
@@ -4068,11 +4297,14 @@ def can_b1(e):
 
 					cx,cy=man_items_coords["add_image"]
 
-					r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+					r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
 
 					if r<=40:
 
 						file=filedialog.askopenfilename()
+
+						if file=="":
+							return
 						
 
 
@@ -4083,6 +4315,7 @@ def can_b1(e):
 							im=Image.open(file)
 
 							man_items_ims["image"]=im
+							man_items_ims["_image_"]=im
 
 							main(1)
 
@@ -4095,7 +4328,7 @@ def can_b1(e):
 				x1,y1=man_items_coords["delete"]
 
 				if x1<=e.x<=x1+25:
-					if y1<=e.y<=y1+25:
+					if y1<=can.canvasy(e.y)<=y1+25:
 
 						man_items_ims["image"]=0
 
@@ -4240,6 +4473,122 @@ def can_b1(e):
 						message(res[0],can,res[1],x+xx/2,y+yy+10+15,350,30)
 						return
 
+				x1,y1=man_items_coords["delete"]
+
+				if x1<=e.x<=x1+25:
+					if y1<=can.canvasy(e.y)<=y1+25:
+
+						man_items_ims["image"]=0
+						man_items_ims["_image_"]=0
+
+						man_item_crop_v=[False,[]]
+
+
+
+						main(1)
+
+						return
+
+				x1,y1=man_items_coords["crop"]
+
+				if x1<=e.x<=x1+25:
+					if y1<=can.canvasy(e.y)<=y1+25:
+
+
+						if man_item_crop_v[0]==True:
+
+
+							man_item_crop_v=[False,[]]
+
+						else:
+
+
+
+							if man_items_ims["image"]!=0:
+
+								man_item_crop_v=[True,[]]
+
+						
+
+
+						main(1)
+
+						return
+
+
+				x1,y1=man_items_coords["refresh"]
+
+				if x1<=e.x<=x1+25:
+					if y1<=can.canvasy(e.y)<=y1+25:
+
+						man_item_crop_v=[False,[]]
+
+						if man_items_ims["image"]!=0:
+
+							man_items_ims["image"]=man_items_ims["_image_"]
+
+
+
+						main(1)
+
+						return
+
+
+
+
+				if man_item_crop_v[0]==True:
+
+					_x_,_y_=e.x,can.canvasy(e.y)
+
+					x1,y1,x2,y2=man_items_coords["imagep_"]
+
+
+					if x1<=_x_<=x2:
+						if y1<=_y_<=y2:
+
+
+							if len(man_item_crop_v[1])==0:
+
+
+								man_item_crop_v[1].append([_x_,_y_])
+
+								man_item_crop_coord_norm=[_x_-x,_y_-y]
+
+
+
+							else:
+
+								if len(man_item_crop_v[1][-1])==2:
+
+									man_item_crop_v[1][-1].append(_x_)
+									man_item_crop_v[1][-1].append(_y_)
+
+
+									x1_,y1_,x2_,y2_=man_item_crop_v[1][-1]
+
+									_x,_y=man_items_ims["image"].size
+
+									x_1=int(round((x1_-x1)*_x/(x2-x1),0))
+									x_2=int(round((x2_-x1)*_x/(x2-x1),0))
+
+									y_1=int(round((y1_-y1)*_y/(y2-y1),0))
+									y_2=int(round((y2_-y1)*_y/(y2-y1),0))
+
+
+									man_items_ims["image"]=man_items_ims["image"].crop((x_1,y_1,x_2,y_2))
+
+									man_item_crop_v[0]=False
+
+									main(1)
+
+
+
+
+								elif len(man_item_crop_v[1][-1])==4:
+
+									man_item_crop_v[1].append([_x_,_y_])
+
+									man_item_crop_coord_norm=[_x_-x,_y_-y]
 
 
 
@@ -4310,11 +4659,14 @@ def can_b1(e):
 
 
 
+					if file=="":
+						return
 
 
 					try:
 						im=Image.open(file)
 
+						add_items_ims["_image_"]=im
 						add_items_ims["image"]=im
 
 						main(1)
@@ -4333,11 +4685,58 @@ def can_b1(e):
 				if y1<=e.y<=y1+25:
 
 					add_items_ims["image"]=0
+					add_items_ims["_image_"]=0
+
+					add_item_crop_v=[False,[]]
+
 
 
 					main(1)
 
 					return
+
+			x1,y1=add_items_coords["crop"]
+
+			if x1<=e.x<=x1+25:
+				if y1<=e.y<=y1+25:
+
+					if add_item_crop_v[0]==True:
+
+
+						add_item_crop_v=[False,[]]
+
+					else:
+
+
+						if add_items_ims["image"]!=0:
+
+							add_item_crop_v=[True,[]]
+
+					
+
+
+					main(1)
+
+					return
+
+
+			x1,y1=add_items_coords["refresh"]
+
+			if x1<=e.x<=x1+25:
+				if y1<=e.y<=y1+25:
+
+					add_item_crop_v=[False,[]]
+
+					if add_items_ims["image"]!=0:
+
+						add_items_ims["image"]=add_items_ims["_image_"]
+
+
+
+					main(1)
+
+					return
+
 
 
 			x1,y1,x2,y2=add_items_coords["save"]
@@ -4364,6 +4763,67 @@ def can_b1(e):
 				if y1<=e.y<=y2:
 					add_new_item()
 					return
+
+
+
+
+			if add_item_crop_v[0]==True:
+
+				_x_,_y_=e.x,can.canvasy(e.y)
+
+				x1,y1,x2,y2=add_items_coords["imagep_"]
+
+
+				if x1<=_x_<=x2:
+					if y1<=_y_<=y2:
+
+
+						if len(add_item_crop_v[1])==0:
+
+
+							add_item_crop_v[1].append([_x_,_y_])
+
+							add_item_crop_coord_norm=[_x_-x,_y_-y]
+
+
+
+						else:
+
+							if len(add_item_crop_v[1][-1])==2:
+
+								add_item_crop_v[1][-1].append(_x_)
+								add_item_crop_v[1][-1].append(_y_)
+
+
+								x1_,y1_,x2_,y2_=add_item_crop_v[1][-1]
+
+								_x,_y=add_items_ims["image"].size
+
+								x_1=int(round((x1_-x1)*_x/(x2-x1),0))
+								x_2=int(round((x2_-x1)*_x/(x2-x1),0))
+
+								y_1=int(round((y1_-y1)*_y/(y2-y1),0))
+								y_2=int(round((y2_-y1)*_y/(y2-y1),0))
+
+
+								add_items_ims["image"]=add_items_ims["image"].crop((x_1,y_1,x_2,y_2))
+
+								add_item_crop_v[0]=False
+
+								main(1)
+
+
+
+
+							elif len(add_item_crop_v[1][-1])==4:
+
+								add_item_crop_v[1].append([_x_,_y_])
+
+								add_item_crop_coord_norm=[_x_-x,_y_-y]
+
+
+
+
 
 
 
@@ -4496,11 +4956,68 @@ def add_new_item():
 	message(1,can,"Item added successfullly!",x+xx/2,y+yy+10+15,350,30)
 
 
+add_items_crop_v_=0
+man_items_crop_v_=0
+def can_motion(e):
+	global st_,st
+	global add_item_crop_v,man_item_crop_v
+	global add_items_coords,man_items_coords
+	global add_items_crop_v_,man_items_crop_v_
+
+	if st_=="main":
+
+		if st=="Add Items":
+
+			if add_item_crop_v[0]==True:
+
+				x,y=e.x,can.canvasy(e.y)
+
+				x1,y1,x2,y2=add_items_coords["imagep_"]
+
+
+				if x1<=x<=x2:
+					if y1<=y<=y2:
+
+
+						if len(add_item_crop_v[1])>0:
+
+							if len(add_item_crop_v[1][-1])==2:
+
+								x1_,y1_=add_item_crop_v[1][-1]
+
+								can.delete(add_items_crop_v_)
+
+								add_items_crop_v_=can.create_rectangle(x1_,y1_, x,y,outline="#ff0000")
+
+		elif st=="Manage items":
+
+			if man_item_crop_v[0]==True:
+
+				x,y=e.x,can.canvasy(e.y)
+
+				x1,y1,x2,y2=man_items_coords["imagep_"]
+
+
+				if x1<=x<=x2:
+					if y1<=y<=y2:
+
+
+						if len(man_item_crop_v[1])>0:
+
+							if len(man_item_crop_v[1][-1])==2:
+
+								x1_,y1_=man_item_crop_v[1][-1]
+
+								can.delete(man_items_crop_v_)
+
+								man_items_crop_v_=can.create_rectangle(x1_,y1_, x,y,outline="#ff0000")
+								
+
 
 can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can.place(in_=root,x=0,y=0)
 can.bind("<Button-1>",can_b1)
-
+can.bind("<Motion>",can_motion)
 
 def can2_b1(e):
 	global search_coords
@@ -4508,6 +5025,9 @@ def can2_b1(e):
 	global sel_item
 	global search_val
 	global st_,st
+	global sel_sb
+
+	#sel_sb=None
 
 	if sel_item==None and st_=="main":
 
@@ -4586,6 +5106,7 @@ def can2_b1(e):
 
 can2=tk.Canvas(width=width,height=40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can2.bind("<Button-1>",can2_b1)
+
 def can3_b1(e):
 	global sel_item
 	global man_item
@@ -4594,6 +5115,9 @@ def can3_b1(e):
 	global can,dashboard
 	global search_focus
 	global st_,st
+	global sel_sb
+
+	#sel_sb=None
 
 	if st_=="main" and search_focus==True:
 
@@ -4607,6 +5131,8 @@ def can3_b1(e):
 
 
 	if sel_item==None and man_item==None:
+
+		
 
 		can_b1_sb("can",e.x,e.y)
 		can_b1_sb("cart",e.x,e.y)
@@ -4689,24 +5215,93 @@ def can3_b1_release(e):
 	can3_b1_sb_release("can")
 	can3_b1_sb_release("cart")
 
+
+
+sel_sb=None
+def scroll(e):
+	global _scroll_
+	global sel_sb
+	global sel_item,man_item
+
+
+
+	if sel_item==None and man_item==None:
+
+
+
+
+
+		if not sel_sb==None:
+
+
+			if sel_sb[1]=="vertical":
+
+
+				var=-int(e.delta/120)
+
+
+				_scroll_[sel_sb[0]]["widget"].yview_scroll(var,"units")
+
+				h=_scroll_[sel_sb[0]]["_y"]
+
+				y=_scroll_[sel_sb[0]]["widget"].canvasy(0)
+
+
+				_scroll_[sel_sb[0]]["v_sb_coord"][-1]=y/h
+
+
+				draw_v_sb(sel_sb[0])
+
+			elif sel_sb[1]=="horizontal":
+
+				
+				var=-int(e.delta/120)
+
+
+				_scroll_[sel_sb[0]]["widget"].xview_scroll(var,"units")
+
+				w=_scroll_[sel_sb[0]]["_x2"]
+
+				x=_scroll_[sel_sb[0]]["widget"].canvasx(0)
+
+
+				_scroll_[sel_sb[0]]["h_sb_coord"][-1]=x/w
+
+
+				draw_h_sb(sel_sb[0])
+
+
+
+
+
 can3=tk.Canvas(width=400,height=height-40,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can3.bind("<Button-1>",can3_b1)
 can3.bind("<B1-Motion>",can3_b1_motion)
 can3.bind("<ButtonRelease-1>",can3_b1_release)
-
+can3.bind_all("<MouseWheel>",scroll)
 
 
 can["scrollregion"]=(0,0,width,height)
 
 
-can4=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+def can4_b1(e):
+	global sel_sb
 
+	#sel_sb=None
+
+
+
+	pass
+
+
+can4=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+can4.bind("<Button-1>",can4_b1)
 
 db_st=0
 def dashboard_b1(e):
 	global dashboard
 	global db_st
-	global db_items
+	global db_items_
 	global st
 	global search_val
 	global cart_ar
@@ -4726,7 +5321,7 @@ def dashboard_b1(e):
 
 	#select db
 
-	for i in db_items:
+	for i in db_items_:
 
 		if i[1]<=e.y<=i[1]+50:
 
@@ -4752,7 +5347,9 @@ def dashboard_b1(e):
 def move_db():
 	global dashboard
 	global db_st
+	global sel_sb
 
+	#sel_sb=None
 
 	if not db_st==0:
 
@@ -4769,11 +5366,16 @@ def move_db():
 
 				main(1)
 
+
+
+
 			else:
 
 				x+=1
 
 				dashboard.place(in_=root,x=x,y=0)
+
+
 
 
 
@@ -4790,12 +5392,20 @@ def move_db():
 
 				db_st=0
 				main(1)
+
+
+
+
+
+
+
 			else:
 
 				x-=1
 
 
 				dashboard.place(in_=root,x=x,y=0)
+
 
 
 
@@ -4885,6 +5495,18 @@ text1=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat"
 t_widgets={"entries":[ent1,ent2,ent3,ent4,ent_search],
 			"text":[text1],
 			"canvas":[dashboard,can,can2,can3,can4]}
+
+
+
+
+
+
+
+
+
+
+
+
 
 load_im()
 
