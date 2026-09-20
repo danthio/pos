@@ -19,7 +19,7 @@ add_items_coords={}
 add_item_im=0
 
 #+254769167904
-
+"""
 
 
 db_reports=database.connect("data/reports.db")
@@ -34,7 +34,7 @@ rows=cur.fetchall()
 for row in rows:
 	print(row)
 
-
+"""
 def formart_number(no,x,con=0):
 
 	f=font.Font(family="FreeMono",size=13)
@@ -1048,14 +1048,19 @@ def complete_payment():
 
 		date_time=datetime.datetime.now()
 
-		db_items=database.connect("data/items.db")
-		cur=db_items.cursor()
 
 
 
 		for i in cart_ar:
 
+
+
+
 			id_,sold_at,quantity=i
+
+			db_items=database.connect("data/items.db")
+			cur=db_items.cursor()
+
 
 			cur.execute("SELECT * FROM items WHERE item_id="+str(id_)+"")
 
@@ -1063,6 +1068,7 @@ def complete_payment():
 
 			name=row[1]
 			sp=row[3]
+			q=row[4]
 
 
 
@@ -1073,11 +1079,19 @@ def complete_payment():
 
 			db_reports.commit()
 
+
+			cur.execute(f"UPDATE items SET quantity={int(q)-int(quantity)} WHERE item_id={id_}")
+			db_items.commit()
+
+
+
 		con=1
 
 
 
-	except:
+	except Exception as e:
+
+		print(e)
 		pass
 
 
@@ -1183,6 +1197,7 @@ def pay_with_cash(con):
 	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
+	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
 
 
 	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
@@ -1220,6 +1235,8 @@ def pay_with_cash(con):
 
 
 	can5["scrollregion"]=(0,0,int(can5["width"]),int(can5["height"]))
+
+	can5.delete("all")
 
 	
 
@@ -1352,7 +1369,7 @@ def pay_with_cash(con):
 
 	ent1["bg"]="#ffffff"
 
-	ent1.place(in_=root,x=x1+5,y=y1+5+40)
+	ent1.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0))
 
 
 	v+=1
@@ -1413,12 +1430,12 @@ def pay_with_cash(con):
 
 
 		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=f"Ksh.{int(int(ent1.get())-_total_)}",
-			font=("FreeMono",13),fill="#00aa00",anchor="c")
+			font=("FreeMono",15),fill="#00aa00",anchor="c")
 
 	except:
 
 		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text="",
-			font=("FreeMono",13),fill="#00aa00",anchor="c")
+			font=("FreeMono",15),fill="#00aa00",anchor="c")
 
 
 	ent1.focus_set()
