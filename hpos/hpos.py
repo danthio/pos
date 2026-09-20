@@ -1067,6 +1067,7 @@ def complete_payment():
 			row=cur.fetchall()[0]
 
 			name=row[1]
+			bp=row[2]
 			sp=row[3]
 			q=row[4]
 
@@ -1075,7 +1076,7 @@ def complete_payment():
 			db_reports=database.connect("data/reports.db")
 			cur2=db_reports.cursor()
 
-			cur2.execute(f"INSERT INTO reports VALUES('{name}','{date_time}','{user_name}',{quantity},{sp},{sold_at})")
+			cur2.execute(f"INSERT INTO reports VALUES('{name}','{date_time}','{user_name}',{quantity},{bp},{sp},{sold_at})")
 
 			db_reports.commit()
 
@@ -1112,6 +1113,8 @@ bal_=0
 _total_=0
 
 sell_items_coords={}
+
+v4,h4=0,0
 def pay_with_cash(con):
 	global sell_items_ims
 	global pay_st
@@ -1121,6 +1124,7 @@ def pay_with_cash(con):
 	global cart_im
 	global bal_,_total_
 	global sell_items_coords
+	global v4,h4
 
 
 
@@ -1245,10 +1249,10 @@ def pay_with_cash(con):
 			"sb_st":"both",
 			"sb_sz":10,
 			"v_sb_coord":[(y1+15,y1+15+int(can5["height"]),x2+4,x2+4+10,0),0],
-			"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),can.canvasy(y2+4),can.canvasy(y2+4+10)),0],
+			"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),y2+4,y2+4+10),0],
 			"_y":int(can5["height"]),
-			"v":v2,
-			"h_":h2,
+			"v":v4,
+			"h_":h4,
 			"w":int(can5["width"]),
 			"h":int(can5["height"]),
 			"_x":int(can5["width"]),
@@ -1339,6 +1343,8 @@ def pay_with_cash(con):
 		can5["scrollregion"]=(0,0,int(can5["width"]),_y)
 
 		_scroll_["cart2"]["_y"]=_y
+
+
 
 
 
@@ -3076,8 +3082,6 @@ def can_b1_sb(widget,_x_,_y_):
 
 
 
-
-
 	    
 
 	    if x1<=_x_<=x2:
@@ -4331,7 +4335,7 @@ def can_b1(e):
 
 	if pay_st=="Cash":
 
-		can_b1_sb("cart2",e.x,e.y)
+		can_b1_sb("cart2",e.x,can.canvasy(e.y))
 
 
 	#sel_sb=None
@@ -5656,7 +5660,7 @@ def can_drag(e):
 
 	if pay_st=="Cash":
 
-		sb_drag("cart2",e.x,e.y)
+		sb_drag("cart2",e.x,can.canvasy(e.y))
 
 
 def can_b1_sb_release(widget):
@@ -6268,6 +6272,7 @@ try:
 		date_time VARCHAR(255),
 		sold_by VARCHAR(255),
 		quantity INT,
+		bp,INT
 		sp INT,
 		sold_at INT
 
