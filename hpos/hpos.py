@@ -10,6 +10,7 @@ import time
 from tkinter import filedialog
 
 import os
+import datetime
 
 add_items_ims={}
 
@@ -19,13 +20,13 @@ add_item_im=0
 
 #+254769167904
 
-"""
-
-db_items=database.connect("data/items.db")
-cur=db_items.cursor()
 
 
-cur.execute("SELECT * FROM items")
+db_reports=database.connect("data/reports.db")
+cur=db_reports.cursor()
+
+
+cur.execute("SELECT * FROM reports")
 rows=cur.fetchall()
 
 
@@ -33,7 +34,7 @@ rows=cur.fetchall()
 for row in rows:
 	print(row)
 
-"""
+
 def formart_number(no,x,con=0):
 
 	f=font.Font(family="FreeMono",size=13)
@@ -811,6 +812,7 @@ def draw_manage_item(id_,con):
 		ent4.insert(tk.END,qt)
 		text1.insert(tk.END,desc)
 
+
 	else:
 
 
@@ -907,6 +909,8 @@ def draw_manage_item(id_,con):
 
 		man_items_coords["add_image"]=None
 
+		can.create_rectangle(man_items_coords["imagep_"],outline="#000000")
+
 	else:
 
 
@@ -928,7 +932,7 @@ def draw_manage_item(id_,con):
 		man_items_coords["add_image"]=[cx,cy]
 
 
-	can.create_rectangle(man_items_coords["imagep"],outline="#aaaaaa")
+	
 
 
 
@@ -995,6 +999,436 @@ def draw_manage_item(id_,con):
 
 
 
+cb_v=""
+def check_balance():
+	global pay_st
+	global bal_,_total_
+	global ent1
+	global cb_v
+
+
+	if pay_st=="Cash":
+
+		if cb_v!=ent1.get():
+
+			try:
+
+				v_=int(ent1.get())
+
+
+				can.itemconfig(bal_,text=f"Ksh.{int(int(ent1.get())-_total_)}")
+
+
+
+			except:
+
+				can.itemconfig(bal_,text="")
+
+
+			cb_v=ent1.get()
+
+
+
+	root.after(1,check_balance)
+
+
+
+
+
+def complete_payment():
+
+	global cart_ar
+	global user_name
+
+
+	con=0
+
+	try:
+
+
+		date_time=datetime.datetime.now()
+
+		db_items=database.connect("data/items.db")
+		cur=db_items.cursor()
+
+
+
+		for i in cart_ar:
+
+			id_,sold_at,quantity=i
+
+			cur.execute("SELECT * FROM items WHERE item_id="+str(id_)+"")
+
+			row=cur.fetchall()[0]
+
+			name=row[1]
+			sp=row[3]
+
+
+
+			db_reports=database.connect("data/reports.db")
+			cur2=db_reports.cursor()
+
+			cur2.execute(f"INSERT INTO reports VALUES('{name}','{date_time}','{user_name}',{quantity},{sp},{sold_at})")
+
+			db_reports.commit()
+
+		con=1
+
+
+
+	except:
+		pass
+
+
+
+	return con
+
+
+
+
+	
+
+
+
+
+
+pay_st=None
+bal_=0
+_total_=0
+
+sell_items_coords={}
+def pay_with_cash(con):
+	global sell_items_ims
+	global pay_st
+	global can,can2,can3,can4,can5
+	global quit,qp
+	global sel_sb
+	global cart_im
+	global bal_,_total_
+	global sell_items_coords
+
+
+
+	pay_st="Cash"
+
+	if con==0:
+		ent1.delete(0,tk.END)
+
+
+
+
+
+
+	f=font.Font(family="FreeMono",size=13)
+
+
+	im=Image.new("RGBA",(int(can["width"]),int(can["height"])),(0,0,0,128))
+	sell_items_ims["can_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can_overlay_"]=can.create_image(0,can.canvasy(0),image=sell_items_ims["can_overlay"],anchor="nw")
+
+
+
+	im=Image.new("RGBA",(int(can2["width"]),int(can2["height"])),(0,0,0,128))
+	sell_items_ims["can2_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can2_overlay_"]=can2.create_image(0,0,image=sell_items_ims["can2_overlay"],anchor="nw")
+
+
+
+	im=Image.new("RGBA",(int(can3["width"]),int(can3["height"])),(0,0,0,128))
+	sell_items_ims["can3_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can3_overlay_"]=can3.create_image(0,0,image=sell_items_ims["can3_overlay"],anchor="nw")
+
+
+
+
+	im=Image.new("RGBA",(int(can4["width"]),int(can4["height"])),(0,0,0,128))
+	sell_items_ims["can4_overlay"]=ImageTk.PhotoImage(im)
+
+	sell_items_ims["can4_overlay_"]=can4.create_image(0,can4.canvasy(0),image=sell_items_ims["can4_overlay"],anchor="nw")
+
+
+
+	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
+
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+
+
+
+	v=len(sell_items_ims)+1
+
+
+
+	x=x+((int(can["width"])-x)-xx)/2
+	y=can.canvasy(40+((int(can["height"])-40)-yy)/2)
+
+
+	x1,y1,x2,y2=x,y,x+xx,y+yy
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+
+	can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+		x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+
+
+
+	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+
+
+	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
+
+	qp=[x2-5-25,y1+5]
+
+	can.create_line(x2-270,y1+40, x2-270,y2-15)
+
+
+	
+
+
+	x1,y1,x2,y2=x1+15,y1+35+30,x2-270-4-10-4,y2-15-4-10-4
+
+	x_=x1+((x2-x1)-(25+10+f.measure("Cart")))/2
+
+	can.create_image(x_,y1-30+(30-25)/2,image=cart_im,anchor="nw")
+	can.create_text(x_+25+10,y1-30+15,text="Cart",font=("FreeMono",13),fill="#000000",anchor="w")
+
+	v+=1
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+
+	can5["width"]=int(x2-x1)-2
+	can5["height"]=int(y2-y1)-15-15
+
+	can5["bg"]="#ffffff"
+
+	can5.place(in_=root,x=x1+1,y=y1+15-can.canvasy(0)+40)
+
+
+	can5["scrollregion"]=(0,0,int(can5["width"]),int(can5["height"]))
+
+	
+
+	dict_={"widget": can5,
+			"sb_widget":can,
+			"sb_st":"both",
+			"sb_sz":10,
+			"v_sb_coord":[(y1+15,y1+15+int(can5["height"]),x2+4,x2+4+10,0),0],
+			"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),can.canvasy(y2+4),can.canvasy(y2+4+10)),0],
+			"_y":int(can5["height"]),
+			"v":v2,
+			"h_":h2,
+			"w":int(can5["width"]),
+			"h":int(can5["height"]),
+			"_x":int(can5["width"]),
+			"_x2":int(can5["width"]),
+			"scrollregion":can5["scrollregion"],
+			"v_drag_st":0,
+			"h_drag_st":0,
+			"v_var":0,
+			"h_var":0
+
+
+			}
+
+	_scroll_["cart2"]=dict_
+
+
+	db_items=database.connect("data/items.db")
+	cur=db_items.cursor()
+
+
+	_y=0
+
+	#can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
+
+
+	total=0
+	discount=0
+	no_items=0
+
+	con2_=0
+
+	for i in cart_ar:
+
+		con2_=1
+
+		id_,sold_at,quantity=i
+
+
+
+
+
+		cur.execute(f"SELECT * FROM items WHERE item_id={id_}")
+		rows=cur.fetchall()
+
+
+
+		for row in rows:
+			name=row[1]
+			sp=row[3]
+
+
+		can5.create_text(5,_y+15,text=name,font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+		if int(quantity)==1:
+			q="Unit"
+		else:
+			q="Units"
+		can5.create_text(5,_y+15+30+10,text=q,font=("FreeMono",13),fill="#000000",anchor="w")
+		can5.create_text(5+f.measure("Total")+20,_y+15+30+10,text=str(formart_number(quantity,(int(can4["width"]))-(5+f.measure("Total")+20))),font=("FreeMono",13),fill="#ff0000",anchor="w")
+		can5.create_text(5,_y+15+30+10+30,text="Total",font=("FreeMono",13),fill="#000000",anchor="w")
+		can5.create_text(5+f.measure("Total")+20,_y+15+30+10+30,text=f"Ksh.{formart_number(int(sold_at)*int(quantity),(int(can4["width"]))-(5+f.measure("Total")+20),1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+		_y+=15+30+10+30+20
+
+		can5.create_line(0,_y, int(can5["width"]),_y,fill="#000000")
+
+
+		no_items+=int(quantity)
+		total+=int(sold_at)*int(quantity)
+		discount+=(int(sp)-int(sold_at))*int(quantity)
+
+
+	_y+=10
+
+
+
+
+
+	if _y<=int(can5["height"]):
+
+		_scroll_["cart"]["_y"]=int(can5["height"])
+
+		can5["scrollregion"]=(0,0,int(can5["width"]),int(can5["height"]))
+
+
+	else:
+
+		can5["scrollregion"]=(0,0,int(can5["width"]),_y)
+
+		_scroll_["cart2"]["_y"]=_y
+
+
+
+	can.create_text((x+xx)-270+10,y+40+15,text="Sub Total",font=("FreeMono",13),fill="#000000",anchor="w")
+	can.create_text((x+xx)-10,y+40+15,text="Ksh."+str(total),font=("FreeMono",13),fill="#ff0000",anchor="e")
+
+	_total_=total
+
+	can.create_text((x+xx)-270+10,y+40+15+40,text="Cash",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+
+	#can.create_text(x+10+10,y+20+15+50*3, text="Quantity",font=("FreeMono",13), anchor="w",fill="#000000")
+
+	v+=1
+
+
+
+	x1,y1,x2,y2=(x+xx)-270+10+150-5+10-100+29,y+40+15+40-15,(x+xx)-270+10+150-5+10+100+60+6-100+29,y+40+15+40-15+25+6
+
+
+	im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+	__y1=y2
+
+	ent1["bg"]="#ffffff"
+
+	ent1.place(in_=root,x=x1+5,y=y1+5+40)
+
+
+	v+=1
+
+
+	x1,y1,x2,y2=x+xx-270+10,y+yy-15-30, x+xx-10,y+yy-15	
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
+
+
+	can.create_text(x1+(x2-x1)/2,y1+15,text="Complete Payment",fill="#ffffff",font=("FreeMono",13),anchor="c")
+
+
+	sell_items_coords["complete payment"]=x1,y1,x2,y2
+
+
+	__y2=y1
+
+	_scroll_["cart2"]["v_sb_coord"][-1]=0
+	_scroll_["cart2"]["h_sb_coord"][-1]=0
+
+	draw_v_sb("cart2")
+	draw_h_sb("cart2")
+
+	sel_sb=["cart2","vertical"]
+
+
+	y__=__y1+(__y2-__y1-100)/2
+
+	v+=1
+
+
+	x1,y1,x2,y2=x1,y__,x2,y__+100
+
+	im=draw_round_rect(15,x1,y1,x2,y2, "#00aa00",alpha=1,width=1)
+
+	draw=ImageDraw.Draw(im)
+
+	draw.rectangle((15,-5,15+5+f.measure("Balance")+5,+5),fill=(0,0,0,0),outline=(0,0,0,0))
+
+	sell_items_ims[v]=ImageTk.PhotoImage(im)
+	can.create_image(x1,y__,image=sell_items_ims[v],anchor="nw")
+
+
+	can.create_text(x1+15+5,y__,text="Balance",fill="#00aa00",font=("FreeMono",13),anchor="w")
+
+
+
+
+	can.delete(bal_)
+
+	try:
+
+		v_=int(ent1.get())
+
+
+
+		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=f"Ksh.{int(int(ent1.get())-_total_)}",
+			font=("FreeMono",13),fill="#00aa00",anchor="c")
+
+	except:
+
+		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text="",
+			font=("FreeMono",13),fill="#00aa00",anchor="c")
+
+
+	ent1.focus_set()
+
+
+def pay_with_mpesa():
+	pass
+	
+
+
 sell_items_ims={}
 
 _scroll_={}
@@ -1050,6 +1484,8 @@ def main(con=0):
 	global sel_sb
 	global add_item_crop_v,man_item_crop_v
 	global add_item_crop_coord_norm,man_item_crop_coord_norm
+	global pay_st
+	global user_name
 
 	st_="main"
 
@@ -1215,8 +1651,10 @@ def main(con=0):
 
 		row=cur.fetchall()[0]
 
+		user_name=row[1]
 
-		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+		can2.create_text(width-5-25-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
 
 		if row[4]=="":
 
@@ -1715,6 +2153,12 @@ def main(con=0):
 
 			draw_selected_item(sel_item)
 
+		elif pay_st=="Cash":
+			pay_with_cash(1)
+		elif pay_st=="MPESA":
+			pay_with_mpesa()
+
+
 	elif st=="Manage items":
 
 		items_ar=[]
@@ -1725,6 +2169,7 @@ def main(con=0):
 		if con==0:
 			man_item=None
 			man_reset_st=False
+			man_item_crop_v=[False,[]]
 			search_val=""
 			delete_widgets()
 
@@ -2346,6 +2791,8 @@ def main(con=0):
 
 			add_items_coords["add_image"]=None
 
+			can.create_rectangle(add_items_coords["imagep_"],outline="#000000")
+
 		else:
 
 
@@ -2366,7 +2813,7 @@ def main(con=0):
 
 			add_items_coords["add_image"]=[cx,cy]
 
-		can.create_rectangle(add_items_coords["imagep"],outline="#aaaaaa")
+		
 
 
 		v+=1
@@ -3609,7 +4056,7 @@ def draw_registration(con=0):
 
 
 user_id=None
-
+user_name=""
 def valdate_login():
 	global can,dashboard
 	global width,height
@@ -3860,6 +4307,14 @@ def can_b1(e):
 	global sel_sb
 	global add_item_crop_v,add_item_crop_coord_norm
 	global man_item_crop_v,man_item_crop_coord_norm
+	global pay_st
+	global sell_items_coords
+	global _total_
+
+
+	if pay_st=="Cash":
+
+		can_b1_sb("cart2",e.x,e.y)
 
 
 	#sel_sb=None
@@ -4057,128 +4512,64 @@ def can_b1(e):
 
 		if st=="Sell Items":
 
-			if sel_item==None:
 
-				for i in items_ar:
+			if pay_st==None:
 
-					x1,y1,x2,y2=i[1:]
+				if sel_item==None:
 
-					if x1<=e.x<=x2:
-						if y1<=can.canvasy(e.y)<=y2:
+					for i in items_ar:
 
-							draw_selected_item(i[0])
+						x1,y1,x2,y2=i[1:]
+
+						if x1<=e.x<=x2:
+							if y1<=can.canvasy(e.y)<=y2:
+
+								draw_selected_item(i[0])
+
+								return
+				else:
+
+					x,y=qp
+
+
+					if x<=e.x<=x+25:
+						if y<=can.canvasy(e.y)<=y+25:
+
+
+							sel_item=None
+							qp=None
+
+							main(1)
 
 							return
-			else:
-
-				x,y=qp
-
-
-				if x<=e.x<=x+25:
-					if y<=can.canvasy(e.y)<=y+25:
-
-
-						sel_item=None
-						qp=None
-
-						main(1)
-
-						return
 
 
 
-				x=int(dashboard.place_info()["x"])+int(dashboard["width"])
+					x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
 
-				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+					xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
 
 
-				x=x+((int(can["width"])-x)-xx)/2
-				y=can.canvasy(40+((int(can["height"])-40)-yy)/2)-20
-
-
-
-				x1,y1,x2,y2=add_c_coord
-
-				cx,cy=x1+15,y1+15
-
-				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
-
-				db_items=database.connect("data/items.db")
-				cur=db_items.cursor()
-
-				cur.execute(f"SELECT * FROM items WHERE item_id={sel_item}")
-
-				sp=float(cur.fetchall()[0][3])
-
-				if r<=15:
-
-					try:
-						v1=int(ent1.get())
-						v2=int(ent2.get())
-
-					except:
-
-						message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
-
-						return
-
-					if int(ent1.get())>sp:
-						message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
-
-						return
-
-
-					cart_ar.append([sel_item,ent1.get(),ent2.get()])
-
-					#sel_item=None
-					#qp=None
-
-					main(1)
-
-					message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
-
-					return
-
-				cx,cy=x2-15,y1+15
-
-				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
-
-				if r<=15:
-
-
-					try:
-						v1=int(ent1.get())
-						v2=int(ent2.get())
-
-					except:
-
-						message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
-
-						return
-
-					if int(ent1.get())>sp:
-						message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
-
-						return
+					x=x+((int(can["width"])-x)-xx)/2
+					y=can.canvasy(40+((int(can["height"])-40)-yy)/2)-20
 
 
 
-					cart_ar.append([sel_item,ent1.get(),ent2.get()])
+					x1,y1,x2,y2=add_c_coord
 
-					#sel_item=None
-					#qp=None
+					cx,cy=x1+15,y1+15
 
-					main(1)
+					r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
 
-					message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
+					db_items=database.connect("data/items.db")
+					cur=db_items.cursor()
 
-					return
+					cur.execute(f"SELECT * FROM items WHERE item_id={sel_item}")
 
+					sp=float(cur.fetchall()[0][3])
 
-				if x1+15<=e.x<=x2-15:
-					if y1<=can.canvasy(e.y)<=y2:
-
+					if r<=15:
 
 						try:
 							v1=int(ent1.get())
@@ -4205,8 +4596,231 @@ def can_b1(e):
 
 						message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
 
+						return
+
+					cx,cy=x2-15,y1+15
+
+					r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
+
+					if r<=15:
+
+
+						try:
+							v1=int(ent1.get())
+							v2=int(ent2.get())
+
+						except:
+
+							message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+						if int(ent1.get())>sp:
+							message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+
+
+						cart_ar.append([sel_item,ent1.get(),ent2.get()])
+
+						#sel_item=None
+						#qp=None
+
+						main(1)
+
+						message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
 
 						return
+
+
+					if x1+15<=e.x<=x2-15:
+						if y1<=can.canvasy(e.y)<=y2:
+
+
+							try:
+								v1=int(ent1.get())
+								v2=int(ent2.get())
+
+							except:
+
+								message(0,can,"Invalid input!",x+xx/2,y+yy+10+15,350,30)
+
+								return
+
+							if int(ent1.get())>sp:
+								message(0,can,"Item can't be sold above selling price!",x+xx/2,y+yy+10+15,350,30)
+
+								return
+
+
+							cart_ar.append([sel_item,ent1.get(),ent2.get()])
+
+							#sel_item=None
+							#qp=None
+
+							main(1)
+
+							message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
+
+
+							return
+
+			if pay_st=="Cash":
+				x,y=qp
+
+
+				if x<=e.x<=x+25:
+					if y<=can.canvasy(e.y)<=y+25:
+
+
+						pay_st=None
+						qp=None
+
+						main(1)
+
+						return
+
+
+				x=int(dashboard.place_info()["x"])+int(dashboard["width"])
+
+				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+
+
+				x=x+((int(can["width"])-x)-xx)/2
+				y=can.canvasy(40+((int(can["height"])-40)-yy)/2)
+
+
+				if int(dashboard.place_info()["x"])<0:
+					_x=5+25+5
+				else:
+					_x=int(dashboard["width"])
+				x_=_x+(int(can["width"])-_x)/2
+
+				x1,y1,x2,y2=sell_items_coords["complete payment"]
+
+				cx,cy=x1+15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+					if ent1.get()=="":
+
+						message(0,can,"Enter amount paid!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+					try:
+
+						v=int(ent1.get())
+					except:
+
+
+						message(0,can,"Amount paid must be a number!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
+					if int(ent1.get())<_total_:
+
+						message(0,can,"Amount paid is less than sub total!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
+					if complete_payment()==1:
+
+						pay_st=None
+						cart_ar=[]
+						main(1)
+
+						message(1,can,"Purchase successfull!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+
+					else:
+						message(0,can,"Purchase not successfull!",x+xx/2,y+yy+10+15,350,30)
+
+
+
+				cx,cy=x2-15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(can.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+					if ent1.get()=="":
+
+						message(0,can,"Enter amount paid!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+					try:
+
+						v=int(ent1.get())
+					except:
+
+
+						message(0,can,"Amount paid must be a number!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
+					if int(ent1.get())<_total_:
+
+						message(0,can,"Amount paid is less than sub total!",x+xx/2,y+yy+10+15,350,30)
+
+						return
+
+
+					if complete_payment()==1:
+
+						pay_st=None
+						cart_ar=[]
+						main(1)
+						message(1,can,"Purchase successfull!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+
+					else:
+						message(0,can,"Purchase not successfull!",x+xx/2,y+yy+10+15,350,30)
+
+				if x1+15<=e.x<=x2-15:
+					if y1<=can.canvasy(e.y)<=y2:
+
+
+
+						if ent1.get()=="":
+
+							message(0,can,"Enter amount paid!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+						try:
+
+							v=int(ent1.get())
+						except:
+
+
+							message(0,can,"Amount paid must be a number!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+
+						if int(ent1.get())<_total_:
+
+							message(0,can,"Amount paid is less than sub total!",x+xx/2,y+yy+10+15,350,30)
+
+							return
+
+
+						if complete_payment()==1:
+							pay_st=None
+							cart_ar=[]
+							main(1)
+
+							message(1,can,"Purchase successfull!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+
+						else:
+							message(0,can,"Purchase not successfull!",x+xx/2,y+yy+10+15,350,30)
+
 
 		elif st=="Manage items":
 
@@ -4988,6 +5602,9 @@ def can_motion(e):
 								can.delete(add_items_crop_v_)
 
 								add_items_crop_v_=can.create_rectangle(x1_,y1_, x,y,outline="#ff0000")
+			else:
+				can.delete(add_items_crop_v_)
+
 
 		elif st=="Manage items":
 
@@ -5011,13 +5628,100 @@ def can_motion(e):
 								can.delete(man_items_crop_v_)
 
 								man_items_crop_v_=can.create_rectangle(x1_,y1_, x,y,outline="#ff0000")
-								
+
+			else:
+				can.delete(man_items_crop_v_)								
+
+
+def can_drag(e):
+	global pay_st
+
+
+	if pay_st=="Cash":
+
+		sb_drag("cart2",e.x,e.y)
+
+
+def can_b1_sb_release(widget):
+
+    global _scroll_,pay_st
+
+    if pay_st=="Cash":
+
+
+	    _scroll_[widget]["v_drag_st"]=0
+	    _scroll_[widget]["h_drag_st"]=0
+
+
+def can_b1_release(e):
+
+	can_b1_sb_release("cart2")
+
+
+
+
+sel_sb=None
+def scroll(e):
+	global _scroll_
+	global sel_sb
+	global sel_item,man_item
+
+
+
+	if sel_item==None and man_item==None:
+
+
+
+
+
+		if not sel_sb==None:
+
+
+			if sel_sb[1]=="vertical":
+
+
+				var=-int(e.delta/120)
+
+
+				_scroll_[sel_sb[0]]["widget"].yview_scroll(var,"units")
+
+				h=_scroll_[sel_sb[0]]["_y"]
+
+				y=_scroll_[sel_sb[0]]["widget"].canvasy(0)
+
+
+				_scroll_[sel_sb[0]]["v_sb_coord"][-1]=y/h
+
+
+				draw_v_sb(sel_sb[0])
+
+			elif sel_sb[1]=="horizontal":
+
+				
+				var=-int(e.delta/120)
+
+
+				_scroll_[sel_sb[0]]["widget"].xview_scroll(var,"units")
+
+				w=_scroll_[sel_sb[0]]["_x2"]
+
+				x=_scroll_[sel_sb[0]]["widget"].canvasx(0)
+
+
+				_scroll_[sel_sb[0]]["h_sb_coord"][-1]=x/w
+
+
+				draw_h_sb(sel_sb[0])
+
 
 
 can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can.place(in_=root,x=0,y=0)
 can.bind("<Button-1>",can_b1)
 can.bind("<Motion>",can_motion)
+can.bind("<B1-Motion>",can_drag)
+can.bind_all("<MouseWheel>",scroll)
+can.bind("<ButtonRelease-1>",can_b1_release)
 
 def can2_b1(e):
 	global search_coords
@@ -5116,6 +5820,7 @@ def can3_b1(e):
 	global search_focus
 	global st_,st
 	global sel_sb
+	global pay_st
 
 	#sel_sb=None
 
@@ -5130,7 +5835,7 @@ def can3_b1(e):
 			main(1)
 
 
-	if sel_item==None and man_item==None:
+	if sel_item==None and man_item==None and pay_st==None:
 
 		
 
@@ -5194,6 +5899,41 @@ def can3_b1(e):
 					return
 
 
+
+
+
+
+			x1,y1,x2,y2=cart_buttons_coords["pay_with_cash"]
+
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+				pay_with_cash(0)
+
+
+				return
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				pay_with_cash(0)
+
+
+				return
+
+			if x1+15<=e.x<=x2-15:
+				if y1<=e.y<=y2:
+
+					pay_with_cash(0)
+
+					return
+
 def can3_b1_motion(e):
 	global sel_item
 
@@ -5215,60 +5955,6 @@ def can3_b1_release(e):
 	can3_b1_sb_release("can")
 	can3_b1_sb_release("cart")
 
-
-
-sel_sb=None
-def scroll(e):
-	global _scroll_
-	global sel_sb
-	global sel_item,man_item
-
-
-
-	if sel_item==None and man_item==None:
-
-
-
-
-
-		if not sel_sb==None:
-
-
-			if sel_sb[1]=="vertical":
-
-
-				var=-int(e.delta/120)
-
-
-				_scroll_[sel_sb[0]]["widget"].yview_scroll(var,"units")
-
-				h=_scroll_[sel_sb[0]]["_y"]
-
-				y=_scroll_[sel_sb[0]]["widget"].canvasy(0)
-
-
-				_scroll_[sel_sb[0]]["v_sb_coord"][-1]=y/h
-
-
-				draw_v_sb(sel_sb[0])
-
-			elif sel_sb[1]=="horizontal":
-
-				
-				var=-int(e.delta/120)
-
-
-				_scroll_[sel_sb[0]]["widget"].xview_scroll(var,"units")
-
-				w=_scroll_[sel_sb[0]]["_x2"]
-
-				x=_scroll_[sel_sb[0]]["widget"].canvasx(0)
-
-
-				_scroll_[sel_sb[0]]["h_sb_coord"][-1]=x/w
-
-
-				draw_h_sb(sel_sb[0])
 
 
 
@@ -5296,6 +5982,8 @@ def can4_b1(e):
 
 can4=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can4.bind("<Button-1>",can4_b1)
+
+can5=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 
 db_st=0
 def dashboard_b1(e):
@@ -5494,7 +6182,7 @@ text1=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat"
 
 t_widgets={"entries":[ent1,ent2,ent3,ent4,ent_search],
 			"text":[text1],
-			"canvas":[dashboard,can,can2,can3,can4]}
+			"canvas":[dashboard,can,can2,can3,can4,can5]}
 
 
 
@@ -5555,6 +6243,23 @@ except:
 	pass
 
 
+try:
+	dbuser=database.connect('data/reports.db')
+	cur=dbuser.cursor()	
+	cur.execute("""CREATE TABLE reports(
+		item_name VARCHAR(255),
+		date_time VARCHAR(255),
+		sold_by VARCHAR(255),
+		quantity INT,
+		sp INT,
+		sold_at INT
+
+		);""")
+
+	dbuser.close()
+except:
+	pass
+
 def scale_down_im(im_,con,x,y,save_path="data/images"):
 
 	x1_,y1_,x2_,y2_=0,0,x,y
@@ -5611,4 +6316,5 @@ st="Sell Items"
 check_root_sz()
 check_sel_item()
 check_search_entry()
+check_balance()
 root.mainloop()
