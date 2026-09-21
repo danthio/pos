@@ -1480,6 +1480,10 @@ _date_=""
 
 v5,h5=0,0
 v6,h6=0,0
+
+cal_st=0
+
+rep_items_coord={}
 def main(con=0):
 
 	global st,st_
@@ -1519,6 +1523,8 @@ def main(con=0):
 	global rep_items_ims
 	global v5,h5
 	global v6,h6
+	global cal_st
+	global rep_items_coord
 
 	st_="main"
 
@@ -2584,6 +2590,13 @@ def main(con=0):
 
 		can.create_image(_x_,(40-30)/2, image=calendar,anchor="nw")
 
+		rep_items_coord["calendar"]=[_x_,(40-30)/2]
+
+		if con==0:
+			cal_st=0
+
+
+
 		can.create_text(_x_+30+15,20,text=str(_date_),font=("FreeMono",13),fill="#000000",anchor="w")
 
 
@@ -2610,6 +2623,11 @@ def main(con=0):
 		if con==0:
 
 			sel_sb=["can4r","vertical"]
+
+
+		if cal_st==1:
+
+			draw_cal(rep_items_coord["calendar"][0]+30,rep_items_coord["calendar"][1]+30)
 
 
 
@@ -3904,8 +3922,10 @@ no_record=0
 
 save_im=0
 delete2=0
-reset_im=0
+reset_im,reset_im2=0,0
 calendar=0
+
+previous,next_=0,0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -3922,8 +3942,9 @@ def load_im():
 	global search
 	global no_profile_im
 	global no_record
-	global save_im,delete2,reset_im
+	global save_im,delete2,reset_im,reset_im2
 	global calendar
+	global previous,next_
 
 
 	#db
@@ -4106,6 +4127,9 @@ def load_im():
 	#reset
 
 	im=Image.open("data/icons/reset.png")
+
+	im=im.resize((25,25))
+	reset_im2=ImageTk.PhotoImage(im)
 	im=im.resize((20,20))
 	reset_im=ImageTk.PhotoImage(im)
 
@@ -4115,6 +4139,22 @@ def load_im():
 	im=Image.open("data/icons/calendar.png")
 	im=im.resize((30,30))
 	calendar=ImageTk.PhotoImage(im)
+
+
+	#previous
+
+	im=Image.open("data/icons/previous.png")
+	im=im.resize((20,20))
+	previous=ImageTk.PhotoImage(im)
+
+
+	#next
+
+	im=Image.open("data/icons/next.png")
+	im=im.resize((20,20))
+	next_=ImageTk.PhotoImage(im)
+
+
 
 db_items_=[]
 def draw_db():
@@ -4836,6 +4876,8 @@ def can_b1(e):
 	global pay_st
 	global sell_items_coords
 	global _total_
+	global cal_st
+	global rep_items_coord
 
 
 	if pay_st=="Cash":
@@ -5349,6 +5391,25 @@ def can_b1(e):
 
 						else:
 							message(0,can,"Purchase not successfull!",x+xx/2,y+yy+10+15,350,30)
+
+
+		elif st=="Reports":
+
+			x_,y_=rep_items_coord["calendar"]
+
+			if x_<=e.x<=x_+30:
+				if y_<=e.y<=y_+30:
+
+					if cal_st==0:
+						cal_st=1
+						draw_cal(rep_items_coord["calendar"][0]+30,rep_items_coord["calendar"][1]+30)
+						return
+
+					else:
+						cal_st=0
+						cal.place_forget()
+						return
+
 
 
 		elif st=="Manage items":
@@ -6736,9 +6797,312 @@ ent_search.bind("<Button-1>",search_b1)
 text1=tk.Text(width=28,height=4, font=("FreeMono",13),bg="#ffffff",relief="flat",highlightthickness=0,border=0,selectbackground="#000000",selectforeground="#ffffff")
 
 
+cal_coord={}
+
+days_ar=[]
+def draw_cal(xx,yy):
+	global cal
+	global _date_
+	global previous,next_
+	global cal_coord
+	global days_ar
+	global reset_im2
+
+	cal.delete("all")
+
+
+
+
+	f=font.Font(family="FreeMono",size=13)
+
+	year,month,day=_date_.split("-")
+	year=int(year)
+	month=int(month)
+	day=int(day)
+
+	if year%4==0:
+		feb_=29
+	else:
+		feb_=28
+
+	months={
+	1:["January",31],
+	2:["February",feb_],
+	3:["March",31],
+	4:["April",30],
+	5:["May",31],
+	6:["June",30],
+	7:["July",31],
+	8:["August",31],
+	9:["September",30],
+	10:["October",31],
+	11:["November",30],
+	12:["December",31]
+	}
+
+
+	cal.create_image(5,5,image=previous,anchor="nw")
+	cal_coord["yp"]=[5,5]
+
+	cal.create_text(5+20+5,5+10,text=str(year),font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+	cal.create_image(5+20+5+f.measure(str(year))+5,5,image=next_,anchor="nw")
+	cal_coord["yn"]=[5+20+5+f.measure(str(year))+5,5]
+
+
+
+
+	cal.create_image(5,5+20+15,image=previous,anchor="nw")
+	cal_coord["mp"]=[5,5+20+15]
+
+
+
+	cal.create_text(5+20+5,5+10+20+15,text=str(months[month][0]),font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+	cal.create_image(5+20+5+f.measure(str(months[month][0]))+5,5+20+15,image=next_,anchor="nw")
+
+	cal_coord["mn"]=[5+20+5+f.measure(str(months[month][0]))+5,5+20+15]
+
+
+
+
+
+	cal.place(in_=root,x=xx,y=yy+40)
+
+
+	day_of_week=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+	day_of_week2=["MON","TUE","WED","THUR","FRI","SAT","SUN"]
+
+
+
+	y=5+20+15+40+30-20
+
+	x=350/7/2
+	for d in day_of_week2:
+
+		cal.create_text(x,y,text=d,font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+		x+=350/7
+
+	cal.create_line(0,y+15,350,y+15,fill="#ffffff")
+
+
+	date_obj = datetime.date(year, month, 1)
+
+	# Get the full weekday name
+	day_name = date_obj.strftime('%A')
+
+	
+	i=day_of_week.index(day_name)
+	n=months[month][1]
+
+
+
+
+	x=350/7/2+(i)*350/7
+	y=y+15+350/7/2
+
+	d=1
+
+	i_=i
+
+	days_ar=[]
+
+	for _ in range(n):
+		col="#ffffff"
+
+
+		if day==d:
+
+			cal.create_rectangle(x-350/7/2,y-350/7/2, x+350/7/2,y+350/7/2,fill="#ffffff",outline="#ffffff")
+
+			col="#000000"
+
+		cal.create_text(x,y,text=str(d),font=("FreeMono",13),fill=col,anchor="c")
+
+		days_ar.append([d,[x-350/7/2,y-350/7/2, x+350/7/2,y+350/7/2]])
+
+		i_+=1
+
+		if i_==7:
+
+			x=350/7/2
+			y+=350/7
+
+			i_=0
+
+		else:
+
+			x+=350/7
+
+
+
+		d+=1
+
+	y+=350/7/2
+
+	cal["width"]=350
+
+	cal["height"]=y
+
+	cal.create_rectangle(0,0, int(cal["width"])-1,int(cal["height"])-1,outline="#ffffff")
+
+	cal.create_image(int(cal["width"])-5-25,5,image=reset_im2,anchor="nw")
+
+	cal_coord["reset"]=int(cal["width"])-5-25,5
+
+
+def cal_b1(e):
+	global cal
+	global cal_coord
+	global _date_
+	global days_ar
+
+	year,month,day=_date_.split("-")
+	year=int(year)
+	month=int(month)
+	day=int(day)
+
+	x,y=cal_coord["reset"]
+
+	if x<=e.x<=x+20:
+		if y<=e.y<=y+20:
+
+			_date_=str(datetime.datetime.now()).split(" ")[0]
+
+			main(1)
+			return
+
+
+	x,y=cal_coord["yp"]
+
+	if x<=e.x<=x+20:
+		if y<=e.y<=y+20:
+			year-=1
+
+			month=str(month)
+
+			if len(month)==1:
+				month="0"+month
+
+
+
+			_date_=f"{year}-{month}-01"
+
+			main(1)
+
+
+
+			return
+
+
+	x,y=cal_coord["yn"]
+
+	if x<=e.x<=x+20:
+		if y<=e.y<=y+20:
+			year+=1
+
+
+			month=str(month)
+
+			if len(month)==1:
+				month="0"+month
+
+			_date_=f"{year}-{month}-01"
+
+			main(1)
+
+			return
+
+
+	x,y=cal_coord["mp"]
+
+	if x<=e.x<=x+20:
+		if y<=e.y<=y+20:
+
+			month-=1
+
+			if month<=0:
+				month=12
+
+
+			month=str(month)
+
+			if len(month)==1:
+				month="0"+month
+
+			_date_=f"{year}-{month}-01"
+
+			main(1)
+
+			return
+
+
+	x,y=cal_coord["mn"]
+
+	if x<=e.x<=x+20:
+		if y<=e.y<=y+20:
+
+			month+=1
+
+			if month>12:
+				month=1
+
+
+			month=str(month)
+
+			if len(month)==1:
+				month="0"+month
+
+			_date_=f"{year}-{month}-01"
+
+			main(1)
+
+			return
+
+
+	for i in days_ar:
+
+		d=i[0]
+		x1,y1,x2,y2=i[1]
+
+		if x1<=e.x<=x2:
+			if y1<=e.y<=y2:
+
+				day=d
+
+
+				month=str(month)
+
+				if len(month)==1:
+					month="0"+month
+
+
+				day=str(day)
+
+				if len(day)==1:
+					day="0"+day
+
+
+				_date_=f"{year}-{month}-{day}"
+
+				main(1)
+
+				return
+
+
+
+
+
+
+cal=tk.Canvas(bg="#000000",relief="flat",highlightthickness=0,border=0)
+
+cal.bind("<Button-1>",cal_b1)
+
 t_widgets={"entries":[ent1,ent2,ent3,ent4,ent_search],
 			"text":[text1],
-			"canvas":[dashboard,can,can2,can3,can4,can5]}
+			"canvas":[dashboard,can,can2,can3,can4,can5,cal]}
 
 
 
