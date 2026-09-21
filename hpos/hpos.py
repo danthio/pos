@@ -1474,6 +1474,12 @@ add_item_crop_v=[False,[]]
 add_item_crop_coord_norm=[]
 man_item_crop_v=[False,[]]
 man_item_crop_coord_norm=[]
+
+rep_items_ims={}
+_date_=""
+
+v5,h5=0,0
+v6,h6=0,0
 def main(con=0):
 
 	global st,st_
@@ -1509,6 +1515,10 @@ def main(con=0):
 	global add_item_crop_coord_norm,man_item_crop_coord_norm
 	global pay_st
 	global user_name
+	global calendar,_date_
+	global rep_items_ims
+	global v5,h5
+	global v6,h6
 
 	st_="main"
 
@@ -2180,6 +2190,419 @@ def main(con=0):
 			pay_with_cash(1)
 		elif pay_st=="MPESA":
 			pay_with_mpesa()
+
+	elif st=="Reports":
+
+
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+			search_val=""
+			delete_widgets()
+
+			_date_=str(datetime.datetime.now()).split(" ")[0]
+
+
+
+		can["width"]=width
+		can["height"]=height-40
+
+		can.place(in_=root,x=0,y=40)
+
+		can.delete("all")
+
+
+
+		can2["width"]=width
+		can2["height"]=40
+		can2["bg"]="#ffffff"
+
+		can2.place(in_=root,x=0,y=0)
+
+		can2.delete("all")
+
+		can2.create_line(0,0,width,0,fill="#000000")
+		#can2.create_line(0,39,width,39,fill="#dddddd")
+		v=0
+
+
+		_x_=400-10
+
+
+
+		if int(dashboard.place_info()["x"])<0:
+			_x=5+25+5
+		else:
+			_x=int(dashboard["width"])
+		x_=_x+(int(can["width"])-_x-_x_)/2
+
+		x1,y1,x2,y2=x_,5,x_+_x_,5+30
+
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(x1,y1,image=rep_items_ims[v],anchor="nw")
+
+		ent_search["width"]=40
+
+		if search_focus==False:
+			if search_val=="":
+
+				can2.create_text(x1+15,y1+15,text="Search",font=("FreeMono",13),fill="#000000",anchor="w")
+
+				can2.create_image(x1+15+f.measure("Search")+10,y1+2.5,image=search,anchor="nw")
+
+			else:
+
+				can2.create_text(x1+15+1,y1+15,text=search_val,font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		can2.create_image(x2+5,y1+2.5,image=quit,anchor="nw")
+
+
+
+		search_coords=[x1,y1,x2,y2,[x2+5,y1+2.5]]
+
+		if search_focus==True:
+
+
+			ent_search.place(in_=root,x=x1+15,y=y1+4.5)
+
+			ent_search.focus_set()
+
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+		user_name=row[1]
+
+
+		can2.create_text(width-5-25-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
+
+		if row[4]=="":
+
+			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+
+
+		else:
+
+			#process profile picture
+			pass
+
+
+
+
+
+		
+
+		f=font.Font(family="FreeMono",size=13)
+
+
+
+		ar=["Item Name","Date/Time","Sold By","Selling Price","Sold Price","Quantity","Discount","Profit","Total"]
+
+		x_sz=[]
+
+		for i in ar:
+
+			sz=f.measure(i)
+			x_sz.append(sz)
+
+
+		total__=0
+		tprofit=0
+
+
+
+		data=[]
+
+		db_reports=database.connect("data/reports.db")
+		cur=db_reports.cursor()
+
+		cur.execute("SELECT * FROM reports")
+
+		rows=cur.fetchall()
+
+		for row in rows:
+
+			date_time=str(row[1])
+
+			if date_time.split(" ")[0]!=_date_:
+				continue
+
+			item_name=str(row[0])
+			
+			sold_by=str(row[2])
+			selling_price=str(row[5])
+			buying_price=str(row[4])
+			sold_at=str(row[6])
+			quantity=str(row[3])
+			discount=str((int(selling_price)*int(quantity))-(int(sold_at)*int(quantity)))
+			profit=str((int(sold_at)*int(quantity))-(int(buying_price)*int(quantity)))
+			total=str((int(sold_at)*int(quantity)))
+
+
+			tprofit+=int(profit)
+			total__+=int(total)
+
+
+			data.append([item_name,date_time,sold_by,"Ksh."+selling_price,"Ksh."+sold_at,quantity,"Ksh."+discount,"Ksh."+profit,"Ksh."+total])
+
+		for i in data:
+
+			
+			for _ in range(len(i)):
+
+
+				if f.measure(i[_])>x_sz[_]:
+					x_sz[_]=f.measure(i[_])
+
+			
+
+
+		for _ in range(len(x_sz)):
+
+			x_sz[_]=x_sz[_]+40
+
+
+
+
+
+		xt=0
+
+		for x_ in x_sz:
+
+			xt+=x_
+
+
+
+
+		if xt>(int(can["width"])-int(dashboard["width"]))-60:
+
+			xx=(int(can["width"])-int(dashboard["width"]))-60
+
+		else:
+
+			xx=xt
+
+
+
+		if int(dashboard.place_info()["x"])<0:
+
+			x_=5+25+5
+
+		else:
+
+			x_=int(dashboard["width"])
+
+
+
+		_x_=x_+((int(can["width"])-x_)-xx)/2
+
+		can3["width"]=xx
+		can3["height"]=30
+
+		can3["bg"]="#000000"
+		can3.delete("all")
+
+		can3.place(in_=root,x=_x_,y=40+40)
+
+		_x=0
+		for _ in range(len(ar)):
+
+
+			can3.create_text(_x+x_sz[_]/2,15,text=ar[_],font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+			if _==len(ar)-1:
+				pass
+			else:
+				can3.create_line(_x+x_sz[_],0, _x+x_sz[_],30, fill="#ffffff")
+
+			_x+=x_sz[_]
+
+
+		can4["width"]=xx
+		can4["height"]=height-40-40-30-50-50
+
+		can4["scrollregion"]=(0,0,int(can4["width"]),int(can4["height"]))
+
+		can4.place(in_=root,x=_x_,y=40+40+30)
+		can4.delete("all")
+
+
+
+
+
+		_st_=0
+
+		y=0
+		for i in data:
+
+			if _st_==1:
+
+				can4.create_rectangle(0,y, xt,y+30, fill="#dddddd",outline="#dddddd")
+
+			_x=0
+
+			for _ in range(len(i)):
+
+				txt=i[_]
+
+				can4.create_text(_x+x_sz[_]/2,y+15,text=txt,font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+
+				_x+=x_sz[_]
+
+				can4.create_line(_x,y, _x,y+30, fill="#000000")
+			
+			if _st_==0:
+				_st_=1
+			elif _st_==1:
+				_st_=0
+
+
+
+
+			#can4.create_line(0,y+30,int(can4["width"]),y+30,fill="#000000")
+
+
+
+
+			y+=30
+
+
+		can.create_rectangle(_x_-1,40-1, _x_+int(can3["width"]),40+30+int(can4["height"]),outline="#000000")
+
+
+		if xt<=int(can3["width"]):
+
+			can3["scrollregion"]=(0,0, int(can3["width"]), int(can3["height"]))
+
+			xxx=int(can3["width"])
+
+		else:
+
+			can3["scrollregion"]=(0,0, xt, int(can3["height"]))
+
+			xxx=xt
+
+
+
+
+		dict_={"widget": can3,
+				"sb_widget":can,
+				"sb_st":"horizontal",
+				"sb_sz":10,
+				"h_sb_coord":[(_x_,_x_+int(can4["width"]),40+30+int(can4["height"])+4,40+30+int(can4["height"])+4+10),0],
+				"_y":height-40,
+				"v":v5,
+				"h_":h5,
+				"w":int(can3["width"]),
+				"h":int(can3["height"]),
+				"_x":int(can3["width"]),
+				"_x2":xxx,
+				"scrollregion":can3["scrollregion"],
+				"v_drag_st":0,
+				"h_drag_st":0,
+				"v_var":0,
+				"h_var":0
+
+
+				}			
+
+		_scroll_["can3r"]=dict_
+
+		draw_h_sb("can3r")
+
+
+		if y<=int(can4["height"]):
+
+			can4["scrollregion"]=(0,0,xxx,int(can4["height"]))
+
+			yyy=int(can4["height"])
+
+		else:
+
+			can4["scrollregion"]=(0,0,xxx,y)
+
+			yyy=y
+
+
+
+
+		dict_={"widget": can4,
+				"sb_widget":can,
+				"sb_st":"both",
+				"sb_sz":10,
+				"v_sb_coord":[(40+30,40+30+int(can4["height"]),_x_+int(can3["width"])+4,_x_+int(can3["width"])+4+10),0],
+				"h_sb_coord":[(_x_,_x_+int(can4["width"]),40+30+int(can4["height"])+4,40+30+int(can4["height"])+4+10),0],
+				"_y":yyy,
+				"v":v6,
+				"h_":h6,
+				"w":int(can4["width"]),
+				"h":int(can4["height"]),
+				"_x":int(can4["width"]),
+				"_x2":xxx,
+				"scrollregion":can4["scrollregion"],
+				"v_drag_st":0,
+				"h_drag_st":0,
+				"v_var":0,
+				"h_var":0
+
+
+				}			
+
+		_scroll_["can4r"]=dict_
+
+		draw_v_sb("can4r")
+		draw_h_sb("can4r")
+
+
+		_x_-1,40-1
+
+		can.create_image(_x_,(40-30)/2, image=calendar,anchor="nw")
+
+		can.create_text(_x_+30+15,20,text=str(_date_),font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		_x_+int(can3["width"]),40+30+int(can4["height"])
+
+		x_=_x_+int(can3["width"])-f.measure(f"Ksh.{total__}")-30-f.measure("Total Profit")
+
+		can.create_text(_x_+int(can3["width"]),40+30+int(can4["height"])+4+10+30+15-15,text=f"Ksh.{tprofit}",font=("FreeMono",13),
+			fill="#ff0000",anchor="e")
+
+		can.create_text(x_,40+30+int(can4["height"])+4+10+30+15-15,text="Total Profit",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		can.create_text(_x_+int(can3["width"]),40+30+int(can4["height"])+4+10+30+15+30-15,text=f"Ksh.{total__}",font=("FreeMono",13),
+			fill="#ff0000",anchor="e")
+
+		can.create_text(x_,40+30+int(can4["height"])+4+10+30+15+30-15,text="Total Sales",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
 
 
 	elif st=="Manage items":
@@ -2976,7 +3399,6 @@ def draw_h_sb(widget):
     widget_=_scroll_[widget]["widget"]
     sb_widget=_scroll_[widget]["sb_widget"]
     sb_sz=_scroll_[widget]["sb_sz"]
-    v_sb_coord=_scroll_[widget]["v_sb_coord"]
     h_sb_coord=_scroll_[widget]["h_sb_coord"]
     _y=_scroll_[widget]["_y"]
     h_=_scroll_[widget]["h_"]
@@ -3409,6 +3831,7 @@ no_record=0
 save_im=0
 delete2=0
 reset_im=0
+calendar=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -3426,6 +3849,7 @@ def load_im():
 	global no_profile_im
 	global no_record
 	global save_im,delete2,reset_im
+	global calendar
 
 
 	#db
@@ -3610,6 +4034,13 @@ def load_im():
 	im=Image.open("data/icons/reset.png")
 	im=im.resize((20,20))
 	reset_im=ImageTk.PhotoImage(im)
+
+
+	#calendar
+
+	im=Image.open("data/icons/calendar.png")
+	im=im.resize((30,30))
+	calendar=ImageTk.PhotoImage(im)
 
 db_items_=[]
 def draw_db():
@@ -4337,6 +4768,10 @@ def can_b1(e):
 
 		can_b1_sb("cart2",e.x,can.canvasy(e.y))
 
+	if st_=="main" and st=="Reports":
+
+		can_b1_sb("can3r",e.x,e.y)
+		can_b1_sb("can4r",e.x,e.y)
 
 	#sel_sb=None
 
@@ -5656,11 +6091,19 @@ def can_motion(e):
 
 def can_drag(e):
 	global pay_st
+	global st_,st
 
 
 	if pay_st=="Cash":
 
 		sb_drag("cart2",e.x,can.canvasy(e.y))
+
+
+	if st_=="main" and st=="Reports":
+
+		sb_drag("can3r",e.x,e.y)
+		sb_drag("can4r",e.x,e.y)
+
 
 
 def can_b1_sb_release(widget):
@@ -5718,6 +6161,16 @@ def scroll(e):
 
 			elif sel_sb[1]=="horizontal":
 
+				sb2=None
+
+				if sel_sb[0]=="can3r":
+
+					sb2="can4r"
+
+				elif sel_sb[0]=="can4r":
+					sb2="can3r"
+
+
 				
 				var=-int(e.delta/120)
 
@@ -5734,6 +6187,19 @@ def scroll(e):
 
 				draw_h_sb(sel_sb[0])
 
+				if sb2!=None:
+
+					_scroll_[sb2]["widget"].xview_scroll(var,"units")
+
+					w=_scroll_[sb2]["_x2"]
+
+					x=_scroll_[sb2]["widget"].canvasx(0)
+
+
+					_scroll_[sb2]["h_sb_coord"][-1]=x/w
+
+
+					draw_h_sb(sb2)
 
 
 can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
