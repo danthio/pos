@@ -2453,7 +2453,11 @@ def main(con=0):
 		_st_=0
 
 		y=0
-		for i in data:
+
+		p=len(data)-1
+		for _ in range(len(data)):
+
+			i=data[p]
 
 			if _st_==1:
 
@@ -2483,7 +2487,7 @@ def main(con=0):
 
 			#can4.create_line(0,y+30,int(can4["width"]),y+30,fill="#000000")
 
-
+			p-=1
 
 
 			y+=30
