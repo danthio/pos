@@ -286,7 +286,7 @@ def draw_selected_item(id_):
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
 
 
 
@@ -1172,7 +1172,7 @@ def pay_with_cash(con):
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
 
 
 
@@ -1348,8 +1348,8 @@ def pay_with_cash(con):
 
 
 
-	can.create_text((x+xx)-270+10,y+40+15,text="Sub Total",font=("FreeMono",13),fill="#000000",anchor="w")
-	can.create_text((x+xx)-10,y+40+15,text="Ksh."+str(total),font=("FreeMono",13),fill="#ff0000",anchor="e")
+	can.create_text((x+xx)-270+10,y+35+15,text="Sub Total",font=("FreeMono",13),fill="#000000",anchor="w")
+	can.create_text((x+xx)-10,y+35+15,text="Ksh."+str(total),font=("FreeMono",13),fill="#ff0000",anchor="e")
 
 	_total_=total
 
@@ -1623,6 +1623,8 @@ def main(con=0):
 
 		can3.delete("all")
 		can3.place(in_=root,x=width-400,y=40)
+
+		can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
 
 		v=0
 
@@ -2209,6 +2211,8 @@ def main(con=0):
 
 		can.place(in_=root,x=0,y=40)
 
+		can["scrollregion"]=(0,0,int(can["width"]),int(can["height"]))
+
 		can.delete("all")
 
 
@@ -2352,6 +2356,9 @@ def main(con=0):
 			tprofit+=int(profit)
 			total__+=int(total)
 
+			if item_name.lower().find(search_val.lower())==-1 and date_time.lower().find(search_val.lower())==-1 and sold_by.lower().find(search_val.lower())==-1:
+
+				continue
 
 			data.append([item_name,date_time,sold_by,"Ksh."+selling_price,"Ksh."+sold_at,quantity,"Ksh."+discount,"Ksh."+profit,"Ksh."+total])
 
@@ -2411,6 +2418,8 @@ def main(con=0):
 
 		can3["bg"]="#000000"
 		can3.delete("all")
+
+		can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
 
 		can3.place(in_=root,x=_x_,y=40+40)
 
@@ -2594,7 +2603,9 @@ def main(con=0):
 		
 
 
+		if con==0:
 
+			sel_sb=["can4r","vertical"]
 
 
 
@@ -3511,7 +3522,6 @@ def can_b1_sb(widget,_x_,_y_):
 	        if y1<=_y_<=y2:
 	            sel_sb=[widget,"vertical"]	   
 	            can3.focus_set()
-	            print(sel_sb)
 	            _scroll_[widget]["v_drag_st"]=1
 
 
@@ -3542,7 +3552,10 @@ def can_b1_sb(widget,_x_,_y_):
     if _scroll_[widget]["sb_st"]=="horizontal" or _scroll_[widget]["sb_st"]=="both":
 
 	    
-	    
+	    sb2=None
+
+	    if widget=="can4r":
+	    	sb2="can3r"
 
 	    var=draw_h_sb(widget)
 
@@ -3557,8 +3570,6 @@ def can_b1_sb(widget,_x_,_y_):
 
 
 	            sel_sb=[widget,"horizontal"]
-	            can3.focus_set()
-	            print(sel_sb)
 	            _scroll_[widget]["h_drag_st"]=1
 
 
@@ -3573,6 +3584,25 @@ def can_b1_sb(widget,_x_,_y_):
 
 
 	            draw_h_sb(widget)
+
+
+	            if sb2=="can3r":
+
+
+		            sel_sb=["can3r","horizontal"]
+		            _scroll_["can3r"]["h_drag_st"]=1
+
+
+
+		            if var[0]<=x<=var[1]:
+
+		                _scroll_["can3r"]["h_var"]=x-var[0]
+		                return
+
+		            _scroll_["can3r"]["h_sb_coord"][-1]=x/_scroll_["can3r"]["w"]
+
+
+		            draw_h_sb("can3r")
 
 	            return
 
@@ -3651,14 +3681,28 @@ def sb_drag(widget,_x_,_y_):
 
 
 
+    	
+
+    	
+
+    		
+
+
 	    if _scroll_[widget]["h_drag_st"]==1:
 
+
+
+
+	        sb2=None
+	        if widget=="can4r":
+	        	sb2="can3r"
 
 
 
 
 	        x1=_scroll_[widget]["h_sb_coord"][0][0]
 	        y1=_scroll_[widget]["h_sb_coord"][0][2]
+
 
 	        x2,y2=x1+_scroll_[widget]["w"],y1+4+_scroll_[widget]["sb_sz"]
 
@@ -3680,6 +3724,17 @@ def sb_drag(widget,_x_,_y_):
 	                draw_h_sb(widget)
 
 
+	                if sb2=="can3r":
+
+
+
+		                _scroll_["can3r"]["h_sb_coord"][-1]=x/_scroll_["can3r"]["w"]
+
+
+		                draw_h_sb("can3r")
+
+
+
 	                return
 
 	        elif x1-10<_x_<x1:
@@ -3691,6 +3746,12 @@ def sb_drag(widget,_x_,_y_):
 
 	            draw_h_sb(widget)
 
+	            if sb2=="can3r":
+
+		            _scroll_[can3r]["h_sb_coord"][-1]=0
+
+
+		            draw_h_sb(can3r)
 	            return
 
 	        elif x2+10>_x_>x2:
@@ -3701,6 +3762,15 @@ def sb_drag(widget,_x_,_y_):
 
 
 	            draw_h_sb(widget)
+
+	            if sb2=="can3r":
+
+
+		            _scroll_["can3r"]["h_sb_coord"][-1]=1
+
+
+		            draw_h_sb("can3r")
+
 
 	            return
 
@@ -4770,7 +4840,6 @@ def can_b1(e):
 
 	if st_=="main" and st=="Reports":
 
-		can_b1_sb("can3r",e.x,e.y)
 		can_b1_sb("can4r",e.x,e.y)
 
 	#sel_sb=None
@@ -5004,7 +5073,7 @@ def can_b1(e):
 					x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
 
-					xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+					xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
 
 
 					x=x+((int(can["width"])-x)-xx)/2
@@ -5140,7 +5209,7 @@ def can_b1(e):
 
 				x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
+				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
 
 
 				x=x+((int(can["width"])-x)-xx)/2
@@ -6101,7 +6170,6 @@ def can_drag(e):
 
 	if st_=="main" and st=="Reports":
 
-		sb_drag("can3r",e.x,e.y)
 		sb_drag("can4r",e.x,e.y)
 
 
@@ -6163,11 +6231,8 @@ def scroll(e):
 
 				sb2=None
 
-				if sel_sb[0]=="can3r":
 
-					sb2="can4r"
-
-				elif sel_sb[0]=="can4r":
+				if sel_sb[0]=="can4r":
 					sb2="can3r"
 
 
