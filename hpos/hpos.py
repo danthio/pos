@@ -691,12 +691,12 @@ def draw_manage_item(id_,con):
 	qp=[x2-5-25,y1+5]
 
 
-	#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-	#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+	can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+		x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-	can.create_text(x+xx/2,y1+1+15,text="Manage Item",font=("FreeMono",13),fill="#0000ff",anchor="c")
+	can.create_text(x+xx/2,y1+1+15,text="Manage Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
 
@@ -1196,15 +1196,15 @@ def pay_with_cash(con):
 	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
 
 
-	#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-	#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+	can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+		x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#0000ff",anchor="c")
+	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
-	#can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
+	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
 
 
 	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
@@ -1415,7 +1415,7 @@ def pay_with_cash(con):
 
 	x1,y1,x2,y2=x1,y__,x2,y__+100
 
-	im=draw_round_rect(15,x1,y1,x2,y2, "#00aa00",alpha=1,width=1)
+	im=draw_round_rect(15,x1,y1,x2,y2, "#009900",alpha=1,width=1)
 
 	draw=ImageDraw.Draw(im)
 
@@ -1425,7 +1425,7 @@ def pay_with_cash(con):
 	can.create_image(x1,y__,image=sell_items_ims[v],anchor="nw")
 
 
-	can.create_text(x1+15+5,y__,text="Balance",fill="#00aa00",font=("FreeMono",13),anchor="w")
+	can.create_text(x1+15+5,y__,text="Balance",fill="#009900",font=("FreeMono",13),anchor="w")
 
 
 
@@ -1439,12 +1439,12 @@ def pay_with_cash(con):
 
 
 		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=f"Ksh.{int(int(ent1.get())-_total_)}",
-			font=("FreeMono",15),fill="#00aa00",anchor="c")
+			font=("FreeMono",15),fill="#009900",anchor="c")
 
 	except:
 
 		bal_=can.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text="",
-			font=("FreeMono",15),fill="#00aa00",anchor="c")
+			font=("FreeMono",15),fill="#009900",anchor="c")
 
 
 	ent1.focus_set()
@@ -2401,12 +2401,15 @@ def main(con=0):
 			total=str((int(sold_at)*int(quantity)))
 
 
-			tprofit+=int(profit)
-			total__+=int(total)
+
 
 			if item_name.lower().find(search_val.lower())==-1 and date_time.lower().find(search_val.lower())==-1 and sold_by.lower().find(search_val.lower())==-1:
 
 				continue
+
+
+			tprofit+=int(profit)
+			total__+=int(total)
 
 			data.append([item_name,date_time,sold_by,"Ksh."+selling_price,"Ksh."+sold_at,quantity,"Ksh."+discount,"Ksh."+profit,"Ksh."+total])
 
@@ -2539,6 +2542,8 @@ def main(con=0):
 
 
 			y+=30
+
+		can4.create_line(0,y, xt,y,fill="#000000")
 
 		if len(data)==0:
 
@@ -3267,12 +3272,12 @@ def main(con=0):
 		can.create_image(x,y,image=add_items_ims[v],anchor="nw")
 
 
-		#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-		#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+		can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+			x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-		can.create_text(x+xx/2,y1+1+15,text="Add Item",font=("FreeMono",13),fill="#0000ff",anchor="c")
+		can.create_text(x+xx/2,y1+1+15,text="Add Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
 
