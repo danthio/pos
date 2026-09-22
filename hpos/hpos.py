@@ -241,7 +241,7 @@ sel_total=0
 qp=None
 add_c_coord=[]
 sel_totalx=0
-def draw_selected_item(id_):
+def draw_selected_item(id_,con):
 	global can,sel_item,sell_items_ims
 	global dashboard,can,can2,can3,can4
 	global quit,qp
@@ -415,8 +415,9 @@ def draw_selected_item(id_):
 	sell_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
 
-	ent1.delete(0,tk.END)
-	ent1.insert(tk.END,str(sp))
+	if con==0:
+		ent1.delete(0,tk.END)
+		ent1.insert(tk.END,str(sp))
 
 
 	ent1.place(in_=root,x=x1+5,y=_y_+5+40-can.canvasy(0))
@@ -433,8 +434,10 @@ def draw_selected_item(id_):
 	sell_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x1,y1+40+10,image=sell_items_ims[v],anchor="nw")
 
-	ent2.delete(0,tk.END)
-	ent2.insert(tk.END,str(1))
+
+	if con==0:
+		ent2.delete(0,tk.END)
+		ent2.insert(tk.END,str(1))
 
 
 	ent2.place(in_=root,x=x1+5,y=y1+5+40-can.canvasy(0)+40+10)
@@ -1484,6 +1487,7 @@ v6,h6=0,0
 cal_st=0
 
 rep_items_coord={}
+all_by=None
 def main(con=0):
 
 	global st,st_
@@ -1525,6 +1529,7 @@ def main(con=0):
 	global v6,h6
 	global cal_st
 	global rep_items_coord
+	global all_by
 
 	st_="main"
 
@@ -1546,8 +1551,10 @@ def main(con=0):
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
 		if con==0:
+			sell_items_ims={}
 			sel_item=None
 			search_val=""
+			search_focus=False
 			delete_widgets()
 
 		can["width"]=width-400
@@ -1897,9 +1904,9 @@ def main(con=0):
 				_x=int(dashboard["width"])
 			x_=_x+(int(can["width"])-_x)/2
 
-			can.create_image(x_,int(can["height"])/2,image=sell_items_ims[v],anchor="c")
+			can.create_image(x_,int(can["height"])/2-(10+30)/2,image=sell_items_ims[v],anchor="c")
 
-			can.create_text(x_,int(can["height"])/2+250/2+10+15,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+			can.create_text(x_,int(can["height"])/2+250/2+10+15-(10+30)/2,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
 
 
 
@@ -2067,9 +2074,9 @@ def main(con=0):
 
 			sell_items_ims[v]=ImageTk.PhotoImage(im)
 
-			can4.create_image(int(can4["width"])/2,int(can4["height"])/2,image=sell_items_ims[v],anchor="c")
+			can4.create_image(int(can4["width"])/2,int(can4["height"])/2-(10+30)/2,image=sell_items_ims[v],anchor="c")
 
-			can4.create_text(int(can4["width"])/2,int(can4["height"])/2+50+10+15,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+			can4.create_text(int(can4["width"])/2,int(can4["height"])/2+50+10+15-(10+30)/2,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
 
 
 
@@ -2192,7 +2199,7 @@ def main(con=0):
 
 		if sel_item!=None:
 
-			draw_selected_item(sel_item)
+			draw_selected_item(sel_item,con)
 
 		elif pay_st=="Cash":
 			pay_with_cash(1)
@@ -2205,7 +2212,10 @@ def main(con=0):
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
 		if con==0:
+			rep_items_ims={}
 			search_val=""
+			search_focus=False
+			all_by=None
 			delete_widgets()
 
 			_date_=str(datetime.datetime.now()).split(" ")[0]
@@ -2326,8 +2336,19 @@ def main(con=0):
 			x_sz.append(sz)
 
 
+
+		xt2=0
+
+		for x_ in x_sz:
+
+			xt2+=x_+40
+
+
 		total__=0
 		tprofit=0
+
+
+
 
 
 
@@ -2344,8 +2365,29 @@ def main(con=0):
 
 			date_time=str(row[1])
 
-			if date_time.split(" ")[0]!=_date_:
-				continue
+			_y_,_m_,_d_=date_time.split(" ")[0].split("-")
+			
+			_y_2,_m_2,_d_2=_date_.split("-")
+
+			if all_by==None:
+
+				if date_time.split(" ")[0]!=_date_:
+					continue
+
+			elif all_by=="month":
+
+				if _y_==_y_2 and _m_==_m_2:
+					pass
+				else:
+					continue
+
+
+			elif all_by=="year":
+
+				if _y_==_y_2:
+					pass
+				else:
+					continue
 
 			item_name=str(row[0])
 			
@@ -2397,13 +2439,13 @@ def main(con=0):
 
 
 
-		if xt>(int(can["width"])-int(dashboard["width"]))-60:
+		if xt2>(int(can["width"])-int(dashboard["width"]))-60:
 
 			xx=(int(can["width"])-int(dashboard["width"]))-60
 
 		else:
 
-			xx=xt
+			xx=xt2
 
 
 
@@ -2497,6 +2539,28 @@ def main(con=0):
 
 
 			y+=30
+
+		if len(data)==0:
+
+
+
+
+			im=no_record
+
+			im=im.resize((250,250))
+
+			v+=1
+
+			rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+
+
+			can4.create_image(int(can4["width"])/2,int(can4["height"])/2-(10+30)/2,image=rep_items_ims[v],anchor="c")
+
+			can4.create_text(int(can4["width"])/2,int(can4["height"])/2+250/2+10+15-(10+30)/2,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+
 
 
 		can.create_rectangle(_x_-1,40-1, _x_+int(can3["width"]),40+30+int(can4["height"]),outline="#000000")
@@ -2595,9 +2659,108 @@ def main(con=0):
 		if con==0:
 			cal_st=0
 
+			
+
 
 
 		can.create_text(_x_+30+15,20,text=str(_date_),font=("FreeMono",13),fill="#000000",anchor="w")
+
+		v+=1
+
+		can.create_text(_x_+30+15+f.measure(str(_date_))+50,20,text="All by Month",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50,20+15,
+		
+		rep_items_coord["all_by_month"]=[x1,y1,x2,y2]
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=rep_items_ims[v],anchor="nw")
+
+
+
+
+		if all_by=="month":
+
+
+			v+=1
+
+
+			im=draw_round_rect(10,0,0,20,20, "#00ff00","#00ff00",alpha=1,width=1)
+
+			rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can.create_image(x2-15,y1+15,image=rep_items_ims[v],anchor="c")
+
+		else:
+
+
+			v+=1
+
+
+			im=draw_round_rect(10,0,0,20,20, "#ff0000","#ff0000",alpha=1,width=1)
+
+			rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can.create_image(x1+15,y1+15,image=rep_items_ims[v],anchor="c")
+
+
+
+		v+=1
+
+		can.create_text(_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40,20,text="All by Year",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40+f.measure("All by Year")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40+f.measure("All by Year")+20+50,20+15,
+		
+
+		rep_items_coord["all_by_year"]=[x1,y1,x2,y2]
+
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=rep_items_ims[v],anchor="nw")
+		
+
+		v+=1
+
+
+		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+		if all_by=="year":
+
+
+			v+=1
+
+
+			im=draw_round_rect(10,0,0,20,20, "#00ff00","#00ff00",alpha=1,width=1)
+
+			rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can.create_image(x2-15,y1+15,image=rep_items_ims[v],anchor="c")
+
+		else:
+
+
+			v+=1
+
+
+			im=draw_round_rect(10,0,0,20,20, "#ff0000","#ff0000",alpha=1,width=1)
+
+			rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can.create_image(x1+15,y1+15,image=rep_items_ims[v],anchor="c")
+
+
+
+
 
 
 		_x_+int(can3["width"]),40+30+int(can4["height"])
@@ -2646,8 +2809,11 @@ def main(con=0):
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
 		if con==0:
+
+			man_items_ims={}
 			man_item=None
 			man_reset_st=False
+			search_focus=False
 			man_item_crop_v=[False,[]]
 			search_val=""
 			delete_widgets()
@@ -2977,9 +3143,9 @@ def main(con=0):
 				_x=int(dashboard["width"])
 			x_=_x+(int(can["width"])-_x)/2
 
-			can.create_image(x_,int(can["height"])/2,image=man_items_ims[v],anchor="c")
+			can.create_image(x_,int(can["height"])/2-(10+30)/2,image=man_items_ims[v],anchor="c")
 
-			can.create_text(x_,int(can["height"])/2+250/2+10+15,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+			can.create_text(x_,int(can["height"])/2+250/2+10+15-(10+30)/2,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
 
 
 
@@ -3031,6 +3197,7 @@ def main(con=0):
 		forget_widgets(except_=dashboard)
 		entries_show_reset()
 		if con==0:
+			add_items_ims={}
 			delete_widgets()
 
 
@@ -3770,10 +3937,10 @@ def sb_drag(widget,_x_,_y_):
 
 	            if sb2=="can3r":
 
-		            _scroll_[can3r]["h_sb_coord"][-1]=0
+		            _scroll_["can3r"]["h_sb_coord"][-1]=0
 
 
-		            draw_h_sb(can3r)
+		            draw_h_sb("can3r")
 	            return
 
 	        elif x2+10>_x_>x2:
@@ -4878,6 +5045,8 @@ def can_b1(e):
 	global _total_
 	global cal_st
 	global rep_items_coord
+	global all_by
+
 
 
 	if pay_st=="Cash":
@@ -5095,7 +5264,7 @@ def can_b1(e):
 						if x1<=e.x<=x2:
 							if y1<=can.canvasy(e.y)<=y2:
 
-								draw_selected_item(i[0])
+								draw_selected_item(i[0],0)
 
 								return
 				else:
@@ -5410,6 +5579,135 @@ def can_b1(e):
 						cal.place_forget()
 						return
 
+
+			x1,y1,x2,y2=rep_items_coord["all_by_month"]
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				if all_by==None or all_by=="year":
+
+					all_by="month"
+
+					main(1)
+
+					return
+
+				elif all_by=="month":
+
+					all_by=None
+					main(1)
+
+					return
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				if all_by==None or all_by=="year":
+
+					all_by="month"
+
+					main(1)
+
+					return
+
+				elif all_by=="month":
+					
+					all_by=None
+					main(1)
+
+					return
+
+			if x1+15<=e.x<=x2-15:
+				if y1<=e.x<=y2:
+
+					if all_by==None or all_by=="year":
+
+						all_by="month"
+
+						main(1)
+
+						return
+
+					elif all_by=="month":
+						
+						all_by=None
+						main(1)
+
+						return
+
+
+
+			x1,y1,x2,y2=rep_items_coord["all_by_year"]
+
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				if all_by==None or all_by=="month":
+
+					all_by="year"
+
+					main(1)
+
+					return
+
+				elif all_by=="year":
+
+					all_by=None
+					main(1)
+
+					return
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				if all_by==None or all_by=="month":
+
+					all_by="year"
+
+					main(1)
+
+					return
+
+				elif all_by=="year":
+					
+					all_by=None
+					main(1)
+
+					return
+
+			if x1+15<=e.x<=x2-15:
+				if y1<=e.x<=y2:
+
+					if all_by==None or all_by=="month":
+
+						all_by="year"
+
+						main(1)
+
+						return
+
+					elif all_by=="year":
+						
+						all_by=None
+						main(1)
+
+						return
 
 
 		elif st=="Manage items":
@@ -6958,6 +7256,7 @@ def cal_b1(e):
 	global cal_coord
 	global _date_
 	global days_ar
+	global all_by
 
 	year,month,day=_date_.split("-")
 	year=int(year)
@@ -6970,6 +7269,8 @@ def cal_b1(e):
 		if y<=e.y<=y+20:
 
 			_date_=str(datetime.datetime.now()).split(" ")[0]
+
+			all_by=None
 
 			main(1)
 			return
@@ -6989,6 +7290,8 @@ def cal_b1(e):
 
 
 			_date_=f"{year}-{month}-01"
+
+			all_by=None
 
 			main(1)
 
@@ -7010,6 +7313,8 @@ def cal_b1(e):
 				month="0"+month
 
 			_date_=f"{year}-{month}-01"
+
+			all_by=None
 
 			main(1)
 
@@ -7033,6 +7338,7 @@ def cal_b1(e):
 				month="0"+month
 
 			_date_=f"{year}-{month}-01"
+			all_by=None
 
 			main(1)
 
@@ -7056,6 +7362,8 @@ def cal_b1(e):
 				month="0"+month
 
 			_date_=f"{year}-{month}-01"
+
+			all_by=None
 
 			main(1)
 
@@ -7086,6 +7394,8 @@ def cal_b1(e):
 
 
 				_date_=f"{year}-{month}-{day}"
+
+				all_by=None
 
 				main(1)
 
