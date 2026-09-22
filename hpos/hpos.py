@@ -691,12 +691,12 @@ def draw_manage_item(id_,con):
 	qp=[x2-5-25,y1+5]
 
 
-	can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-		x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+	#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+	#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-	can.create_text(x+xx/2,y1+1+15,text="Manage Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
+	can.create_text(x+xx/2,y1+1+15,text="Manage Item",font=("FreeMono",13),fill="#0000ff",anchor="c")
 
 
 
@@ -1196,15 +1196,15 @@ def pay_with_cash(con):
 	can.create_image(x1,y1,image=sell_items_ims[v],anchor="nw")
 
 
-	can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-		x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+	#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+	#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#ffffff",anchor="c")
+	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#0000ff",anchor="c")
 
 
-	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
+	#can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
 
 
 	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
@@ -2659,7 +2659,11 @@ def main(con=0):
 		if con==0:
 			cal_st=0
 
+
+		m=["Jan","Feb","March","April","May","Jun","July","Aug","Sep","Oct","Nov","Dec"]
 			
+
+		m_=m[int(_date_.split("-")[1])-1]
 
 
 
@@ -2667,43 +2671,41 @@ def main(con=0):
 
 		v+=1
 
-		can.create_text(_x_+30+15+f.measure(str(_date_))+50,20,text="All by Month",font=("FreeMono",13),fill="#000000",anchor="w")
+		can.create_text(_x_+30+15+f.measure(str(_date_))+50,20,text=f"All by Month ({m_})",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
-		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50,20+15,
+		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure(f"All by Month ({m_})")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure(f"All by Month ({m_})")+20+50,20+15,
 		
 		rep_items_coord["all_by_month"]=[x1,y1,x2,y2]
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+
+		if all_by=="month":
+			col="#00ff00"
+		else:
+			col="#ff0000"
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",col,alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can.create_image(x1,y1,image=rep_items_ims[v],anchor="nw")
 
 
+		v+=1
+
+
+		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+
 
 
 		if all_by=="month":
 
-
-			v+=1
-
-
-			im=draw_round_rect(10,0,0,20,20, "#00ff00","#00ff00",alpha=1,width=1)
-
-			rep_items_ims[v]=ImageTk.PhotoImage(im)
-
 			can.create_image(x2-15,y1+15,image=rep_items_ims[v],anchor="c")
 
 		else:
-
-
-			v+=1
-
-
-			im=draw_round_rect(10,0,0,20,20, "#ff0000","#ff0000",alpha=1,width=1)
-
-			rep_items_ims[v]=ImageTk.PhotoImage(im)
 
 			can.create_image(x1+15,y1+15,image=rep_items_ims[v],anchor="c")
 
@@ -2711,16 +2713,21 @@ def main(con=0):
 
 		v+=1
 
-		can.create_text(_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40,20,text="All by Year",font=("FreeMono",13),fill="#000000",anchor="w")
+		can.create_text(_x_+30+15+f.measure(str(_date_))+50+f.measure(f"All by Month ({m_})")+20+50+40,20,text=f"All by Year ({_date_.split("-")[0]})",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
-		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40+f.measure("All by Year")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure("All by Month")+20+50+40+f.measure("All by Year")+20+50,20+15,
+		x1,y1,x2,y2=_x_+30+15+f.measure(str(_date_))+50+f.measure(f"All by Month ({m_})")+20+50+40+f.measure(f"All by Year ({_date_.split("-")[0]})")+20,20-15, _x_+30+15+f.measure(str(_date_))+50+f.measure(f"All by Month ({m_})")+20+50+40+f.measure(f"All by Year ({_date_.split("-")[0]})")+20+50,20+15,
 		
 
 		rep_items_coord["all_by_year"]=[x1,y1,x2,y2]
 
+		if all_by=="year":
+			col="#00ff00"
+		else:
+			col="#ff0000"
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",col,alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -2734,28 +2741,20 @@ def main(con=0):
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
+
+		v+=1
+
+
+		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
+
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+
 		if all_by=="year":
-
-
-			v+=1
-
-
-			im=draw_round_rect(10,0,0,20,20, "#00ff00","#00ff00",alpha=1,width=1)
-
-			rep_items_ims[v]=ImageTk.PhotoImage(im)
 
 			can.create_image(x2-15,y1+15,image=rep_items_ims[v],anchor="c")
 
 		else:
-
-
-			v+=1
-
-
-			im=draw_round_rect(10,0,0,20,20, "#ff0000","#ff0000",alpha=1,width=1)
-
-			rep_items_ims[v]=ImageTk.PhotoImage(im)
-
 			can.create_image(x1+15,y1+15,image=rep_items_ims[v],anchor="c")
 
 
@@ -3268,12 +3267,12 @@ def main(con=0):
 		can.create_image(x,y,image=add_items_ims[v],anchor="nw")
 
 
-		can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
-			x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
+		#can.create_polygon(x1+(x2-x1)/2-100,y1+2, x1+(x2-x1)/2+100,y1+2,
+		#	x1+(x2-x1)/2+100-15,y1+32, x1+(x2-x1)/2-100+15,y1+32,fill="#000000",outline="#000000")
 
 
 
-		can.create_text(x+xx/2,y1+1+15,text="Add Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
+		can.create_text(x+xx/2,y1+1+15,text="Add Item",font=("FreeMono",13),fill="#0000ff",anchor="c")
 
 
 
