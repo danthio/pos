@@ -105,7 +105,7 @@ def formart_number(no,x,con=0):
 			return f"{round(no/1000000000,1)} B"
 
 		elif no>=1000000:
-			return f"{round(no/1000000,1)} B"
+			return f"{round(no/1000000,1)} M"
 
 		elif no>=1000:
 			return f"{round(no/1000,1)} K"
@@ -1570,7 +1570,8 @@ graph_coords={}
 
 graph_st=""
 graph_ims={}
-forecast_st=""
+forecast_st,forecast_st_="",""
+forecast_st2=0
 forecast_ims={}
 forecast_coords={}
 fp,fs=0,0
@@ -1620,7 +1621,7 @@ def main(con=0):
 	global graph_st
 	global previous2,next2
 	global graph_ims
-	global forecast_st
+	global forecast_st,forecast_st_,forecast_st2
 	global forecast_ims
 	global forecast_coords
 	global fp,fs
@@ -3376,10 +3377,24 @@ def main(con=0):
 
 			forecast_ims={}
 
-			forecast_st="Monthly"
+			forecast_st="Daily"
+
+
+			forecast_st2=0
 
 			
 			delete_widgets()
+
+		elif con==1:
+
+			forecast_st2=1
+
+
+		if forecast_st_!=forecast_st:
+
+			forecast_st2=0
+
+			forecast_st_=forecast_st
 
 
 		can["width"]=width
@@ -3454,77 +3469,119 @@ def main(con=0):
 
 		can3.delete("all")
 
-		can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
+
+		if forecast_st2==0:
+			can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
 
 		can3.place(in_=root,x=x1_,y=y1_+40)
 
 
-		def det_next_day(date):
+		def det_next_date(date,con_):
 
-		    y,m,d=date.split("-")
+			if con_=="Day":
+				y,m,d=date.split("-")
 
-		    y=int(y)
-		    m=int(m)
-		    d=int(d)
+				y=int(y)
+				m=int(m)
+				d=int(d)
 
+			elif con_=="Week":
+				y,m=date.split(" (")[0].split("-")
 
+				y=int(y)
+				m=int(m)
 
-		    if y%4==0:
-		        feb_=29
-		    else:
-		        feb_=28
-
-		    months={
-		    1:["January",31],
-		    2:["February",feb_],
-		    3:["March",31],
-		    4:["April",30],
-		    5:["May",31],
-		    6:["June",30],
-		    7:["July",31],
-		    8:["August",31],
-		    9:["September",30],
-		    10:["October",31],
-		    11:["November",30],
-		    12:["December",31]
-		    }
+				w=int(date.split(" (")[1][0])
 
 
-		    if d+1<=months[m][1]:
+			elif con_=="Month":
 
-		        return f"{y}-{m}-{d+1}"
+				y,m=date.split("-")
 
-		    elif months[m][1]==d:
-
-		        if m==12:
-
-		            return f"{y+1}-{1}-{1}"
-
-		        else:
-		            return f"{y}-{m+1}-{1}"
+				y=int(y)
+				m=int(m)
 
 
 
 
-		forecast_st="Daily"
+
+			if y%4==0:
+			    feb_=29
+			else:
+			    feb_=28
+
+			months={
+			1:["January",31],
+			2:["February",feb_],
+			3:["March",31],
+			4:["April",30],
+			5:["May",31],
+			6:["June",30],
+			7:["July",31],
+			8:["August",31],
+			9:["September",30],
+			10:["October",31],
+			11:["November",30],
+			12:["December",31]
+			}
+
+
+			if con_=="Day":
+
+
+			    if d+1<=months[m][1]:
+
+			        return f"{y}-{m}-{d+1}"
+
+			    elif months[m][1]==d:
+
+			        if m==12:
+
+			            return f"{y+1}-{1}-{1}"
+
+			        else:
+			            return f"{y}-{m+1}-{1}"
+			elif con_=="Week":
+
+				if w==4:
+
+					if m==12:
+
+						return f"{y+1}-{m+1} ({1})"
+
+					else:
+						return f"{y}-{m+1} ({1})"
+
+				else:
+
+					return f"{y}-{m} ({w+1})"
+
+
+
+
+			elif con_=="Month":
+
+				if m+1>12:
+
+					return f"{y+1}-{1}"
+
+				else:
+
+					return f"{y}-{m+1}"
+
+
+
 
 		
-		fx=[]
 
-		start_date="2026-9-20"
-		y_,m_,d_=str(datetime.datetime.now()).split(" ")[0].split("-")
+		
 
-		cur_date=f"{int(y_)}-{int(m_)}-{int(d_)}"
-
-		x_=50
-
-		fx.append([x_,start_date])
 
 
 		can.create_rectangle(x1+150-1,y1+50-1,x1+150+int(can3["width"]),y1+50+int(can3["height"]))
 
 
-		def det_total_daily_sales_n_profits(date):
+		def det_total_daily_sales_n_profits(date,con_):
 
 
 			tprofit=0
@@ -3538,11 +3595,31 @@ def main(con=0):
 
 			rows=cur.fetchall()
 
-			y_,m_,d_=date.split("-")
+			if con_=="Daily":
 
-			y_=int(y_)
-			m_=int(m_)
-			d_=int(d_)
+				y_,m_,d_=date.split("-")
+
+				y_=int(y_)
+				m_=int(m_)
+				d_=int(d_)
+
+			elif con_=="Weekly":
+
+				y_,m_=date.split(" (")[0].split("-")
+
+				y_=int(y_)
+				m_=int(m_)
+
+				w_=int(date.split(" (")[1][0])
+
+
+
+
+			elif con_=="Monthly":
+				y_,m_=date.split("-")
+
+				y_=int(y_)
+				m_=int(m_)
 
 			for row in rows:
 
@@ -3555,39 +3632,92 @@ def main(con=0):
 				_d_=int(_d_)
 
 
+				w=_d_/7
 
-				if _y_==y_ and _m_==m_ and _d_==d_:
+				w=int(w)
 
+				if w==4:
+					w=3
 
-					selling_price=str(row[5])
-					buying_price=str(row[4])
-					sold_at=str(row[6])
-					quantity=str(row[3])
-					profit=(int(sold_at)*int(quantity))-(int(buying_price)*int(quantity))
-					total=(int(sold_at)*int(quantity))
+				w+=1
 
 
-					tprofit+=profit
-					tsales+=total
+				if con_=="Daily":
 
 
+
+					if _y_!=y_ or _m_!=m_ or _d_!=d_:
+
+						continue
+
+				elif con_=="Weekly":
+
+
+
+
+					if _y_!=y_ or _m_!=m_ or w!=w_:
+
+						continue
+
+
+
+
+
+
+				elif con_=="Monthly":
+
+
+					if _y_!=y_ or _m_!=m_:
+						continue
+
+
+				selling_price=str(row[5])
+				buying_price=str(row[4])
+				sold_at=str(row[6])
+				quantity=str(row[3])
+				profit=(int(sold_at)*int(quantity))-(int(buying_price)*int(quantity))
+				total=(int(sold_at)*int(quantity))
+
+
+				tprofit+=profit
+				tsales+=total
+						
 			return [tprofit,tsales]
+
+		
 
 
 		if forecast_st=="Daily":
 
+
+
+			fx=[]
+
+			start_date="2026-9-20"
+			y_,m_,d_=str(datetime.datetime.now()).split(" ")[0].split("-")
+
+			cur_date=f"{int(y_)}-{int(m_)}-{int(d_)}"
+
+			x_=0
+
+			fx.append([x_,start_date])
 			
 			con_=0
 
+			
+
 			while 1:
 
+
+				if start_date==cur_date:
+					break
 
 			
 
 				x_+=100
 
 
-				date=det_next_day(fx[-1][1])
+				date=det_next_date(fx[-1][1],"Day")
 
 
 				if date==cur_date:
@@ -3604,7 +3734,7 @@ def main(con=0):
 			x_+=100
 			for _ in range(30):
 
-				date=det_next_day(fx[-1][1])
+				date=det_next_date(fx[-1][1],"Day")
 
 				fx.append([x_,date])
 
@@ -3618,13 +3748,173 @@ def main(con=0):
 
 
 
-				fy.append(det_total_daily_sales_n_profits(fx[_][1]))
+				fy.append(det_total_daily_sales_n_profits(fx[_][1],"Daily"))
 
 
 				if fx[_][1]==cur_date:
 
-					break 
+					break
 
+		elif forecast_st=="Weekly":
+
+
+
+			fx=[]
+
+
+			w=int(20/7)
+
+			if w==4:
+				w=3
+
+			w+=1
+
+			start_date=f"2026-9 ({w})"
+			y_,m_,d_=str(datetime.datetime.now()).split(" ")[0].split("-")
+
+
+			w=int(int(d_)/7)
+
+			if w==4:
+				w=3
+
+			w+=1
+
+
+
+			cur_date=f"{int(y_)}-{int(m_)} ({w})"
+
+			x_=0
+
+			fx.append([x_,start_date])
+
+
+			con_=0
+
+			
+
+			while 1:
+
+
+				if start_date==cur_date:
+					break
+
+
+			
+
+				x_+=100
+
+
+				date=det_next_date(fx[-1][1],"Week")
+
+
+				if date==cur_date:
+					con_=1
+
+
+
+
+				fx.append([x_,date])
+
+				if con_==1:
+					break
+
+			x_+=100
+			for _ in range(12):
+
+				date=det_next_date(fx[-1][1],"Week")
+
+				fx.append([x_,date])
+
+				x_+=100
+
+			fy=[]
+
+			for _ in range(len(fx)):
+
+
+
+
+
+				fy.append(det_total_daily_sales_n_profits(fx[_][1],"Weekly"))
+
+
+				if fx[_][1]==cur_date:
+
+					break
+
+
+
+		elif forecast_st=="Monthly":
+
+
+
+			fx=[]
+
+			start_date="2026-9"
+			y_,m_,d_=str(datetime.datetime.now()).split(" ")[0].split("-")
+
+			cur_date=f"{int(y_)}-{int(m_)}"
+
+			x_=0
+
+			fx.append([x_,start_date])
+
+
+			con_=0
+
+			
+
+			while 1:
+
+
+				if start_date==cur_date:
+					break
+
+
+			
+
+				x_+=100
+
+
+				date=det_next_date(fx[-1][1],"Month")
+
+
+
+				if date==cur_date:
+					con_=1
+
+
+
+
+				fx.append([x_,date])
+
+				if con_==1:
+					break
+
+			x_+=100
+			for _ in range(12):
+
+				date=det_next_date(fx[-1][1],"Month")
+
+				fx.append([x_,date])
+
+				x_+=100
+
+			fy=[]
+
+			for _ in range(len(fx)):
+
+
+
+
+
+				fy.append(det_total_daily_sales_n_profits(fx[_][1],"Monthly"))
+
+
+				if fx[_][1]==cur_date:
+
+					break
 
 
 
@@ -3650,7 +3940,7 @@ def main(con=0):
 
 		fp=ImageTk.PhotoImage(im)
 
-		can3.create_line(0,int(can3["height"])-50,fx[-1][0]+50,int(can3["height"])-50,fill="#000000")
+		
 
 
 
@@ -3660,9 +3950,9 @@ def main(con=0):
 			date=fx[_][1]
 			x_=fx[_][0]
 
-			can3.create_text(x_,int(can3["height"])-50+25,text=date,font=("FreeMono",13),fill="#000000",anchor="c")
+			can3.create_text(x_+50,int(can3["height"])-50+25,text=date,font=("FreeMono",13),fill="#000000",anchor="c")
 
-			can3.create_line(x_,0,x_,int(can3["height"])-50,fill="#000000",dash=(1,3))
+			can3.create_line(x_+50,0,x_+50,int(can3["height"])-50,fill="#808080",dash=(1,3))
 
 
 		x1,y1,x2,y2=_x_,40,_x_+xx,int(can["height"])-40
@@ -3689,13 +3979,15 @@ def main(con=0):
 
 			can.create_text(x1+150-10,y__,text=formart_number(int(a),50),fill="#000000",anchor="e",font=("FreeMono",13))
 
-			can3.create_line(0,y__-(y1+50),fx[-1][0]+50,y__-(y1+50),fill="#000000",dash=(1,3))
+			can3.create_line(0,y__-(y1+50),fx[-1][0]+50,y__-(y1+50),fill="#808080",dash=(1,3))
 
 
 			y_+=y_s
 			y__-=y_s
 
+		can3.create_line(50,0,50,int(can3["height"])-50,fill="#000000")
 
+		can3.create_line(0,int(can3["height"])-50,fx[-1][0]+50+50,int(can3["height"])-50,fill="#000000")
 
 
 		c=0
@@ -3708,10 +4000,12 @@ def main(con=0):
 			y_s=s*(int(can3["height"])-50)/max_sales/2
 
 
-			can3.create_image(fx[c][0], int(can3["height"])-50-y_p, image=fp, anchor="c")
-			can3.create_image(fx[c][0], int(can3["height"])-50-y_s, image=fs, anchor="c")
+			can3.create_image(fx[c][0]+50, int(can3["height"])-50-y_p, image=fp, anchor="c")
+			can3.create_image(fx[c][0]+50, int(can3["height"])-50-y_s, image=fs, anchor="c")
 
 			c+=1
+
+
 
 
 
@@ -3730,41 +4024,52 @@ def main(con=0):
 			x_values.append(fx[_][0])
 
 
-
-		b0,b1=linear_regression(y_values,x_values)
-
-		y1_=b0*(int(can3["height"])-50)/max_sales/2
-
-		y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
-
-
-		can3.create_line(fx[0][0],int(can3["height"])-50-y1_, fx[-1][0],int(can3["height"])-50-y2_, fill="#ff0000")
+		try:
 
 
 
-		#sales
+			b0,b1=linear_regression(y_values,x_values)
 
-		y_values=[]
-		x_values=[]
+			y1_=b0*(int(can3["height"])-50)/max_sales/2
 
-		for _ in range(len(fy)):
-
-			y_values.append(fy[_][1])
-			x_values.append(fx[_][0])
+			y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
 
 
-
-		b0,b1=linear_regression(y_values,x_values)
-
-		y1_=b0*(int(can3["height"])-50)/max_sales/2
-
-		y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#ff0000")
 
 
-		can3.create_line(fx[0][0],int(can3["height"])-50-y1_, fx[-1][0],int(can3["height"])-50-y2_, fill="#0000ff")
+
+			#sales
+
+			y_values=[]
+			x_values=[]
+
+			for _ in range(len(fy)):
+
+				y_values.append(fy[_][1])
+				x_values.append(fx[_][0])
 
 
-		can3["scrollregion"]=(0,0,fx[-1][0]+50,int(can3["height"]))
+
+
+
+			b0,b1=linear_regression(y_values,x_values)
+
+
+			y1_=b0*(int(can3["height"])-50)/max_sales/2
+
+			y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+
+
+			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#0000ff")
+
+		except:
+			pass
+
+
+		if forecast_st2==0:
+
+			can3["scrollregion"]=(0,0,fx[-1][0]+50+50,int(can3["height"]))
 
 
 		can.create_image(x1+150-5-20,y1+50+int(can3["height"])-20,image=previous2,anchor="nw")
@@ -3773,7 +4078,15 @@ def main(con=0):
 		forecast_coords["right"]=[x1+150+int(can3["width"])+5,y1+50+int(can3["height"])-20]
 
 
-		can.create_text(x1+150+int(can3["width"])/2,y1+25,text="LINREAR REGRESSION SHOWING POSSIBLE SALES ON FUTURE DAYS",
+		if forecast_st=="Daily":
+			txt="DAYS"
+		elif forecast_st=="Weekly":
+			txt="WEEKS"
+		elif forecast_st=="Monthly":
+			txt="MONTHS"
+
+
+		can.create_text(x1+150+int(can3["width"])/2,y1+25,text=f"LINREAR REGRESSION SHOWING POSSIBLE SALES ON FUTURE {txt}",
 			font=("FreeMono",13,"bold"),fill="#000000")
 
 
@@ -3793,6 +4106,19 @@ def main(con=0):
 		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20+30,
 			text="Linear regression for Profits",font=("FreeMono",13),fill="#000000",anchor="w")
 
+
+		can.create_image(x1,(40-20)/2,image=previous2,anchor="nw")
+		forecast_coords["previous"]=[x1,(40-20)/2]
+
+		can.create_text(x1+20+10,20,text=forecast_st,font=("FreeMono",13),fill="#000000",
+			anchor="w")
+
+		can.create_image(x1+20+10+f.measure(forecast_st)+10,(40-20)/2,image=next2,anchor="nw")
+
+		forecast_coords["next"]=[x1+20+10+f.measure(forecast_st)+10,(40-20)/2]
+
+
+		can.focus_set()
 
 
 	elif st=="Manage items":
@@ -6086,6 +6412,7 @@ def can_b1(e):
 	global graph_coords
 	global graph_st
 	global forecast_coords
+	global forecast_st,forecast_st2
 
 
 
@@ -6802,6 +7129,55 @@ def can_b1(e):
 					return
 
 		elif st=="Forecasts":
+
+
+			x_,y_=forecast_coords["previous"]
+
+			if x_<=e.x<=x_+20:
+
+				if y_<=e.y<=y_+20:
+
+					if forecast_st=="Daily":
+						forecast_st="Monthly"
+
+					elif forecast_st=="Monthly":
+						forecast_st="Weekly"
+
+					elif forecast_st=="Weekly":
+						forecast_st="Daily"
+
+
+					forecast_st2=0
+
+					main(1)
+
+					return
+
+
+
+			x_,y_=forecast_coords["next"]
+
+			if x_<=e.x<=x_+20:
+
+				if y_<=e.y<=y_+20:
+
+					if forecast_st=="Daily":
+						forecast_st="Weekly"
+
+					elif forecast_st=="Weekly":
+						forecast_st="Monthly"
+						
+					elif forecast_st=="Monthly":
+						forecast_st="Daily"
+
+
+					forecast_st2=0
+
+
+					main(1)
+
+					return
+
 
 
 			x_,y_=forecast_coords["left"]
@@ -7747,6 +8123,28 @@ def scroll(e):
 					draw_h_sb(sb2)
 
 
+
+
+
+
+
+def can_left(e):
+
+	global can3
+
+
+	can3.xview_scroll(-1,"units")
+
+
+def can_right(e):
+
+	global can3
+
+
+	can3.xview_scroll(1,"units")
+
+
+
 can=tk.Canvas(width=width,height=height,relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can.place(in_=root,x=0,y=0)
 can.bind("<Button-1>",can_b1)
@@ -7754,6 +8152,9 @@ can.bind("<Motion>",can_motion)
 can.bind("<B1-Motion>",can_drag)
 can.bind_all("<MouseWheel>",scroll)
 can.bind("<ButtonRelease-1>",can_b1_release)
+
+can.bind("<Left>",can_left)
+can.bind("<Right>",can_right)
 
 def can2_b1(e):
 	global search_coords
