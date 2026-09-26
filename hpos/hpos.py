@@ -12,6 +12,55 @@ from tkinter import filedialog
 import os
 import datetime
 
+
+"""
+def linear_regression(y_values):
+    n = len(y_values)
+
+    # x values are simply 1, 2, 3, ...
+    x_values = list(range(1, n + 1))
+
+    x_mean = sum(x_values) / n
+    y_mean = sum(y_values) / n
+
+    # Calculate slope (b1)
+    numerator = sum(
+        (x - x_mean) * (y - y_mean)
+        for x, y in zip(x_values, y_values)
+    )
+
+    denominator = sum(
+        (x - x_mean) ** 2
+        for x in x_values
+    )
+
+    b1 = numerator / denominator
+
+    # Calculate intercept (b0)
+    b0 = y_mean - b1 * x_mean
+
+    return b0, b1
+
+
+# Example
+y = [45, 50, 60, 65, 72]
+
+b0, b1 = linear_regression(y)
+
+print("Intercept:", b0)
+print("Slope:", b1)
+
+# Predict the next value (x = 6)
+x = 6
+prediction = b0 + b1 * x
+
+print("Prediction:", prediction)
+
+θ=tan−1(1)=45∘
+
+"""
+
+
 add_items_ims={}
 
 add_items_coords={}
@@ -53,13 +102,13 @@ def formart_number(no,x,con=0):
 
 		if no>=1000000000:
 
-			return f"{round(no/1000000000,3)} B"
+			return f"{round(no/1000000000,1)} B"
 
 		elif no>=1000000:
-			return f"{round(no/1000000,3)} B"
+			return f"{round(no/1000000,1)} B"
 
 		elif no>=1000:
-			return f"{round(no/1000,3)} K"
+			return f"{round(no/1000,1)} K"
 
 		else:
 			return f"{no}"
@@ -1455,6 +1504,35 @@ def pay_with_mpesa():
 	
 
 
+def linear_regression(y_values,x_values):
+    n = len(y_values)
+
+    # x values are simply 1, 2, 3, ...
+    #x_values = list(range(1, n + 1))
+
+    x_mean = sum(x_values) / n
+    y_mean = sum(y_values) / n
+
+    # Calculate slope (b1)
+    numerator = sum(
+        (x - x_mean) * (y - y_mean)
+        for x, y in zip(x_values, y_values)
+    )
+
+    denominator = sum(
+        (x - x_mean) ** 2
+        for x in x_values
+    )
+
+    b1 = numerator / denominator
+
+    # Calculate intercept (b0)
+    b0 = y_mean - b1 * x_mean
+
+    return b0, b1
+
+
+
 sell_items_ims={}
 
 _scroll_={}
@@ -1488,6 +1566,14 @@ cal_st=0
 
 rep_items_coord={}
 all_by=None
+graph_coords={}
+
+graph_st=""
+graph_ims={}
+forecast_st=""
+forecast_ims={}
+forecast_coords={}
+fp,fs=0,0
 def main(con=0):
 
 	global st,st_
@@ -1530,6 +1616,14 @@ def main(con=0):
 	global cal_st
 	global rep_items_coord
 	global all_by
+	global graph_coords
+	global graph_st
+	global previous2,next2
+	global graph_ims
+	global forecast_st
+	global forecast_ims
+	global forecast_coords
+	global fp,fs
 
 	st_="main"
 
@@ -1557,12 +1651,12 @@ def main(con=0):
 			search_focus=False
 			delete_widgets()
 
-		can["width"]=width-400
+		can["width"]=width-450
 		can["height"]=height-40
 		can["scrollregion"]=(0,0,width,height-40)
 		can["bg"]="#ffffff"
 
-		can["scrollregion"]=(0,0,width-400,height-40)
+		can["scrollregion"]=(0,0,width-450,height-40)
 
 
 		if con==0:
@@ -1577,8 +1671,8 @@ def main(con=0):
 					"h_":h1,
 					"w":int(can["width"]),
 					"h":int(can["height"]),
-					"_x":width-400,
-					"_x2":width-400,
+					"_x":width-450,
+					"_x2":width-450,
 					"scrollregion":can["scrollregion"],
 					"v_drag_st":0,
 					"h_drag_st":0,
@@ -1600,8 +1694,8 @@ def main(con=0):
 					"h_":h1,
 					"w":int(can["width"]),
 					"h":int(can["height"]),
-					"_x":width-400,
-					"_x2":width-400,
+					"_x":width-450,
+					"_x2":width-450,
 					"scrollregion":can["scrollregion"],
 					"v_drag_st":0,
 					"h_drag_st":0,
@@ -1625,24 +1719,24 @@ def main(con=0):
 		can2.delete("all")
 
 		can2.create_line(0,0,width,0,fill="#000000")
-		#can2.create_line(0,39,width,39,fill="#dddddd")
+		#can2.create_line(0,39,width,39,fill="#eeeeee")
 
 		can2.place(in_=root,x=0,y=0)
 
 
-		can3["width"]=400
+		can3["width"]=450
 		can3["height"]=height-40
 		can3["bg"]="#ffffff"
 
 		can3.delete("all")
-		can3.place(in_=root,x=width-400,y=40)
+		can3.place(in_=root,x=width-450,y=40)
 
 		can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
 
 		v=0
 
 
-		_x_=400-10
+		_x_=450-10
 
 
 
@@ -2111,14 +2205,14 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30,10+5+10+15+25+10+f.measure("Clear Cart")+15,int(can3["height"])-10-30-(10+30)*2-30*2-15-10
+		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30,int(can3["width"])-10-5,int(can3["height"])-10-30-(10+30)*2-30*2-15-10
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000","#ff0000",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
-		can3.create_image(x1+15,y1+2.5,image=clear_cart,anchor="nw")
-		can3.create_text(x1+15+25+10,y1+15, text="Clear Cart",fill="#ffffff",font=("FreeMono",13),anchor="w")
+		can3.create_image(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2,y1+2.5,image=clear_cart,anchor="nw")
+		can3.create_text(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2+25+10,y1+15, text="Clear Cart",fill="#ffffff",font=("FreeMono",13),anchor="w")
 
 
 		cart_buttons_coords["clear_cart"]=[x1,y1,x2,y2]
@@ -2242,11 +2336,11 @@ def main(con=0):
 		can2.delete("all")
 
 		can2.create_line(0,0,width,0,fill="#000000")
-		#can2.create_line(0,39,width,39,fill="#dddddd")
+		#can2.create_line(0,39,width,39,fill="#eeeeee")
 		v=0
 
 
-		_x_=400-10
+		_x_=450-10
 
 
 
@@ -2512,7 +2606,7 @@ def main(con=0):
 
 			if _st_==1:
 
-				can4.create_rectangle(0,y, xt,y+30, fill="#dddddd",outline="#dddddd")
+				can4.create_rectangle(0,y, xt,y+30, fill="#eeeeee",outline="#eeeeee")
 
 			_x=0
 
@@ -2665,7 +2759,7 @@ def main(con=0):
 			cal_st=0
 
 
-		m=["Jan","Feb","March","April","May","Jun","July","Aug","Sep","Oct","Nov","Dec"]
+		m=["January","February","March","April","May","June","July","August","September","October","November","December"]
 			
 
 		m_=m[int(_date_.split("-")[1])-1]
@@ -2689,7 +2783,7 @@ def main(con=0):
 		else:
 			col="#ff0000"
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",col,alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -2699,7 +2793,7 @@ def main(con=0):
 		v+=1
 
 
-		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
+		im=draw_round_rect(10,0,0,20,20, "#000000",col,alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -2732,7 +2826,7 @@ def main(con=0):
 			col="#ff0000"
 
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",col,alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -2742,18 +2836,12 @@ def main(con=0):
 		v+=1
 
 
-		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
+		im=draw_round_rect(10,0,0,20,20, "#000000",col,alpha=1,width=1)
 
 		rep_items_ims[v]=ImageTk.PhotoImage(im)
 
 
-		v+=1
-
-
-		im=draw_round_rect(10,0,0,20,20, "#000000","#000000",alpha=1,width=1)
-
-		rep_items_ims[v]=ImageTk.PhotoImage(im)
-
+		
 
 		if all_by=="year":
 
@@ -2802,6 +2890,908 @@ def main(con=0):
 
 
 
+
+
+
+	elif st=="Graphs":
+
+
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+
+			cal_st=0
+
+			_date_=str(datetime.datetime.now()).split(" ")[0]
+
+			graph_st="Annually"
+
+			
+			delete_widgets()
+
+
+		can["width"]=width
+		can["height"]=height-40
+		can["bg"]="#ffffff"
+		can["scrollregion"]=(0,0,int(can["width"]),int(can["height"]))
+		can.delete("all")
+
+		can.place(in_=root,x=0,y=40)
+
+		can2["width"]=width
+		can2["height"]=40
+
+		can2.place(in_=root,x=0,y=0)
+
+		can2.delete("all")
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+
+		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+		if row[4]=="":
+
+			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+
+
+		else:
+
+			#process profile picture
+			pass
+
+
+
+
+
+
+		if int(dashboard.place_info()["x"])<0:
+
+			x_=5+25+5
+
+		else:
+
+			x_=int(dashboard["width"])
+
+
+		xx=int(can["width"])-int(dashboard["width"])-200
+
+
+		_x_=x_+((int(can["width"])-x_)-xx)/2
+
+
+		can.create_image(_x_,(40-30)/2, image=calendar,anchor="nw")
+
+		graph_coords["calendar"]=[_x_,(40-30)/2]
+
+
+		d=_date_.split("-")
+		y=d[0]
+		m=d[1]
+		can.create_text(_x_+30+20,20,text=f"{y}-{m}",font=("FreeMono",13),fill="#000000",anchor="w")
+
+		x1,y1,x2,y2=_x_,40,_x_+xx,int(can["height"])-40
+
+
+		can.create_image(x2-20,(40-20)/2,image=next2,anchor="nw")
+
+		graph_coords["next"]=x2-20,(40-20)/2
+
+		can.create_text(x2-20-10-f.measure(graph_st),20,text=graph_st,font=("FreeMono",13),fill="#000000",anchor="w")
+
+		can.create_image(x2-20-10-f.measure(graph_st)-10-20,(40-20)/2,image=previous2,anchor="nw")
+
+		graph_coords["previous"]=x2-20-10-f.measure(graph_st)-10-20,(40-20)/2
+
+
+
+		#can.create_rectangle(x1,y1,x2,y2,outline="#000000",fill="#eeeeee")
+
+		v=0
+		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#eeeeee",alpha=1,width=1)
+
+		graph_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=graph_ims[v],anchor="nw")
+
+		if graph_st=="Annually":
+
+			db_reports=database.connect("data/reports.db")
+			cur=db_reports.cursor()
+
+			cur.execute("SELECT * FROM reports")
+
+			rows=cur.fetchall()
+
+			data={1:{"month":"Jan","profit":0,"total sales":0},
+				2:{"month":"Feb","profit":0,"total sales":0},
+				3:{"month":"March","profit":0,"total sales":0},
+				4:{"month":"April","profit":0,"total sales":0},
+				5:{"month":"May","profit":0,"total sales":0},
+				6:{"month":"June","profit":0,"total sales":0},
+				7:{"month":"July","profit":0,"total sales":0},
+				8:{"month":"Aug","profit":0,"total sales":0},
+				9:{"month":"Sept","profit":0,"total sales":0},
+				10:{"month":"Oct","profit":0,"total sales":0},
+				11:{"month":"Nov","profit":0,"total sales":0},
+				12:{"month":"Dec","profit":0,"total sales":0},
+				}
+
+
+
+			for row in rows:
+
+				date_time=str(row[1])
+
+				_y_,_m_,_d_=date_time.split(" ")[0].split("-")
+
+				if y!=_y_:
+					continue
+
+
+
+				selling_price=str(row[5])
+				buying_price=str(row[4])
+				sold_at=str(row[6])
+				quantity=str(row[3])
+				discount=str((int(selling_price)*int(quantity))-(int(sold_at)*int(quantity)))
+				profit=str((int(sold_at)*int(quantity))-(int(buying_price)*int(quantity)))
+				total=str((int(sold_at)*int(quantity)))
+
+
+				data[int(_m_)]["profit"]+=int(profit)
+				data[int(_m_)]["total sales"]+=int(total)
+
+
+
+
+			max_sales=0
+
+			for i in data:
+
+				if max_sales<data[i]["total sales"]:
+
+					max_sales=data[i]["total sales"]
+
+
+
+
+
+
+			can.create_rectangle(x1+150,y1+50, x2-50,y2-100-40, outline="#000000",fill="#ffffff")
+
+			y_s=(((y2-100-40)-(y1+50))/10)
+
+			y_=y2-100-40
+
+			for _ in range(10):
+
+				can.create_line(x1+150,y_,x2-50,y_,fill="#808080",dash=(1,3))
+
+				y_-=y_s
+
+
+
+			xr=((x2-50)-(x1+150))/12
+
+			x__=x1+150+xr
+
+			for _ in range(12):
+
+				can.create_line(x__,y1+50,x__,y2-100-40,fill="#808080",dash=(1,3))
+
+				x__+=xr
+
+
+			can.create_rectangle(x1+150,y1+50, x2-50,y2-100-40, outline="#000000")
+
+			x_=x1+150+xr/2
+
+
+			xw=(xr-10-5)/2
+
+			x__=(xr-xw*2-5)/2
+
+			for i in data:
+
+				p=data[i]["profit"]
+				ts=data[i]["total sales"]
+
+
+				if max_sales==0:
+					y_1,y_2=0,0
+				else:
+
+					y_1=int(round((((y2-100-40)-(y1+50))-100)*p/max_sales,0))
+					y_2=int(round((((y2-100-40)-(y1+50))-100)*ts/max_sales,0))
+
+				if y_1!=0:
+
+					can.create_rectangle(x_+x__-xr/2,y2-100-40, x_+x__+xw-xr/2,y2-100-40-y_1,fill="#ff0000",outline="#ff0000")
+		
+				if y_2!=0:
+
+					can.create_rectangle(x_+x__+xw+5-xr/2,y2-100-40, x_+x__+xw+5+xw-xr/2,y2-100-40-y_2,fill="#0000ff",outline="#0000ff")
+
+
+				can.create_text(x_,y2-100+30-40,text=data[i]["month"],font=("FreeMono",13),fill="#000000")
+
+				x_+=xr
+
+
+
+			can.create_text(x1+150+((x2-50)-(x1+150))/2,y2-100+30+40-40,text="Months",font=("FreeMono",13,"bold"),fill="#000000")
+			can.create_text(x1+20,y1+50+((y2-100)-(y1+50))/2,text="Ksh",font=("FreeMono",13,"bold"),fill="#000000",anchor="w")
+
+
+			
+
+			y_=0
+
+			y__=y2-100-40
+
+
+			for _ in range(11):
+
+				mx=max_sales
+
+				if max_sales==0:
+
+					mx=500000
+
+				a=int(round((y_)/(((y2-100-40)-(y1+50))-100)*mx,0))
+
+
+
+				can.create_text(x1+150-10,y__,text=formart_number(int(a),50),fill="#000000",anchor="e",font=("FreeMono",13))
+
+				y_+=y_s
+				y__-=y_s
+
+
+
+
+			can.create_rectangle(x1+150,y2-10-30-10-5, x1+150+10,y2-10-30-10+10-5, fill="#ff0000",outline="#ff0000")
+			can.create_text(x1+150+10+15,y2-10-30-10+5-5,text="Profits",fill="#000000",font=("FreeMono",13),anchor="w")
+
+
+			can.create_rectangle(x1+150,y2-10-30-10+30-5, x1+150+10,y2-10-30-10+10+30-5, fill="#0000ff",outline="#0000ff")
+			can.create_text(x1+150+10+15,y2-10-30-10+5+30-5,text="Total Sales",fill="#000000",font=("FreeMono",13),anchor="w")
+
+			can.create_text(x1+150+((x2-50)-(x1+150))/2,y1+25,text=F"BAR GRAPH SHOWING YEAR {y} SALES.",font=("FreeMono",13,"bold"),fill="#000000")
+
+
+
+		elif graph_st=="Monthly":
+
+
+			db_reports=database.connect("data/reports.db")
+			cur=db_reports.cursor()
+
+			cur.execute("SELECT * FROM reports")
+
+			rows=cur.fetchall()
+
+			data={0:{"week":"Week 1","profit":0,"total sales":0},
+				1:{"week":"Week 2","profit":0,"total sales":0},
+				2:{"week":"Week 3","profit":0,"total sales":0},
+				3:{"week":"Week 4","profit":0,"total sales":0},
+				}
+
+
+			for row in rows:
+
+				date_time=str(row[1])
+
+				_y_,_m_,_d_=date_time.split(" ")[0].split("-")
+
+				if y!=_y_ or int(m)!=int(_m_):
+					continue
+
+
+
+				selling_price=str(row[5])
+				buying_price=str(row[4])
+				sold_at=str(row[6])
+				quantity=str(row[3])
+				discount=str((int(selling_price)*int(quantity))-(int(sold_at)*int(quantity)))
+				profit=str((int(sold_at)*int(quantity))-(int(buying_price)*int(quantity)))
+				total=str((int(sold_at)*int(quantity)))
+
+
+				week=int(int(_d_)/7)
+
+				if week>3:
+					week=3
+
+
+
+
+				data[week]["profit"]+=int(profit)
+				data[week]["total sales"]+=int(total)
+
+
+
+
+			max_sales=0
+
+			for i in data:
+
+				if max_sales<data[i]["total sales"]:
+
+					max_sales=data[i]["total sales"]
+
+
+
+
+
+
+			can.create_rectangle(x1+150,y1+50, x2-50,y2-100-40, outline="#000000",fill="#ffffff")
+
+			y_s=(((y2-100-40)-(y1+50))/10)
+
+			y_=y2-100-40
+
+			for _ in range(10):
+
+				can.create_line(x1+150,y_,x2-50,y_,fill="#808080",dash=(1,3))
+
+				y_-=y_s
+
+			
+
+
+			xr=((x2-50)-(x1+150))/4
+			x__=x1+150+xr
+
+			for _ in range(4):
+
+				can.create_line(x__,y1+50,x__,y2-100-40,fill="#808080",dash=(1,3))
+
+				x__+=xr
+
+
+			can.create_rectangle(x1+150,y1+50, x2-50,y2-100-40, outline="#000000")
+
+			x_=x1+150+xr/2
+
+
+			xw=(xr-60-5)/2
+
+			x__=(xr-xw*2-5)/2
+
+			for i in data:
+
+				p=data[i]["profit"]
+				ts=data[i]["total sales"]
+
+
+				if max_sales==0:
+					y_1,y_2=0,0
+				else:
+
+					y_1=int(round((((y2-100-40)-(y1+50))-100)*p/max_sales,0))
+					y_2=int(round((((y2-100-40)-(y1+50))-100)*ts/max_sales,0))
+
+				if y_1!=0:
+
+					can.create_rectangle(x_+x__-xr/2,y2-100-40, x_+x__+xw-xr/2,y2-100-40-y_1,fill="#ff0000",outline="#ff0000")
+		
+				if y_2!=0:
+
+					can.create_rectangle(x_+x__+xw+5-xr/2,y2-100-40, x_+x__+xw+5+xw-xr/2,y2-100-40-y_2,fill="#0000ff",outline="#0000ff")
+
+
+				can.create_text(x_,y2-100+30-40,text=data[i]["week"],font=("FreeMono",13),fill="#000000")
+
+				x_+=xr
+
+
+
+			can.create_text(x1+150+((x2-50)-(x1+150))/2,y2-100+30+40-40,text="Week",font=("FreeMono",13,"bold"),fill="#000000")
+			can.create_text(x1+20,y1+50+((y2-100)-(y1+50))/2,text="Ksh",font=("FreeMono",13,"bold"),fill="#000000",anchor="w")
+
+
+			
+
+			y_=0
+
+			y__=y2-100-40
+
+
+			for _ in range(11):
+
+				mx=max_sales
+
+				if max_sales==0:
+
+					mx=500000
+
+				a=int(round((y_)/(((y2-100-40)-(y1+50))-100)*mx,0))
+
+
+
+				can.create_text(x1+150-10,y__,text=formart_number(int(a),50),fill="#000000",anchor="e",font=("FreeMono",13))
+
+				y_+=y_s
+				y__-=y_s
+
+
+
+
+			can.create_rectangle(x1+150,y2-10-30-10-5, x1+150+10,y2-10-30-10+10-5, fill="#ff0000",outline="#ff0000")
+			can.create_text(x1+150+10+15,y2-10-30-10+5-5,text="Profits",fill="#000000",font=("FreeMono",13),anchor="w")
+
+
+			can.create_rectangle(x1+150,y2-10-30-10+30-5, x1+150+10,y2-10-30-10+10+30-5, fill="#0000ff",outline="#0000ff")
+			can.create_text(x1+150+10+15,y2-10-30-10+5+30-5,text="Total Sales",fill="#000000",font=("FreeMono",13),anchor="w")
+
+			m__=["January","February","March","April","May","June","July","August","September","October","November","December"]
+
+			m_=m__[int(m)-1]
+
+			can.create_text(x1+150+((x2-50)-(x1+150))/2,y1+25,text=f"BAR GRAPH SHOWING {m_.upper()} YEAR {y} SALES.",font=("FreeMono",13,"bold"),fill="#000000")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		if cal_st==1:
+						
+			draw_cal(graph_coords["calendar"][0]+30,graph_coords["calendar"][1]+30)
+				
+
+	elif st=="Forecasts":
+
+
+
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+
+			forecast_ims={}
+
+			forecast_st="Monthly"
+
+			
+			delete_widgets()
+
+
+		can["width"]=width
+		can["height"]=height-40
+		can["bg"]="#ffffff"
+		can["scrollregion"]=(0,0,int(can["width"]),int(can["height"]))
+		can.delete("all")
+
+		can.place(in_=root,x=0,y=40)
+
+		can2["width"]=width
+		can2["height"]=40
+
+		can2.place(in_=root,x=0,y=0)
+
+		can2.delete("all")
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+
+		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+		if row[4]=="":
+
+			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+
+
+		else:
+
+			#process profile picture
+			pass
+
+
+		if int(dashboard.place_info()["x"])<0:
+
+			x_=5+25+5
+
+		else:
+
+			x_=int(dashboard["width"])
+
+
+		xx=int(can["width"])-int(dashboard["width"])-200
+
+
+		_x_=x_+((int(can["width"])-x_)-xx)/2
+
+
+
+		v=0
+
+		x1,y1,x2,y2=_x_,40,_x_+xx,int(can["height"])-40
+		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#eeeeee",alpha=1,width=1)
+
+		forecast_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=forecast_ims[v],anchor="nw")
+
+		x1_,y1_,x2_,y2_=x1+150,y1+50, x2-50,y2-100-40
+
+
+		can3["width"]=int(x2_-x1_)
+		can3["height"]=int(y2_-y1_)
+
+		can3["bg"]="#ffffff"
+
+		can3.delete("all")
+
+		can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
+
+		can3.place(in_=root,x=x1_,y=y1_+40)
+
+
+		def det_next_day(date):
+
+		    y,m,d=date.split("-")
+
+		    y=int(y)
+		    m=int(m)
+		    d=int(d)
+
+
+
+		    if y%4==0:
+		        feb_=29
+		    else:
+		        feb_=28
+
+		    months={
+		    1:["January",31],
+		    2:["February",feb_],
+		    3:["March",31],
+		    4:["April",30],
+		    5:["May",31],
+		    6:["June",30],
+		    7:["July",31],
+		    8:["August",31],
+		    9:["September",30],
+		    10:["October",31],
+		    11:["November",30],
+		    12:["December",31]
+		    }
+
+
+		    if d+1<=months[m][1]:
+
+		        return f"{y}-{m}-{d+1}"
+
+		    elif months[m][1]==d:
+
+		        if m==12:
+
+		            return f"{y+1}-{1}-{1}"
+
+		        else:
+		            return f"{y}-{m+1}-{1}"
+
+
+
+
+		forecast_st="Daily"
+
+		
+		fx=[]
+
+		start_date="2026-9-20"
+		y_,m_,d_=str(datetime.datetime.now()).split(" ")[0].split("-")
+
+		cur_date=f"{int(y_)}-{int(m_)}-{int(d_)}"
+
+		x_=50
+
+		fx.append([x_,start_date])
+
+
+		can.create_rectangle(x1+150-1,y1+50-1,x1+150+int(can3["width"]),y1+50+int(can3["height"]))
+
+
+		def det_total_daily_sales_n_profits(date):
+
+
+			tprofit=0
+			tsales=0
+
+
+			db_reports=database.connect("data/reports.db")
+			cur=db_reports.cursor()
+
+			cur.execute("SELECT * FROM reports")
+
+			rows=cur.fetchall()
+
+			y_,m_,d_=date.split("-")
+
+			y_=int(y_)
+			m_=int(m_)
+			d_=int(d_)
+
+			for row in rows:
+
+				date_time=str(row[1])
+
+				_y_,_m_,_d_=date_time.split(" ")[0].split("-")
+
+				_y_=int(_y_)
+				_m_=int(_m_)
+				_d_=int(_d_)
+
+
+
+				if _y_==y_ and _m_==m_ and _d_==d_:
+
+
+					selling_price=str(row[5])
+					buying_price=str(row[4])
+					sold_at=str(row[6])
+					quantity=str(row[3])
+					profit=(int(sold_at)*int(quantity))-(int(buying_price)*int(quantity))
+					total=(int(sold_at)*int(quantity))
+
+
+					tprofit+=profit
+					tsales+=total
+
+
+			return [tprofit,tsales]
+
+
+		if forecast_st=="Daily":
+
+			
+			con_=0
+
+			while 1:
+
+
+			
+
+				x_+=100
+
+
+				date=det_next_day(fx[-1][1])
+
+
+				if date==cur_date:
+					con_=1
+
+
+
+
+				fx.append([x_,date])
+
+				if con_==1:
+					break
+
+			x_+=100
+			for _ in range(30):
+
+				date=det_next_day(fx[-1][1])
+
+				fx.append([x_,date])
+
+				x_+=100
+
+			fy=[]
+
+			for _ in range(len(fx)):
+
+
+
+
+
+				fy.append(det_total_daily_sales_n_profits(fx[_][1]))
+
+
+				if fx[_][1]==cur_date:
+
+					break 
+
+
+
+
+
+
+		max_sales=0
+
+		for i in fy:
+
+			if i[1]>max_sales:
+				max_sales=i[1]
+
+		
+
+		x1,y1,x2,y2=0,0,10,10
+		im=draw_round_rect(5,x1,y1,x2,y2, "#000000","#0000ff",alpha=1,width=1)
+
+		fs=ImageTk.PhotoImage(im)
+		
+
+		x1,y1,x2,y2=0,0,10,10
+		im=draw_round_rect(5,x1,y1,x2,y2, "#000000","#ff0000",alpha=1,width=1)
+
+		fp=ImageTk.PhotoImage(im)
+
+		can3.create_line(0,int(can3["height"])-50,fx[-1][0]+50,int(can3["height"])-50,fill="#000000")
+
+
+
+		for _ in range(len(fx)):
+
+
+			date=fx[_][1]
+			x_=fx[_][0]
+
+			can3.create_text(x_,int(can3["height"])-50+25,text=date,font=("FreeMono",13),fill="#000000",anchor="c")
+
+			can3.create_line(x_,0,x_,int(can3["height"])-50,fill="#000000",dash=(1,3))
+
+
+		x1,y1,x2,y2=_x_,40,_x_+xx,int(can["height"])-40
+
+		y_s=(((y2-100-40-50)-(y1+50))/10)
+
+
+		y_=0
+
+		y__=y1_+int(can3["height"])-50
+
+
+		for _ in range(11):
+
+			mx=max_sales
+
+			if max_sales==0:
+
+				mx=500000
+
+			a=y_*max_sales*2/(int(can3["height"])-50)
+
+
+
+			can.create_text(x1+150-10,y__,text=formart_number(int(a),50),fill="#000000",anchor="e",font=("FreeMono",13))
+
+			can3.create_line(0,y__-(y1+50),fx[-1][0]+50,y__-(y1+50),fill="#000000",dash=(1,3))
+
+
+			y_+=y_s
+			y__-=y_s
+
+
+
+
+		c=0
+		for s in fy:
+
+			p=s[0]
+			s=s[1]
+
+			y_p=p*(int(can3["height"])-50)/max_sales/2
+			y_s=s*(int(can3["height"])-50)/max_sales/2
+
+
+			can3.create_image(fx[c][0], int(can3["height"])-50-y_p, image=fp, anchor="c")
+			can3.create_image(fx[c][0], int(can3["height"])-50-y_s, image=fs, anchor="c")
+
+			c+=1
+
+
+
+		can.create_text(x1+150+int(can3["width"])/2,y1+50+int(can3["height"])+20,text="Days",font=("FreeMono",13,"bold"),fill="#000000")
+
+		can.create_text(x1+20,y1+50+(int(can3["height"])-50)/2,text="Ksh",font=("FreeMono",13,"bold"),fill="#000000",anchor="w")
+
+		#profit
+
+		y_values=[]
+		x_values=[]
+
+		for _ in range(len(fy)):
+
+			y_values.append(fy[_][0])
+			x_values.append(fx[_][0])
+
+
+
+		b0,b1=linear_regression(y_values,x_values)
+
+		y1_=b0*(int(can3["height"])-50)/max_sales/2
+
+		y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+
+
+		can3.create_line(fx[0][0],int(can3["height"])-50-y1_, fx[-1][0],int(can3["height"])-50-y2_, fill="#ff0000")
+
+
+
+		#sales
+
+		y_values=[]
+		x_values=[]
+
+		for _ in range(len(fy)):
+
+			y_values.append(fy[_][1])
+			x_values.append(fx[_][0])
+
+
+
+		b0,b1=linear_regression(y_values,x_values)
+
+		y1_=b0*(int(can3["height"])-50)/max_sales/2
+
+		y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+
+
+		can3.create_line(fx[0][0],int(can3["height"])-50-y1_, fx[-1][0],int(can3["height"])-50-y2_, fill="#0000ff")
+
+
+		can3["scrollregion"]=(0,0,fx[-1][0]+50,int(can3["height"]))
+
+
+		can.create_image(x1+150-5-20,y1+50+int(can3["height"])-20,image=previous2,anchor="nw")
+		forecast_coords["left"]=[x1+150-5-20,y1+50+int(can3["height"])-20]
+		can.create_image(x1+150+int(can3["width"])+5,y1+50+int(can3["height"])-20,image=next2,anchor="nw")
+		forecast_coords["right"]=[x1+150+int(can3["width"])+5,y1+50+int(can3["height"])-20]
+
+
+		can.create_text(x1+150+int(can3["width"])/2,y1+25,text="LINREAR REGRESSION SHOWING POSSIBLE SALES ON FUTURE DAYS",
+			font=("FreeMono",13,"bold"),fill="#000000")
+
+
+		can.create_image(x1+150+5,y1+50+int(can3["height"])+30+20,image=fs)
+		can.create_text(x1+150+5+10+10,y1+50+int(can3["height"])+30+20,text="Sales",font=("FreeMono",13),anchor="w",fill="#000000")
+
+
+		can.create_line(x1+150+5+10+10+f.measure("Sales")+20,y1+50+int(can3["height"])+30+20, x1+150+5+10+10+f.measure("Sales")+20+15,y1+50+int(can3["height"])+30+20,fill="#0000ff",width=2)
+		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20,
+			text="Linear regression for Sales",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+		can.create_image(x1+150+5,y1+50+int(can3["height"])+30+20+30,image=fp)
+		can.create_text(x1+150+5+10+10,y1+50+int(can3["height"])+30+20+30,text="Profit",font=("FreeMono",13),anchor="w",fill="#000000")
+
+		can.create_line(x1+150+5+10+10+f.measure("Sales")+20,y1+50+int(can3["height"])+30+20+30, x1+150+5+10+10+f.measure("Sales")+20+15,y1+50+int(can3["height"])+30+20+30,fill="#ff0000",width=2)
+		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20+30,
+			text="Linear regression for Profits",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
 
@@ -2890,7 +3880,7 @@ def main(con=0):
 		can2.delete("all")
 
 		can2.create_line(0,0,width,0,fill="#000000")
-		#can2.create_line(0,39,width,39,fill="#dddddd")
+		#can2.create_line(0,39,width,39,fill="#eeeeee")
 
 		can2.place(in_=root,x=0,y=0)
 
@@ -2905,7 +3895,7 @@ def main(con=0):
 		v=0
 
 
-		_x_=400-10
+		_x_=450-10
 
 
 
@@ -3110,7 +4100,7 @@ def main(con=0):
 
 
 			can.create_text(x1+10,y2-25-25-25, text=f"{format_text(row[1],x2-x1-20)}",font=("FreeMono",13),fill="#0000ff",anchor="w")
-			can.create_text(x1+10,y2-25-25, text=f"Ksh.{formart_number(row[3],x2-x1-20,1)}",font=("FreeMono",13),fill="#000000",anchor="w")
+			can.create_text(x1+10,y2-25-25, text=f"Ksh.{formart_number(row[3],x2-x1-20,1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
 			can.create_text(x1+10,y2-25, text=f"{formart_number(row[4],x2-x1-20)} items left",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
@@ -4097,6 +5087,9 @@ reset_im,reset_im2=0,0
 calendar=0
 
 previous,next_=0,0
+previous2,next2=0,0
+graph1,graph2=0,0
+forecast1,forecast2=0,0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -4116,6 +5109,9 @@ def load_im():
 	global save_im,delete2,reset_im,reset_im2
 	global calendar
 	global previous,next_
+	global previous2,next2
+	global graph1,graph2
+	global forecast1,forecast2
 
 
 	#db
@@ -4319,12 +5315,47 @@ def load_im():
 	previous=ImageTk.PhotoImage(im)
 
 
+
+	#previous2
+
+	im=Image.open("data/icons/previous2.png")
+	im=im.resize((20,20))
+	previous2=ImageTk.PhotoImage(im)
+
 	#next
 
 	im=Image.open("data/icons/next.png")
 	im=im.resize((20,20))
 	next_=ImageTk.PhotoImage(im)
 
+
+	#next2
+
+	im=Image.open("data/icons/next2.png")
+	im=im.resize((20,20))
+	next2=ImageTk.PhotoImage(im)
+
+	#graph
+
+	im=Image.open("data/icons/graph1.png")
+	im=im.resize((25,25))
+	graph1=ImageTk.PhotoImage(im)
+
+
+	im=Image.open("data/icons/graph2.png")
+	im=im.resize((25,25))
+	graph2=ImageTk.PhotoImage(im)
+
+	#forecast
+
+	im=Image.open("data/icons/forecast1.png")
+	im=im.resize((25,25))
+	forecast1=ImageTk.PhotoImage(im)
+
+
+	im=Image.open("data/icons/forecast2.png")
+	im=im.resize((25,25))
+	forecast2=ImageTk.PhotoImage(im)
 
 
 db_items_=[]
@@ -4337,6 +5368,8 @@ def draw_db():
 	global width,height
 	global st
 	global db_items_
+	global graph1,graph2
+	global forecast1,forecast2
 
 
 	dashboard["width"]=200
@@ -4351,7 +5384,7 @@ def draw_db():
 
 
 
-	items=[["Sell Items",sell_items_im,sell_items_im2],["Reports",reports_im,reports_im2],["Manage items",manage_items_im,manage_items_im2],
+	items=[["Sell Items",sell_items_im,sell_items_im2],["Reports",reports_im,reports_im2],["Graphs",graph1,graph2],["Forecasts",forecast1,forecast2],["Manage items",manage_items_im,manage_items_im2],
 			["Add Items",add_items_im,add_items_im2],["Profiles", profiles_im,profiles_im2]]
 
 
@@ -5025,7 +6058,7 @@ w,h=int(sz[0]),int(sz[1])
 cur_sz=[w,h]
 
 def can_b1(e):
-	global can,dashboard
+	global can,dashboard,can3
 	global un_login_coord,	pw1_login_coord
 	global ent1,ent2,ent3,ent4,text1
 	global login_coord,register_coord
@@ -5050,6 +6083,10 @@ def can_b1(e):
 	global cal_st
 	global rep_items_coord
 	global all_by
+	global graph_coords
+	global graph_st
+	global forecast_coords
+
 
 
 
@@ -5712,6 +6749,82 @@ def can_b1(e):
 						main(1)
 
 						return
+
+		elif st=="Graphs":
+
+			x_,y_=graph_coords["calendar"]
+
+
+			if x_<=e.x<=x_+30:
+				if y_<=e.y<=y_+30:
+
+					if cal_st==0:
+						cal_st=1
+						draw_cal(graph_coords["calendar"][0]+30,graph_coords["calendar"][1]+30)
+						return
+
+					else:
+						cal_st=0
+						cal.place_forget()
+						return
+
+			x_,y_=graph_coords["next"]
+
+			if x_<=e.x<=x_+20:
+				if y_<=e.y<=y_+20:
+
+					if graph_st=="Annually":
+						graph_st="Monthly"
+					elif graph_st=="Monthly":
+						graph_st="Annually"
+
+
+					main(1)
+
+					return
+
+
+
+
+			x_,y_=graph_coords["previous"]
+
+			if x_<=e.x<=x_+20:
+				if y_<=e.y<=y_+20:
+
+					if graph_st=="Annually":
+						graph_st="Monthly"
+					elif graph_st=="Monthly":
+						graph_st="Annually"
+
+
+					main(1)
+
+					return
+
+		elif st=="Forecasts":
+
+
+			x_,y_=forecast_coords["left"]
+
+			if x_<=e.x<=x_+20:
+
+				if y_<=e.y<=y_+20:
+
+					can3.xview_scroll(-1,"units")
+
+					return
+
+
+
+			x_,y_=forecast_coords["right"]
+
+			if x_<=e.x<=x_+20:
+
+				if y_<=e.y<=y_+20:
+
+					can3.xview_scroll(1,"units")
+
+					return
 
 
 		elif st=="Manage items":
@@ -7109,6 +8222,7 @@ def draw_cal(xx,yy):
 	global cal_coord
 	global days_ar
 	global reset_im2
+	global st
 
 	cal.delete("all")
 
@@ -7215,7 +8329,9 @@ def draw_cal(xx,yy):
 		col="#ffffff"
 
 
-		if day==d:
+
+
+		if day==d and st=="Reports":
 
 			cal.create_rectangle(x-350/7/2,y-350/7/2, x+350/7/2,y+350/7/2,fill="#ffffff",outline="#ffffff")
 
@@ -7261,6 +8377,7 @@ def cal_b1(e):
 	global _date_
 	global days_ar
 	global all_by
+	global st
 
 	year,month,day=_date_.split("-")
 	year=int(year)
@@ -7374,36 +8491,39 @@ def cal_b1(e):
 			return
 
 
-	for i in days_ar:
-
-		d=i[0]
-		x1,y1,x2,y2=i[1]
-
-		if x1<=e.x<=x2:
-			if y1<=e.y<=y2:
-
-				day=d
+	if st=="Reports":
 
 
-				month=str(month)
+		for i in days_ar:
 
-				if len(month)==1:
-					month="0"+month
+			d=i[0]
+			x1,y1,x2,y2=i[1]
+
+			if x1<=e.x<=x2:
+				if y1<=e.y<=y2:
+
+					day=d
 
 
-				day=str(day)
+					month=str(month)
 
-				if len(day)==1:
-					day="0"+day
+					if len(month)==1:
+						month="0"+month
 
 
-				_date_=f"{year}-{month}-{day}"
+					day=str(day)
 
-				all_by=None
+					if len(day)==1:
+						day="0"+day
 
-				main(1)
 
-				return
+					_date_=f"{year}-{month}-{day}"
+
+					all_by=None
+
+					main(1)
+
+					return
 
 
 
