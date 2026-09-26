@@ -4086,7 +4086,7 @@ def main(con=0):
 			txt="MONTHS"
 
 
-		can.create_text(x1+150+int(can3["width"])/2,y1+25,text=f"LINREAR REGRESSION SHOWING POSSIBLE SALES ON FUTURE {txt}",
+		can.create_text(x1+150+int(can3["width"])/2,y1+25,text=f"LINEAR REGRESSION SHOWING POSSIBLE SALES ON FUTURE {txt}",
 			font=("FreeMono",13,"bold"),fill="#000000")
 
 
