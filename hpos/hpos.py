@@ -9006,27 +9006,27 @@ def draw_cal(xx,yy):
 	}
 
 
-	cal.create_image(5,5,image=previous,anchor="nw")
-	cal_coord["yp"]=[5,5]
+	cal.create_image(5,5+5,image=previous,anchor="nw")
+	cal_coord["yp"]=[5,5+5]
 
-	cal.create_text(5+20+5,5+10,text=str(year),font=("FreeMono",13),fill="#ffffff",anchor="w")
+	cal.create_text(5+20+5,5+10+5,text=str(year),font=("FreeMono",13),fill="#ffffff",anchor="w")
 
-	cal.create_image(5+20+5+f.measure(str(year))+5,5,image=next_,anchor="nw")
-	cal_coord["yn"]=[5+20+5+f.measure(str(year))+5,5]
-
-
-
-
-	cal.create_image(5,5+20+15,image=previous,anchor="nw")
-	cal_coord["mp"]=[5,5+20+15]
+	cal.create_image(5+20+5+f.measure(str(year))+5,5+5,image=next_,anchor="nw")
+	cal_coord["yn"]=[5+20+5+f.measure(str(year))+5,5+5]
 
 
 
-	cal.create_text(5+20+5,5+10+20+15,text=str(months[month][0]),font=("FreeMono",13),fill="#ffffff",anchor="w")
 
-	cal.create_image(5+20+5+f.measure(str(months[month][0]))+5,5+20+15,image=next_,anchor="nw")
+	cal.create_image(5,5+20+15+5,image=previous,anchor="nw")
+	cal_coord["mp"]=[5,5+20+15+5]
 
-	cal_coord["mn"]=[5+20+5+f.measure(str(months[month][0]))+5,5+20+15]
+
+
+	cal.create_text(5+20+5,5+10+20+15+5,text=str(months[month][0]),font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+	cal.create_image(5+20+5+f.measure(str(months[month][0]))+5,5+20+15+5,image=next_,anchor="nw")
+
+	cal_coord["mn"]=[5+20+5+f.measure(str(months[month][0]))+5,5+20+15+5]
 
 
 
@@ -9040,7 +9040,7 @@ def draw_cal(xx,yy):
 
 
 
-	y=5+20+15+40+30-20
+	y=5+20+15+40+30-20+5
 
 	x=350/7/2
 	for d in day_of_week2:
@@ -9115,7 +9115,7 @@ def draw_cal(xx,yy):
 
 	cal["height"]=y
 
-	cal.create_rectangle(0,0, int(cal["width"])-1,int(cal["height"])-1,outline="#ffffff")
+	cal.create_rectangle(0,0, int(cal["width"])-1,int(cal["height"])-1,outline="#808080")
 
 	cal.create_image(int(cal["width"])-5-25,5,image=reset_im2,anchor="nw")
 
