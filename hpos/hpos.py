@@ -337,7 +337,7 @@ def draw_selected_item(id_,con):
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
 
 
 
@@ -1226,7 +1226,7 @@ def pay_with_cash(con):
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
+	xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
 
 
 
@@ -3744,7 +3744,7 @@ def main(con=0):
 					break
 
 			x_+=100
-			for _ in range(30):
+			for _ in range(60):
 
 				date=det_next_date(fx[-1][1],"Day")
 
@@ -3832,7 +3832,7 @@ def main(con=0):
 					break
 
 			x_+=100
-			for _ in range(12):
+			for _ in range(24):
 
 				date=det_next_date(fx[-1][1],"Week")
 
@@ -3905,7 +3905,7 @@ def main(con=0):
 					break
 
 			x_+=100
-			for _ in range(12):
+			for _ in range(24):
 
 				date=det_next_date(fx[-1][1],"Month")
 
@@ -4106,6 +4106,8 @@ def main(con=0):
 			if given_date < dt.today():
 
 				_date_=str(datetime.datetime.now()).split(" ")[0]
+
+				message(0,can,"Date is past the current date!",x1+(x2-x1)/2,y2+5+15,350,30)
 
 
 
@@ -4321,7 +4323,7 @@ def main(con=0):
 
 		except:
 			
-			can.create_text(x1+150+10,y1+50+int(can3["height"])+30+20+30+15+5-15+15,text="No enough records to perform linear regression!",
+			can.create_text(x1+150+10,y1+50+int(can3["height"])+30+20+30+15+5-15+15,text="Few values to perform linear regression!",
 				font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
@@ -6914,7 +6916,7 @@ def can_b1(e):
 					x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
 
-					xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
+					xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
 
 
 					x=x+((int(can["width"])-x)-xx)/2
@@ -7050,7 +7052,7 @@ def can_b1(e):
 
 				x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
-				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.7)
+				xx,yy=int(can["width"])-int(dashboard["width"])-60,int(int(can["height"])*0.6)
 
 
 				x=x+((int(can["width"])-x)-xx)/2
