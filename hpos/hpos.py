@@ -13,6 +13,8 @@ import os
 import datetime
 
 
+from datetime import date as dt
+
 """
 def linear_regression(y_values):
     n = len(y_values)
@@ -3382,6 +3384,11 @@ def main(con=0):
 
 			forecast_st2=0
 
+
+			_date_=str(datetime.datetime.now()).split(" ")[0]
+
+			cal_st=0
+
 			
 			delete_widgets()
 
@@ -3392,7 +3399,12 @@ def main(con=0):
 
 		if forecast_st_!=forecast_st:
 
+			_date_=str(datetime.datetime.now()).split(" ")[0]
+
 			forecast_st2=0
+
+
+			cal_st=0
 
 			forecast_st_=forecast_st
 
@@ -3987,7 +3999,7 @@ def main(con=0):
 
 		can3.create_line(50,0,50,int(can3["height"])-50,fill="#000000")
 
-		can3.create_line(0,int(can3["height"])-50,fx[-1][0]+50+50,int(can3["height"])-50,fill="#000000")
+		can3.create_line(50,int(can3["height"])-50,fx[-1][0]+50+50,int(can3["height"])-50,fill="#000000")
 
 
 		c=0
@@ -4007,32 +4019,52 @@ def main(con=0):
 
 
 
+		if forecast_st=="Daily":
+
+			txt="Days"
+
+		elif forecast_st=="Weekly":
+			txt="Weeks"
+
+		elif forecast_st=="Monthly":
+			txt="Months"
 
 
-		can.create_text(x1+150+int(can3["width"])/2,y1+50+int(can3["height"])+20,text="Days",font=("FreeMono",13,"bold"),fill="#000000")
+		can.create_text(x1+150+int(can3["width"])/2,y1+50+int(can3["height"])+20,text=txt,font=("FreeMono",13,"bold"),fill="#000000")
 
 		can.create_text(x1+20,y1+50+(int(can3["height"])-50)/2,text="Ksh",font=("FreeMono",13,"bold"),fill="#000000",anchor="w")
 
-		#profit
 
-		y_values=[]
-		x_values=[]
 
-		for _ in range(len(fy)):
+		v+=1
 
-			y_values.append(fy[_][0])
-			x_values.append(fx[_][0])
+		x1_,y1_,x2_,y2_=x1+150,y1+50+int(can3["height"])+30+20+30+15+5-15-10, x1+150+int(can3["width"]),y1+50+int(can3["height"])+30+20+30+15+5-15+30+10
+		im=draw_round_rect(10,x1_,y1_,x2_,y2_, "#000000","#ffffff",alpha=1,width=1)
+
+		forecast_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1_,y1_,image=forecast_ims[v],anchor="nw")
 
 
 		try:
 
+			#profit
+
+			y_values=[]
+			x_values=[]
+
+			for _ in range(len(fy)):
+
+				y_values.append(fy[_][0])
+				x_values.append(fx[_][0])
 
 
-			b0,b1=linear_regression(y_values,x_values)
 
-			y1_=b0*(int(can3["height"])-50)/max_sales/2
+			pb0,pb1=linear_regression(y_values,x_values)
 
-			y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+			y1_=pb0*(int(can3["height"])-50)/max_sales/2
+
+			y2_=(pb0 + pb1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
 
 
 			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#ff0000")
@@ -4053,18 +4085,244 @@ def main(con=0):
 
 
 
-			b0,b1=linear_regression(y_values,x_values)
+			sb0,sb1=linear_regression(y_values,x_values)
 
 
-			y1_=b0*(int(can3["height"])-50)/max_sales/2
+			y1_=sb0*(int(can3["height"])-50)/max_sales/2
 
-			y2_=(b0 + b1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+			y2_=(sb0 + sb1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
 
 
 			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#0000ff")
 
+			y,m,d=_date_.split("-")
+
+			y=int(y)
+			m=int(m)
+			d=int(d)
+
+			given_date = dt(y, m, d)
+
+			if given_date < dt.today():
+
+				_date_=str(datetime.datetime.now()).split(" ")[0]
+
+
+
+
+			if forecast_st=="Daily":
+
+				y,m,d=_date_.split("-")
+
+				y=int(y)
+				m=int(m)
+				d=int(d)
+
+				date=f"{y}-{m}-{d}"
+
+			elif forecast_st=="Weekly":
+
+				y,m,d=_date_.split("-")
+
+				y=int(y)
+				m=int(m)
+				d=int(d)
+
+
+				w=d/7
+
+				w=int(w)
+
+				if w==4:
+					w=3
+
+				w+=1
+
+				date=f"{y}-{m} ({w})"
+
+
+			elif forecast_st=="Monthly":
+				y,m,d=_date_.split("-")
+
+				y=int(y)
+				m=int(m)
+				d=int(d)
+
+
+				date=f"{y}-{m}"
+
+
+
+
+			can.create_image(x1+150+10,y1+50+int(can3["height"])+30+20+30+15+5-15,image=calendar,anchor="nw")
+
+			forecast_coords["calendar"]=[x1+150+10,y1+50+int(can3["height"])+30+20+30+15+5-15]
+
+			can.create_text(x1+150+10+30+15,y1+50+int(can3["height"])+30+20+30+15+5+15-15,text=date,
+				font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+			if cal_st==1:
+				draw_cal(forecast_coords["calendar"][0]+30,forecast_coords["calendar"][1])
+
+
+
+			if forecast_st=="Daily":
+
+
+				for _ in range(len(fx)):
+
+
+					if cur_date==fx[_][1]:
+
+						xc=fx[_][0]
+
+
+				date_=cur_date
+
+				while 1:
+
+					if date==date_:
+
+						break
+
+
+					date_=det_next_date(date_,"Day")
+
+
+					xc+=100
+
+
+
+				profit_=pb0+pb1*xc
+				sales_=sb0+sb1*xc
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Profit - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(profit_,50)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Sales - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30+f.measure("Predicted Sales - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(sales_,50)}",font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+			elif forecast_st=="Weekly":
+
+				for _ in range(len(fx)):
+
+
+					if cur_date==fx[_][1]:
+
+						xc=fx[_][0]
+
+
+
+				date_=cur_date
+
+				while 1:
+
+					if date==date_:
+
+						break
+
+
+					date_=det_next_date(date_,"Week")
+
+
+					xc+=100
+
+
+
+
+				profit_=pb0+pb1*xc
+				sales_=sb0+sb1*xc
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Profit - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(profit_,50)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Sales - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30+f.measure("Predicted Sales - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(sales_,50)}",font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+
+			elif forecast_st=="Monthly":
+
+
+
+				for _ in range(len(fx)):
+
+
+					if cur_date==fx[_][1]:
+
+						xc=fx[_][0]
+
+
+
+				date_=cur_date
+
+				while 1:
+
+					if date==date_:
+
+						break
+
+
+					date_=det_next_date(date_,"Month")
+
+
+					xc+=100
+
+
+
+
+				profit_=pb0+pb1*xc
+				sales_=sb0+sb1*xc
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Profit - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(profit_,50)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30,y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text="Predicted Sales - ",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+				can.create_text(x1+150+10+30+15+f.measure(date)+30+f.measure("Predicted Profit - ")+f.measure(f"Ksh.{int(profit_)}")+30+f.measure("Predicted Sales - "),y1+50+int(can3["height"])+30+20+30+15+5+15-15,
+					text=f"Ksh.{formart_number(sales_,50)}",font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+
+
 		except:
-			pass
+			
+			can.create_text(x1+150+10,y1+50+int(can3["height"])+30+20+30+15+5-15+15,text="No enough records to perform linear regression!",
+				font=("FreeMono",13),fill="#ff0000",anchor="w")
 
 
 		if forecast_st2==0:
@@ -4090,20 +4348,19 @@ def main(con=0):
 			font=("FreeMono",13,"bold"),fill="#000000")
 
 
-		can.create_image(x1+150+5,y1+50+int(can3["height"])+30+20,image=fs)
-		can.create_text(x1+150+5+10+10,y1+50+int(can3["height"])+30+20,text="Sales",font=("FreeMono",13),anchor="w",fill="#000000")
+		can.create_image(x1+150+5,y1+50+int(can3["height"])+30+20+5,image=fs)
+		can.create_text(x1+150+5+10+10,y1+50+int(can3["height"])+30+20+5,text="Sales",font=("FreeMono",13),anchor="w",fill="#000000")
 
 
-		can.create_line(x1+150+5+10+10+f.measure("Sales")+20,y1+50+int(can3["height"])+30+20, x1+150+5+10+10+f.measure("Sales")+20+15,y1+50+int(can3["height"])+30+20,fill="#0000ff",width=2)
-		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20,
-			text="Linear regression for Sales",font=("FreeMono",13),fill="#000000",anchor="w")
+		can.create_line(x1+150+5+10+10+f.measure("Sales")+20,y1+50+int(can3["height"])+30+20+5, x1+150+5+10+10+f.measure("Sales")+20+15,y1+50+int(can3["height"])+30+20+5,fill="#0000ff",width=2)
+		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20+5,text="Linear regression for Sales",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
-		can.create_image(x1+150+5,y1+50+int(can3["height"])+30+20+30,image=fp)
-		can.create_text(x1+150+5+10+10,y1+50+int(can3["height"])+30+20+30,text="Profit",font=("FreeMono",13),anchor="w",fill="#000000")
+		can.create_image(x1+150+5+10+10+f.measure("Sales")+20+15+10+f.measure("Linear regression for Sales")+30,y1+50+int(can3["height"])+30+20+5,image=fp)
+		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10+f.measure("Linear regression for Sales")+30+10+20-10,y1+50+int(can3["height"])+30+20+5,text="Profit",font=("FreeMono",13),anchor="w",fill="#000000")
 
-		can.create_line(x1+150+5+10+10+f.measure("Sales")+20,y1+50+int(can3["height"])+30+20+30, x1+150+5+10+10+f.measure("Sales")+20+15,y1+50+int(can3["height"])+30+20+30,fill="#ff0000",width=2)
-		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10,y1+50+int(can3["height"])+30+20+30,
+		can.create_line(x1+150+5+10+10+f.measure("Sales")+20+15+10+f.measure("Linear regression for Sales")+30+10+20+20+f.measure("Profit")-10,y1+50+int(can3["height"])+30+20+5, x1+150+5+10+10+f.measure("Sales")+20+15+10+f.measure("Linear regression for Sales")+30+10+20+20+f.measure("Profit")+15-10,y1+50+int(can3["height"])+30+20+5,fill="#ff0000",width=2)
+		can.create_text(x1+150+5+10+10+f.measure("Sales")+20+15+10+f.measure("Linear regression for Sales")+30+10+20+20+f.measure("Profit")+15+10-10,y1+50+int(can3["height"])+30+20+5,
 			text="Linear regression for Profits",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
@@ -6413,6 +6670,7 @@ def can_b1(e):
 	global graph_st
 	global forecast_coords
 	global forecast_st,forecast_st2
+	global move_f_st
 
 
 
@@ -7188,6 +7446,8 @@ def can_b1(e):
 
 					can3.xview_scroll(-1,"units")
 
+					move_f_st=1
+
 					return
 
 
@@ -7200,7 +7460,37 @@ def can_b1(e):
 
 					can3.xview_scroll(1,"units")
 
+					move_f_st=2
+
 					return
+
+
+
+			x_,y_=forecast_coords["calendar"]
+
+			if x_<=e.x<=x_+30:
+
+				if y_<=e.y<=y_+30:
+
+					if cal_st==0:
+
+						cal_st=1
+
+						main(1)
+
+					elif cal_st==1:
+						cal_st=0
+
+						main(1)
+
+
+
+					return
+
+
+
+
+			
 
 
 		elif st=="Manage items":
@@ -8014,10 +8304,30 @@ def can_motion(e):
 				can.delete(man_items_crop_v_)								
 
 
+
+move_f_st=0
+def move_f():
+	global can3
+	global move_f_st
+
+
+	if move_f_st==1:
+
+		can3.xview_scroll(-1,"units")
+
+	elif move_f_st==2:
+
+		can3.xview_scroll(1,"units")
+
+	root.after(100,move_f)
+
+
+
+
+
 def can_drag(e):
 	global pay_st
 	global st_,st
-
 
 	if pay_st=="Cash":
 
@@ -8030,9 +8340,11 @@ def can_drag(e):
 
 
 
+
 def can_b1_sb_release(widget):
 
     global _scroll_,pay_st
+
 
     if pay_st=="Cash":
 
@@ -8042,6 +8354,12 @@ def can_b1_sb_release(widget):
 
 
 def can_b1_release(e):
+
+	global move_f_st
+
+
+	move_f_st=0
+
 
 	can_b1_sb_release("cart2")
 
@@ -8684,7 +9002,7 @@ def draw_cal(xx,yy):
 
 
 
-	cal.place(in_=root,x=xx,y=yy+40)
+	
 
 
 	day_of_week=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
@@ -8732,11 +9050,13 @@ def draw_cal(xx,yy):
 
 
 
-		if day==d and st=="Reports":
+		if day==d:
 
-			cal.create_rectangle(x-350/7/2,y-350/7/2, x+350/7/2,y+350/7/2,fill="#ffffff",outline="#ffffff")
+			if st=="Reports" or st=="Forecasts":
 
-			col="#000000"
+				cal.create_rectangle(x-350/7/2,y-350/7/2, x+350/7/2,y+350/7/2,fill="#ffffff",outline="#ffffff")
+
+				col="#000000"
 
 		cal.create_text(x,y,text=str(d),font=("FreeMono",13),fill=col,anchor="c")
 
@@ -8770,6 +9090,14 @@ def draw_cal(xx,yy):
 	cal.create_image(int(cal["width"])-5-25,5,image=reset_im2,anchor="nw")
 
 	cal_coord["reset"]=int(cal["width"])-5-25,5
+
+
+	if st=="Forecasts":
+
+		cal.place(in_=root,x=xx,y=yy+40-int(cal["height"]))
+
+	else:
+		cal.place(in_=root,x=xx,y=yy+40)
 
 
 def cal_b1(e):
@@ -8892,7 +9220,7 @@ def cal_b1(e):
 			return
 
 
-	if st=="Reports":
+	if st=="Reports" or st=="Forecasts":
 
 
 		for i in days_ar:
@@ -9073,4 +9401,7 @@ check_root_sz()
 check_sel_item()
 check_search_entry()
 check_balance()
+
+
+move_f()
 root.mainloop()
