@@ -733,7 +733,7 @@ def draw_manage_item(id_,con):
 
 	x1,y1,x2,y2=x,y, x+xx,y+yy
 
-	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+	im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 	man_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x,y,image=man_items_ims[v],anchor="nw")
 
@@ -750,7 +750,7 @@ def draw_manage_item(id_,con):
 	can.create_text(x+xx/2,y1+1+15,text="Manage Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
-
+	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000",width=1)
 
 
 
@@ -1240,7 +1240,7 @@ def pay_with_cash(con):
 
 	x1,y1,x2,y2=x,y,x+xx,y+yy
 
-	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+	im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 
 	sell_items_ims[v]=ImageTk.PhotoImage(im)
 
@@ -1255,7 +1255,7 @@ def pay_with_cash(con):
 	can.create_text(x+xx/2,y1+1+15,text="Pay with Cash",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
-	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000")
+	can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000",width=1)
 
 
 	can.create_image(x2-5-25,y1+5,image=quit,anchor="nw")
@@ -1577,6 +1577,8 @@ forecast_st2=0
 forecast_ims={}
 forecast_coords={}
 fp,fs=0,0
+
+can3_fb=0
 def main(con=0):
 
 	global st,st_
@@ -1627,6 +1629,7 @@ def main(con=0):
 	global forecast_ims
 	global forecast_coords
 	global fp,fs
+	global can3_fb
 
 	st_="main"
 
@@ -1650,8 +1653,11 @@ def main(con=0):
 		if con==0:
 			sell_items_ims={}
 			sel_item=None
+			man_item=None
+			pay_st=None
 			search_val=""
 			search_focus=False
+
 			delete_widgets()
 
 		can["width"]=width-450
@@ -2210,12 +2216,12 @@ def main(con=0):
 
 		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30,int(can3["width"])-10-5,int(can3["height"])-10-30-(10+30)*2-30*2-15-10
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000","#ff0000",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
 		can3.create_image(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2,y1+2.5,image=clear_cart,anchor="nw")
-		can3.create_text(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2+25+10,y1+15, text="Clear Cart",fill="#ffffff",font=("FreeMono",13),anchor="w")
+		can3.create_text(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2+25+10,y1+15, text="Clear Cart",fill="#ff0000",font=("FreeMono",13),anchor="w")
 
 
 		cart_buttons_coords["clear_cart"]=[x1,y1,x2,y2]
@@ -2313,6 +2319,10 @@ def main(con=0):
 			search_val=""
 			search_focus=False
 			all_by=None
+			sel_item=None
+			man_item=None
+			pay_st=None
+
 			delete_widgets()
 
 			_date_=str(datetime.datetime.now()).split(" ")[0]
@@ -3590,7 +3600,7 @@ def main(con=0):
 
 
 
-		can.create_rectangle(x1+150-1,y1+50-1,x1+150+int(can3["width"]),y1+50+int(can3["height"]))
+		can3_fb=can3.create_rectangle(can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1,outline="#000000")
 
 
 		def det_total_daily_sales_n_profits(date,con_):
@@ -4391,6 +4401,9 @@ def main(con=0):
 
 			man_items_ims={}
 			man_item=None
+			sel_item=None
+			pay_st=None
+
 			man_reset_st=False
 			search_focus=False
 			man_item_crop_v=[False,[]]
@@ -4842,7 +4855,7 @@ def main(con=0):
 
 		x1,y1,x2,y2=x,y, x+xx,y+yy
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x,y,image=add_items_ims[v],anchor="nw")
 
@@ -4855,6 +4868,7 @@ def main(con=0):
 		can.create_text(x+xx/2,y1+1+15,text="Add Item",font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 
+		can.create_line(x1+(x2-x1)/2-200,y1+2, x1+(x2-x1)/2+200,y1+2,fill="#000000",width=1)
 
 
 		if con==0:
@@ -6673,6 +6687,7 @@ def can_b1(e):
 	global forecast_coords
 	global forecast_st,forecast_st2
 	global move_f_st
+	global can3_fb
 
 
 
@@ -7448,6 +7463,8 @@ def can_b1(e):
 
 					can3.xview_scroll(-1,"units")
 
+					can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
+
 					move_f_st=1
 
 					return
@@ -7461,6 +7478,8 @@ def can_b1(e):
 				if y_<=e.y<=y_+20:
 
 					can3.xview_scroll(1,"units")
+
+					can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
 
 					move_f_st=2
 
@@ -8311,15 +8330,18 @@ move_f_st=0
 def move_f():
 	global can3
 	global move_f_st
+	global can3_fb
 
 
 	if move_f_st==1:
 
 		can3.xview_scroll(-1,"units")
+		can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
 
 	elif move_f_st==2:
 
 		can3.xview_scroll(1,"units")
+		can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
 
 	root.after(100,move_f)
 
@@ -8451,17 +8473,23 @@ def scroll(e):
 def can_left(e):
 
 	global can3
+	global can3_fb
+
+
 
 
 	can3.xview_scroll(-1,"units")
+	can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
 
 
 def can_right(e):
 
 	global can3
+	global can3_fb
 
 
 	can3.xview_scroll(1,"units")
+	can3.coords(can3_fb,[can3.canvasx(0),0,can3.canvasx(int(can3["width"])-1),int(can3["height"])-1])
 
 
 
