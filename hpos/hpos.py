@@ -15,52 +15,7 @@ import datetime
 
 from datetime import date as dt
 
-"""
-def linear_regression(y_values):
-    n = len(y_values)
 
-    # x values are simply 1, 2, 3, ...
-    x_values = list(range(1, n + 1))
-
-    x_mean = sum(x_values) / n
-    y_mean = sum(y_values) / n
-
-    # Calculate slope (b1)
-    numerator = sum(
-        (x - x_mean) * (y - y_mean)
-        for x, y in zip(x_values, y_values)
-    )
-
-    denominator = sum(
-        (x - x_mean) ** 2
-        for x in x_values
-    )
-
-    b1 = numerator / denominator
-
-    # Calculate intercept (b0)
-    b0 = y_mean - b1 * x_mean
-
-    return b0, b1
-
-
-# Example
-y = [45, 50, 60, 65, 72]
-
-b0, b1 = linear_regression(y)
-
-print("Intercept:", b0)
-print("Slope:", b1)
-
-# Predict the next value (x = 6)
-x = 6
-prediction = b0 + b1 * x
-
-print("Prediction:", prediction)
-
-θ=tan−1(1)=45∘
-
-"""
 
 
 add_items_ims={}
@@ -1507,31 +1462,38 @@ def pay_with_mpesa():
 
 
 def linear_regression(y_values,x_values):
-    n = len(y_values)
 
-    # x values are simply 1, 2, 3, ...
-    #x_values = list(range(1, n + 1))
+	n=len(y_values)
 
-    x_mean = sum(x_values) / n
-    y_mean = sum(y_values) / n
+	x_mean=sum(x_values)/n
+	y_mean=sum(y_values)/n
 
-    # Calculate slope (b1)
-    numerator = sum(
-        (x - x_mean) * (y - y_mean)
-        for x, y in zip(x_values, y_values)
-    )
 
-    denominator = sum(
-        (x - x_mean) ** 2
-        for x in x_values
-    )
+	numerator=0
 
-    b1 = numerator / denominator
+	for _ in range(n):
 
-    # Calculate intercept (b0)
-    b0 = y_mean - b1 * x_mean
+		numerator+=(x_values[_]-x_mean)*(y_values[_]-y_mean)
 
-    return b0, b1
+
+
+	denominator=0
+
+	for x in x_values:
+
+		denominator+=(x-x_mean)**2
+
+	b1=numerator/denominator
+
+
+	b0=y_mean-b1*x_mean
+
+
+
+
+
+
+	return b0, b1
 
 
 
@@ -2216,12 +2178,12 @@ def main(con=0):
 
 		x1,y1,x2,y2=10+5+10,int(can3["height"])-10-30-(10+30)*2-30*2-15-10-30,int(can3["width"])-10-5,int(can3["height"])-10-30-(10+30)*2-30*2-15-10
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000",alpha=1,width=1)
+		im=draw_round_rect(15,x1,y1,x2,y2, "#ff0000","#ff0000",alpha=1,width=1)
 		sell_items_ims[v]=ImageTk.PhotoImage(im)
 
 		can3.create_image(x1,y1, image=sell_items_ims[v],anchor="nw")
 		can3.create_image(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2,y1+2.5,image=clear_cart,anchor="nw")
-		can3.create_text(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2+25+10,y1+15, text="Clear Cart",fill="#ff0000",font=("FreeMono",13),anchor="w")
+		can3.create_text(x1+(x2-x1-25-f.measure("Clear Cart")-10)/2+25+10,y1+15, text="Clear Cart",fill="#ffffff",font=("FreeMono",13),anchor="w")
 
 
 		cart_buttons_coords["clear_cart"]=[x1,y1,x2,y2]
