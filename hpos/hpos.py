@@ -1541,6 +1541,14 @@ forecast_coords={}
 fp,fs=0,0
 
 can3_fb=0
+
+profile_st=""
+profile_ims={}
+profile_coords={}
+profile_crop=0
+
+profile_sp=0
+profile_pic_st=0
 def main(con=0):
 
 	global st,st_
@@ -1592,6 +1600,11 @@ def main(con=0):
 	global forecast_coords
 	global fp,fs
 	global can3_fb
+	global profile_st,profile_ims,profile_coords,profile_crop
+	global add
+	global show_p,dshow_p
+	global profile_sp
+	global profile_pic_st
 
 	st_="main"
 
@@ -5035,6 +5048,444 @@ def main(con=0):
 		ent1.focus_set()
 
 
+	elif st=="Profiles":
+
+
+
+		forget_widgets(except_=dashboard)
+		entries_show_reset()
+		if con==0:
+
+			profile_st="Update Profile"
+
+			profile_crop=0
+			profile_crop_coords=[]
+
+			
+			delete_widgets()
+
+
+
+		can["width"]=width
+		can["height"]=height-40
+		can["bg"]="#ffffff"
+		can["scrollregion"]=(0,0,int(can["width"]),int(can["height"]))
+		can.delete("all")
+
+
+		im=Image.new("RGBA",(int(can["width"]),int(can["height"])),(0,0,0,128))
+
+		v=0
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+
+		can.create_image(0,0,image=profile_ims[v],anchor="nw")
+
+
+
+
+		can.place(in_=root,x=0,y=40)
+
+		can2["width"]=width
+		can2["height"]=40
+
+		can2.place(in_=root,x=0,y=0)
+
+		can2.delete("all")
+
+		im=Image.new("RGBA",(int(can2["width"]),int(can2["height"])),(0,0,0,128))
+
+		v+=1
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+
+		can2.create_image(0,0,image=profile_ims[v],anchor="nw")
+
+
+
+		
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+
+		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+		if row[4]=="":
+
+			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+
+
+		else:
+
+			#process profile picture
+			pass
+
+
+		if int(dashboard.place_info()["x"])<0:
+
+			x_=5+25+5
+
+		else:
+
+			x_=int(dashboard["width"])
+
+
+		xx=691+30
+
+		yy=376+30-10
+
+
+		_x_=x_+((int(can["width"])-x_)-xx)/2
+		_y_=(int(can["height"])-yy)/2-20
+
+
+
+		f=font.Font(family="FreeMono",size=13)
+
+
+
+		
+
+		v+=1
+
+		x1,y1,x2,y2=_x_,_y_,_x_+f.measure("Add New Profile")+20,_y_+30
+
+		if profile_st=="Update Profile":
+			col="#ffffff"
+			col2="#000000"
+		else:
+			col="#000000"
+			col2="#ffffff"
+
+
+		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+		can.create_text(x1+(x2-x1)/2,y1+15,text="Update Profile",font=("FreeMono",13),fill=col2,anchor="c")
+
+
+		profile_coords["Update Profile"]=[x1,y1,x2,y2]
+
+		v+=1
+
+		x1,y1,x2,y2=x2+2,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
+
+		if profile_st=="Add New Profile":
+			col="#ffffff"
+			col2="#000000"
+		else:
+			col="#000000"
+			col2="#ffffff"
+
+
+		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+		can.create_text(x1+(x2-x1)/2,y1+15,text="Add New Profile",font=("FreeMono",13),fill=col2,anchor="c")
+
+		profile_coords["Add New Profile"]=[x1,y1,x2,y2]
+
+		v+=1
+
+		x1,y1,x2,y2=x2+2,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
+
+		if profile_st=="Manage Profiles":
+			col="#ffffff"
+			col2="#000000"
+		else:
+			col="#000000"
+			col2="#ffffff"
+
+
+		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+		can.create_text(x1+(x2-x1)/2,y1+15,text="Manage Profiles",font=("FreeMono",13),fill=col2,anchor="c")
+
+		profile_coords["Manage Profiles"]=[x1,y1,x2,y2]
+
+		v+=1
+
+		x1,y1,x2,y2=_x_,_y_+30, _x_+xx,_y_+30+yy
+
+		im=draw_round_rect(20,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1,corners=[0,1,1,1])
+
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+		can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+
+		x,y=x1,y1+20
+
+
+		if profile_st=="Update Profile":
+
+	
+
+			can.create_text(x+10+10,y+20+15, text="User Name",font=("FreeMono",13), anchor="w",fill="#000000")
+
+			v+=1
+
+
+			x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6
+
+			im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent1.place(in_=root,x=x+150-20+10,y=y+20+15-10+40)
+
+		
+			can.create_text(x+10+10,y+20+15+60, text="Email",font=("FreeMono",13), anchor="w",fill="#000000")
+
+			v+=1
+
+
+			x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+60,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+60
+
+			im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent2.place(in_=root,x=x+150-20+10,y=y+20+15-10+40+60)
+
+
+
+
+			can.create_text(x+10+10,y+20+15+60*2, text="Contact",font=("FreeMono",13), anchor="w",fill="#000000")
+
+			v+=1
+
+
+			x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+60*2,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+60*2
+
+			im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent3.place(in_=root,x=x+150-20+10,y=y+20+15-10+40+60*2)
+
+
+
+			can.create_text(x+10+10,y+20+15+60*3, text="Password",font=("FreeMono",13), anchor="w",fill="#000000")
+
+			v+=1
+
+
+			x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+60*3,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+60*3
+
+			im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent4.place(in_=root,x=x+150-20+10,y=y+20+15-10+40+60*3)
+
+
+			can.create_text(x+10+10,y+20+15+60*4, text="Password",font=("FreeMono",13), anchor="w",fill="#000000")
+
+			v+=1
+
+
+			x1,y1,x2,y2=x+150-5-20+10,y+20+15-10-5+60*4,x+150-5+100+60+6-20+10,y+20+15-10-5+25+6+60*4
+
+			im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent5.place(in_=root,x=x+150-20+10,y=y+20+15-10+40+60*4)
+
+
+			v+=1
+
+			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350,y+20+15-10-5+25+6+60*4
+
+			print((y2+5+25+5+10+30+10)-y)
+			im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+
+			profile_coords["profile_pic"]=[x1+15,y1+15,x2-15,y2-15]
+
+
+			can.create_image(x2-25,y2+5,image=delete,anchor="nw")
+
+			profile_coords["delete_im"]=[x2-25,y2+5]
+
+
+			can.create_image(x2-25-10-25,y2+5,image=add,anchor="nw")
+			profile_coords["add_im"]=[x2-25-10-25,y2+5]
+
+
+			if profile_crop==1:
+
+				can.create_image(x2-25-10-25-10-25,y2+5,image=crop1,anchor="nw")
+
+			else:
+
+				can.create_image(x2-25-10-25-10-25,y2+5,image=crop2,anchor="nw")
+
+			profile_coords["crop_im"]=[x2-25-10-25-10-25,y2+5]
+
+			can.create_image(x2-25-10-25-10-25-10-25,y2+5,image=refresh,anchor="nw")
+
+			profile_coords["refresh_im"]=[x2-25-10-25-10-25-10-25,y2+5]
+
+
+
+
+			xx_=200
+
+
+			x_=xx/3
+
+
+
+			v+=1
+			x1,y1,x2,y2=_x_+x_-xx_/2,y2+5+25+5+10,_x_+x_+xx_/2,y2+5+25+5+10+30
+
+			im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			can.create_text(x1+(x2-x1)/2,y1+15,text="Delete",font=("FreeMono",13),fill="#ffffff")
+
+
+			profile_coords["delete"]=[x1,y1,x2,y2]
+
+
+			v+=1
+			x1,y1,x2,y2=_x_+xx-x_-xx_/2,y2-30,_x_+xx-x_+xx_/2,y2
+
+			im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
+			profile_ims[v]=ImageTk.PhotoImage(im)
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			can.create_text(x1+(x2-x1)/2,y1+15,text="Save",font=("FreeMono",13),fill="#ffffff")
+
+			profile_coords["save"]=[x1,y1,x2,y2]
+
+			if con==0:
+
+				ent1.focus_set()
+
+				db_users=database.connect("data/users.db")
+				cur=db_users.cursor()
+
+
+				cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+				row=cur.fetchall()[0]
+
+
+				user_name=row[1]
+				email=row[2]
+				contact=row[3]
+				password=row[5]
+				pic=row[4]
+
+
+				ent1.insert(tk.END,user_name)
+				ent2.insert(tk.END,email)
+				ent3.insert(tk.END,contact)
+				ent4.insert(tk.END,password)
+
+
+				profile_sp=0
+
+
+				if pic=="":
+
+					profile_ims["profile_pic_ref"]=Image.open("data/icons/no_profile_im.png")
+
+					profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
+
+					profile_pic_st=0
+
+				else:
+
+					profile_ims["profile_pic_ref"]=Image.open(f"data/images/u_{user_id}.png")
+
+					profile_ims["profile_pic"]=Image.open(f"data/images/u_{user_id}.png")
+
+					profile_pic_st=1
+
+
+			if profile_sp==0:
+
+				ent4["show"]="*"
+				ent5["show"]="*"
+
+
+				can.create_image(x+150-5+100+60+6-20+10+5,y+20+15-10-5+60*3+1,image=show_p,anchor="nw")
+
+			else:
+
+				ent4["show"]=""
+				ent5["show"]=""
+
+
+				can.create_image(x+150-5+100+60+6-20+10+5,y+20+15-10-5+60*3+1,image=dshow_p,anchor="nw")
+
+			profile_coords["password"]=[x+150-5+100+60+6-20+10+5,y+20+15-10-5+60*3+1]
+
+
+			x1,y1,x2,y2=profile_coords["profile_pic"]
+
+			im=profile_ims["profile_pic"]
+
+			x_,y_=im.size
+
+
+			if x_/y_>(x2-x1)/(y2-y1):
+
+				_x=(x2-x1)
+				_y=_x*y_/x_
+
+			elif x_/y_<(x2-x1)/(y2-y1):
+
+				_y=(y2-y1)
+				_x=_y*x_/y_
+
+			else:
+				_x=(x2-x1)
+				_y=(y2-y1)
+
+
+			x__=((x2-x1)-_x)/2
+			y__=((y2-y1)-_y)/2
+
+			_x=int(round(_x,0))
+			_y=int(round(_y,0))
+
+
+			im=im.resize((_x,_y))
+
+
+			profile_ims["profile_pic2"]=ImageTk.PhotoImage(im)
+
+
+
+			can.create_image(x1+x__,y1+y__,image=profile_ims["profile_pic2"],anchor="nw")
+
+			profile_coords["profile_pic2"]=[x1+x__,y1+y__, x1+x__+_x,y1+y__+_y]
 
 
 
@@ -5651,6 +6102,7 @@ previous,next_=0,0
 previous2,next2=0,0
 graph1,graph2=0,0
 forecast1,forecast2=0,0
+add=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -5673,6 +6125,7 @@ def load_im():
 	global previous2,next2
 	global graph1,graph2
 	global forecast1,forecast2
+	global add
 
 
 	#db
@@ -5918,6 +6371,12 @@ def load_im():
 	im=im.resize((25,25))
 	forecast2=ImageTk.PhotoImage(im)
 
+	#add
+
+	im=Image.open("data/icons/add.png")
+	im=im.resize((25,25))
+	add=ImageTk.PhotoImage(im)
+
 
 db_items_=[]
 def draw_db():
@@ -5991,89 +6450,125 @@ def draw_db():
 
 
 
-def draw_round_rect(r,x1,y1,x2,y2, col1,col2=None,alpha=1,width=1):
+def draw_round_rect(r,x1,y1,x2,y2, col1,col2=None,alpha=1,width=1,corners=[1,1,1,1]):
 
-    w,h=int(round(abs(x2-x1),0)),int(round(abs(y2-y1),0))
-    w_=w*4
-    h_=int(round(w_*h/w,0))
-
-
-
-    im=Image.new("RGBA",(w_,h_),(0,0,0,0))
-    draw=ImageDraw.Draw(im)
-
-
-    ar=[]
-
-    r*=4
-
-    cx,cy=r,r
-    a_=180
-
-    for a in range(90):
-
-        x=int(round(r*math.sin(math.radians(a_))+cx,0))
-        y=int(round(r*math.cos(math.radians(a_))+cy,0))
-
-        ar.append((x,y))
-
-        a_+=1
+	w,h=int(round(abs(x2-x1),0)),int(round(abs(y2-y1),0))
+	w_=w*4
+	h_=int(round(w_*h/w,0))
 
 
 
-    cx,cy=r,h_-r-1
-    a_=270
-
-    for a in range(90):
-
-        x=int(round(r*math.sin(math.radians(a_))+cx,0))
-        y=int(round(r*math.cos(math.radians(a_))+cy,0))
-
-        ar.append((x,y))
-
-        a_+=1
-
-    cx,cy=w_-r-1,h_-r-1
-    a_=0
-
-    for a in range(90):
-
-        x=int(round(r*math.sin(math.radians(a_))+cx,0))
-        y=int(round(r*math.cos(math.radians(a_))+cy,0))
-
-        ar.append((x,y))
-
-        a_+=1
+	im=Image.new("RGBA",(w_,h_),(0,0,0,0))
+	draw=ImageDraw.Draw(im)
 
 
+	ar=[]
 
-    cx,cy=w_-r-1,r
-    a_=90
+	r*=4
 
-    for a in range(90):
-
-        x=int(round(r*math.sin(math.radians(a_))+cx,0))
-        y=int(round(r*math.cos(math.radians(a_))+cy,0))
-
-        ar.append((x,y))
-
-        a_+=1
-
-
-
-    if col2==None:
-        draw.polygon(ar,outline=col1,width=int((round(4*width,0))))
-
-    else:
-
-        draw.polygon(ar,fill=(*hex_to_rgb(col2),int(round(255*alpha,0))),outline=col1,width=int((round(4*width,0))))
+	if corners[0]==1:
 
 
 
 
-    im=im.resize((w,h))
 
-    return im
+
+	    cx,cy=r,r
+	    a_=180
+
+	    for a in range(90):
+
+	        x=int(round(r*math.sin(math.radians(a_))+cx,0))
+	        y=int(round(r*math.cos(math.radians(a_))+cy,0))
+
+	        ar.append((x,y))
+
+	        a_+=1
+
+	else:
+		ar=[(0,0)]
+
+
+
+
+	if corners[1]==1:
+
+
+
+	    cx,cy=r,h_-r-1
+	    a_=270
+
+	    for a in range(90):
+
+	        x=int(round(r*math.sin(math.radians(a_))+cx,0))
+	        y=int(round(r*math.cos(math.radians(a_))+cy,0))
+
+	        ar.append((x,y))
+
+	        a_+=1
+
+	else:
+
+		ar.append((0,h_-1))
+
+
+
+
+	if corners[2]==1:
+
+
+
+	    cx,cy=w_-r-1,h_-r-1
+	    a_=0
+
+	    for a in range(90):
+
+	        x=int(round(r*math.sin(math.radians(a_))+cx,0))
+	        y=int(round(r*math.cos(math.radians(a_))+cy,0))
+
+	        ar.append((x,y))
+
+	        a_+=1
+
+
+
+	else:
+
+		ar.append((w_-1,h_-1))
+
+
+
+	if corners[3]==1:
+
+	    cx,cy=w_-r-1,r
+	    a_=90
+
+	    for a in range(90):
+
+	        x=int(round(r*math.sin(math.radians(a_))+cx,0))
+	        y=int(round(r*math.cos(math.radians(a_))+cy,0))
+
+	        ar.append((x,y))
+
+	        a_+=1
+	else:
+
+		ar.append((w_-1,0))
+
+
+	if col2==None:
+	    draw.polygon(ar,outline=col1,width=int((round(4*width,0))))
+
+	else:
+
+	    draw.polygon(ar,fill=(*hex_to_rgb(col2),int(round(255*alpha,0))),outline=col1,width=int((round(4*width,0))))
+
+
+
+
+	im=im.resize((w,h))
+
+	return im
 
 
 login_im1=0
@@ -6618,6 +7113,8 @@ sz=root.geometry().split("+")[0].split("x")
 w,h=int(sz[0]),int(sz[1])
 cur_sz=[w,h]
 
+
+profile_crop_coords=[]
 def can_b1(e):
 	global can,dashboard,can3
 	global un_login_coord,	pw1_login_coord
@@ -6650,6 +7147,10 @@ def can_b1(e):
 	global forecast_st,forecast_st2
 	global move_f_st
 	global can3_fb
+	global profile_st,profile_coords,profile_ims
+	global profile_sp
+	global profile_pic_st
+	global profile_crop,profile_crop_coords
 
 
 
@@ -8093,8 +8594,326 @@ def can_b1(e):
 
 
 
+		elif st=="Profiles":
 
 
+
+			if int(dashboard.place_info()["x"])<0:
+
+				x_=5+25+5
+
+			else:
+
+				x_=int(dashboard["width"])
+
+
+			xx=691+30
+
+			yy=376+30-10
+
+
+			_x_=x_+((int(can["width"])-x_)-xx)/2
+			_y_=(int(can["height"])-yy)/2-20+30
+
+
+
+
+			x1,y1,x2,y2=profile_coords["Update Profile"]
+
+
+			if x1<=e.x<=x2:
+				if y1<=e.y<=y2:
+
+					profile_st="Update Profile"
+
+					main(1)
+
+					return
+
+
+			x1,y1,x2,y2=profile_coords["Add New Profile"]
+
+
+			if x1<=e.x<=x2:
+				if y1<=e.y<=y2:
+
+					profile_st="Add New Profile"
+
+					main(1)
+
+					return
+
+
+			x1,y1,x2,y2=profile_coords["Manage Profiles"]
+
+
+			if x1<=e.x<=x2:
+				if y1<=e.y<=y2:
+
+					profile_st="Manage Profiles"
+
+					main(1)
+
+					return
+
+
+			x_,y_=profile_coords["password"]
+
+			if x_<=e.x<=x_+29:
+				if y_<=e.y<=y_+29:
+
+					if profile_sp==0:
+
+						profile_sp=1
+					elif profile_sp==1:
+						profile_sp=0
+
+
+					main(1)
+
+					return
+
+
+
+			x_,y_=profile_coords["delete_im"]
+
+			if x_<=e.x<=x_+25:
+				if y_<=e.y<=y_+25:
+
+					profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
+					profile_pic_st=0
+
+					main(1)
+
+					return
+
+
+
+			x_,y_=profile_coords["add_im"]
+			if x_<=e.x<=x_+25:
+				if y_<=e.y<=y_+25:
+
+					file=filedialog.askopenfilename()
+
+
+					try:
+						im=Image.open(file)
+
+						profile_ims["profile_pic_ref"]=im
+
+						profile_ims["profile_pic"]=im
+
+						profile_pic_st=1
+
+						main(1)
+
+						return
+
+					except:
+
+						message(0,can,"Can't process image!",_x_+xx/2,_y_+yy+10+15,350,30)
+
+
+
+
+			x_,y_=profile_coords["crop_im"]
+			if x_<=e.x<=x_+25:
+				if y_<=e.y<=y_+25:
+
+					if profile_pic_st==1:
+
+						if profile_crop==0:
+
+							profile_crop=1
+
+						elif profile_crop==1:
+
+							profile_crop=0
+
+
+						main(1)
+
+						return
+
+
+
+
+
+
+			x_,y_=profile_coords["refresh_im"]
+			if x_<=e.x<=x_+25:
+				if y_<=e.y<=y_+25:
+
+					profile_ims["profile_pic"]=profile_ims["profile_pic_ref"]
+					main(1)
+					return
+
+
+			if profile_pic_st==1 and profile_crop==1:
+
+
+				x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+				if x1<=e.x<=x2:
+					if y1<=e.y<=y2:
+
+
+						if profile_crop_coords==[]:
+
+							x_=e.x-x1
+							y_=e.y-y1
+
+							profile_crop_coords.append(x_)
+							profile_crop_coords.append(y_)
+
+						elif len(profile_crop_coords)==2:
+
+							x_=e.x-x1
+							y_=e.y-y1
+
+							profile_crop_coords.append(x_)
+							profile_crop_coords.append(y_)
+
+							im=profile_ims["profile_pic"]
+
+							x,y=profile_ims["profile_pic"].size
+
+							x1_=int(round(profile_crop_coords[0]*x/(x2-x1),0))
+							y1_=int(round(profile_crop_coords[1]*y/(y2-y1),0))
+							x2_=int(round(profile_crop_coords[2]*x/(x2-x1),0))
+							y2_=int(round(profile_crop_coords[3]*y/(y2-y1),0))
+
+
+							im=im.crop((x1_,y1_,x2_,y2_))
+
+							profile_ims["profile_pic"]=im
+
+							profile_crop_coords=[]
+							profile_crop=0
+
+							main(1)
+							return
+
+			x1,y1,x2,y2=profile_coords["save"]
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				main(1)
+				_mess_=update_user()
+
+
+
+				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+
+			if r<=15:
+
+				main(1)
+
+				_mess_=update_user()
+
+				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+
+			if x1+15<=e.x<=x2-15:
+
+				if y1<=e.y<=y2:
+
+					main(1)
+
+					_mess_=update_user()
+
+					message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+
+def update_user():
+
+	global user_id
+	global ent1,ent2,ent3,ent4,ent5
+	global profile_ims
+	global profile_pic_st
+
+	user_name=ent1.get()
+	email=ent2.get()
+	contact=ent3.get()
+	pw1=ent4.get()
+	pw2=ent5.get()
+
+
+	if user_name=="" or email=="" or contact=="" or pw1=="" or pw2=="":
+
+		return [0,"Fill all Fields!"]
+
+
+	if pw1!=pw2:
+
+		return [0,"Passwords don't match"]
+
+
+
+	db_users=database.connect("data/users.db")
+	cur=db_users.cursor()
+
+	cur.execute("SELECT * FROM users ")
+
+
+	con=0
+
+	rows=cur.fetchall()
+
+
+
+	for row in rows:
+
+		if int(row[0])!=user_id:
+
+			if row[1].lower()==user_name.lower():
+
+				return [0,"User name exists!"]
+
+
+
+
+
+	cur.execute(f"UPDATE users SET name='{user_name}' WHERE user_id={user_id}")
+	cur.execute(f"UPDATE users SET email='{email}' WHERE user_id={user_id}")
+	cur.execute(f"UPDATE users SET contact='{contact}' WHERE user_id={user_id}")
+	cur.execute(f"UPDATE users SET password='{pw1}' WHERE user_id={user_id}")
+
+
+	if profile_pic_st==1:
+
+		cur.execute(f"UPDATE users SET pic='u_{user_id}.png' WHERE user_id={user_id}")
+
+
+		im=profile_ims["profile_pic"]
+
+		im.save(f"data/images/u_{user_id}.png")
+
+	else:
+		cur.execute(f"UPDATE users SET pic='' WHERE user_id={user_id}")
+
+
+	db_users.commit()
+
+
+
+	return [1,"Profile Updated!"]
+
+
+
+
+				
 
 
 
@@ -8226,11 +9045,15 @@ def add_new_item():
 
 add_items_crop_v_=0
 man_items_crop_v_=0
+profile_crop_v=0
 def can_motion(e):
 	global st_,st
 	global add_item_crop_v,man_item_crop_v
 	global add_items_coords,man_items_coords
 	global add_items_crop_v_,man_items_crop_v_
+	global profile_coords,profile_crop_coords,profile_crop,profile_pic_st
+	global profile_crop_v
+
 
 	if st_=="main":
 
@@ -8284,7 +9107,38 @@ def can_motion(e):
 								man_items_crop_v_=can.create_rectangle(x1_,y1_, x,y,outline="#ff0000")
 
 			else:
-				can.delete(man_items_crop_v_)								
+				can.delete(man_items_crop_v_)	
+
+		elif st=="Profiles":
+
+
+			x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+
+			if x1<=e.x<=x2:
+
+				if y1<=e.y<=y2:
+
+					if profile_pic_st==1 and profile_crop==1:
+
+
+						if len(profile_crop_coords)==2:
+
+
+							x_,y_=profile_crop_coords
+
+							x_+=x1
+							y_+=y1
+
+							can.delete(profile_crop_v)
+
+							profile_crop_v=can.create_rectangle(x_,y_, e.x,e.y,outline="#ff0000")
+
+
+
+
+
+
 
 
 
@@ -9255,7 +10109,7 @@ cal=tk.Canvas(bg="#000000",relief="flat",highlightthickness=0,border=0)
 
 cal.bind("<Button-1>",cal_b1)
 
-t_widgets={"entries":[ent1,ent2,ent3,ent4,ent_search],
+t_widgets={"entries":[ent1,ent2,ent3,ent4,ent5,ent_search],
 			"text":[text1],
 			"canvas":[dashboard,can,can2,can3,can4,can5,cal]}
 
