@@ -15,6 +15,23 @@ import datetime
 
 from datetime import date as dt
 
+import json
+
+
+try:
+
+	with open("data/users.json","r") as file:
+
+		users_dict=json.load(file)
+
+
+
+
+except:
+
+	users_dict={}
+
+
 
 
 
@@ -23,6 +40,87 @@ add_items_ims={}
 add_items_coords={}
 
 add_item_im=0
+
+"""
+
+try:
+
+	users_dict.pop(str(5))
+
+	with open("data/users.json","w") as file:
+
+		json.dump(users_dict,file,indent=4)
+
+except:
+	pass
+
+
+
+
+db_items=database.connect("data/items.db")
+cur=db_items.cursor()
+
+cur.execute("SELECT * FROM items")
+
+rows=cur.fetchall()
+
+ar_=[]
+for row in rows:
+
+	ar_.append(int(row[0]))
+
+
+
+
+_ar_=[]
+ar=os.listdir("data/images")
+
+for i in ar:
+
+	try:
+
+		v=int(i.split(".png")[0])
+
+		try:
+
+			v_=ar_.index(v)
+
+		except:
+
+			_ar_.append(v)
+
+	except:
+		pass
+
+
+print(_ar_)
+
+
+
+
+for id_ in _ar_:
+
+	try:
+
+		os.remove(f"data/images/{id_}.png")
+
+
+	except:
+		pass
+
+
+
+	try:
+
+		os.remove(f"data/images/{id_}_1.png")
+
+
+	except:
+		pass
+
+
+
+"""
 
 #+254769167904
 """
@@ -116,7 +214,7 @@ def check_root_sz():
 
 		if st_=="main":
 
-			print("ok")
+
 			draw_db()
 			main(1)
 
@@ -502,7 +600,40 @@ def man_items_delete():
 
 	db_items.commit()
 
+	
+
+
+	ar=os.listdir("data/images")
+
+
+	try:
+		v=ar.index(f"{man_item}.png")
+
+		os.remove(f"data/images/{man_item}.png")
+
+
+	except Exception as e:
+
+		#print(e)
+		pass
+
+
+
+	try:
+		v=ar.index(f"{man_item}_1.png")
+
+		os.remove(f"data/images/{man_item}_1.png")
+
+
+	except Exception as e:
+		#print(e)
+		pass
+
+
+
 	man_item=None
+
+
 
 	main(1)
 
@@ -604,6 +735,7 @@ def man_items_save():
 
 man_items_ims={}
 man_items_coords={}
+man_del_st=0
 def draw_manage_item(id_,con):
 	global man_item
 	global ent1,ent2,ent3,ent4,text1
@@ -613,6 +745,15 @@ def draw_manage_item(id_,con):
 	global save_im,delete2,reset_im
 	global man_item_crop_v
 	global man_item_crop_coord_norm
+	global man_del_st
+	global deletex,cancelx
+
+
+	if con==0:
+
+		man_del_st=0
+
+
 
 
 
@@ -669,7 +810,7 @@ def draw_manage_item(id_,con):
 
 
 
-	xx,yy=700,430
+	xx,yy=750,450
 
 	x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
@@ -688,7 +829,7 @@ def draw_manage_item(id_,con):
 
 	x1,y1,x2,y2=x,y, x+xx,y+yy
 
-	im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
+	im=draw_round_rect(20,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 	man_items_ims[v]=ImageTk.PhotoImage(im)
 	can.create_image(x,y,image=man_items_ims[v],anchor="nw")
 
@@ -709,7 +850,7 @@ def draw_manage_item(id_,con):
 
 
 
-	y+=20
+	y+=40
 
 
 
@@ -952,7 +1093,7 @@ def draw_manage_item(id_,con):
 
 	v+=1
 
-	x1,y1,x2,y2=x+x_-80,y+yy-10-30-20, x+x_+80,y+yy-10-20
+	x1,y1,x2,y2=x+x_-80,y+yy-10-30-40, x+x_+80,y+yy-10-40
 
 	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 	man_items_ims[v]=ImageTk.PhotoImage(im)
@@ -960,16 +1101,16 @@ def draw_manage_item(id_,con):
 
 	_x=x1+((x2-x1)-(20+10+f.measure("Reset")))/2
 
-	can.create_image(_x,y+yy-10-15-20-10,image=reset_im,anchor="nw")
+	can.create_image(_x,y+yy-10-15-40-10,image=reset_im,anchor="nw")
 
-	can.create_text(_x+20+10, y+yy-10-15-20, text="Reset", font=("FreeMono",13),fill="#ffffff",anchor="w")
+	can.create_text(_x+20+10, y+yy-10-15-40, text="Reset", font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 	man_items_coords["reset"]=[x1,y1,x2,y2]
 
 
 	v+=1
 
-	x1,y1,x2,y2=x+x_*2-80,y+yy-10-30-20, x+x_*2+80,y+yy-10-20
+	x1,y1,x2,y2=x+x_*2-80,y+yy-10-30-40, x+x_*2+80,y+yy-10-40
 
 	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 	man_items_ims[v]=ImageTk.PhotoImage(im)
@@ -977,18 +1118,36 @@ def draw_manage_item(id_,con):
 
 	_x=x1+((x2-x1)-(20+10+f.measure("Delete")))/2
 
-	can.create_image(_x,y+yy-10-15-20-10,image=delete2,anchor="nw")
+	if man_del_st==0:
+
+		can.create_image(_x,y+yy-10-15-40-10,image=delete2,anchor="nw")
 
 
-	can.create_text(_x+20+10, y+yy-10-15-20, text="Delete", font=("FreeMono",13),fill="#ffffff",anchor="w")
+		can.create_text(_x+20+10, y+yy-10-15-40, text="Delete", font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+	elif man_del_st==1:
+
+		can.create_image(x1+(x2-x1-f.measure("Delete")-20-10)/2-20,y1+5,image=deletex,anchor="nw")
+		man_items_coords["deletex"]=[x1+(x2-x1-f.measure("Delete")-20-10)/2-20,y1+5]
+
+
+		can.create_text(x1+(x2-x1)/2, y+yy-10-15-40, text="Delete", font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+
+		can.create_image(x2-(x2-x1-f.measure("Delete")-20-10)/2,y1+5,image=cancelx,anchor="nw")
+		man_items_coords["cancelx"]=[x2-(x2-x1-f.measure("Delete")-20-10)/2,y1+5]
+
 
 	man_items_coords["_delete_"]=[x1,y1,x2,y2]
 
 
 
+
+
+
 	v+=1
 
-	x1,y1,x2,y2=x+x_*3-80,y+yy-10-30-20, x+x_*3+80,y+yy-10-20
+	x1,y1,x2,y2=x+x_*3-80,y+yy-10-30-40, x+x_*3+80,y+yy-10-40
 
 	im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 	man_items_ims[v]=ImageTk.PhotoImage(im)
@@ -997,9 +1156,9 @@ def draw_manage_item(id_,con):
 
 	_x=x1+((x2-x1)-(20+10+f.measure("Save")))/2
 
-	can.create_image(_x,y+yy-10-15-20-10,image=save_im,anchor="nw")
+	can.create_image(_x,y+yy-10-15-40-10,image=save_im,anchor="nw")
 
-	can.create_text(_x+20+10, y+yy-10-15-20, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="w")
+	can.create_text(_x+20+10, y+yy-10-15-40, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 	man_items_coords["save"]=[x1,y1,x2,y2]
 
@@ -1101,7 +1260,6 @@ def complete_payment():
 
 	except Exception as e:
 
-		print(e)
 		pass
 
 
@@ -1543,12 +1701,15 @@ fp,fs=0,0
 can3_fb=0
 
 profile_st=""
+profile_st2=0
 profile_ims={}
 profile_coords={}
 profile_crop=0
 
 profile_sp=0
 profile_pic_st=0
+
+profile_del_st=0
 def main(con=0):
 
 	global st,st_
@@ -1600,11 +1761,14 @@ def main(con=0):
 	global forecast_coords
 	global fp,fs
 	global can3_fb
-	global profile_st,profile_ims,profile_coords,profile_crop
+	global profile_st,profile_st2,profile_ims,profile_coords,profile_crop
 	global add
 	global show_p,dshow_p
 	global profile_sp
 	global profile_pic_st
+	global users_dict
+	global profile_del_st
+	global save_im,delete2
 
 	st_="main"
 
@@ -1780,17 +1944,18 @@ def main(con=0):
 		user_name=row[1]
 
 
-		can2.create_text(width-5-25-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
-
-		if row[4]=="":
-
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		can2.create_text(width-5-35-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
 
 
-		else:
+		im=process_profile_pic(35)
 
-			#process profile picture
-			pass
+		v+=1
+		sell_items_ims[v]=ImageTk.PhotoImage(im)
+
+
+		
+		can2.create_image(width-5-35,2.5,image=sell_items_ims[v],anchor="nw")
+
 
 
 
@@ -2386,17 +2551,16 @@ def main(con=0):
 		user_name=row[1]
 
 
-		can2.create_text(width-5-25-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
-
-		if row[4]=="":
-
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		can2.create_text(width-5-35-15,20, text=user_name,fill="#000000",font=("FreeMono",13),anchor="e")
 
 
-		else:
+		im=process_profile_pic(35)
 
-			#process profile picture
-			pass
+		v+=1
+		rep_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=rep_items_ims[v],anchor="nw")
+
 
 
 
@@ -2922,17 +3086,15 @@ def main(con=0):
 		row=cur.fetchall()[0]
 
 
-		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
-
-		if row[4]=="":
-
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		can2.create_text(width-5-35-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
 
 
-		else:
+		im=process_profile_pic(35)
 
-			#process profile picture
-			pass
+		v=0
+		graph_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=graph_ims[v],anchor="nw")
 
 
 
@@ -2981,7 +3143,7 @@ def main(con=0):
 
 		#can.create_rectangle(x1,y1,x2,y2,outline="#000000",fill="#eeeeee")
 
-		v=0
+		v+=1
 		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#eeeeee",alpha=1,width=1)
 
 		graph_ims[v]=ImageTk.PhotoImage(im)
@@ -3418,17 +3580,16 @@ def main(con=0):
 		row=cur.fetchall()[0]
 
 
-		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+		can2.create_text(width-5-35-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
 
-		if row[4]=="":
+		im=process_profile_pic(35)
 
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		v=0
+		forecast_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=forecast_ims[v],anchor="nw")
 
 
-		else:
-
-			#process profile picture
-			pass
 
 
 		if int(dashboard.place_info()["x"])<0:
@@ -3447,7 +3608,7 @@ def main(con=0):
 
 
 
-		v=0
+		v+=1
 
 		x1,y1,x2,y2=_x_,40,_x_+xx,int(can["height"])-40
 		im=draw_round_rect(20,x1,y1,x2,y2, "#000000","#eeeeee",alpha=1,width=1)
@@ -4526,17 +4687,17 @@ def main(con=0):
 		row=cur.fetchall()[0]
 
 
-		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
-
-		if row[4]=="":
-
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		can2.create_text(width-5-35-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
 
 
-		else:
+		im=process_profile_pic(35)
 
-			#process profile picture
-			pass
+		v+=1
+		man_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=man_items_ims[v],anchor="nw")
+
+
 
 
 
@@ -4785,7 +4946,6 @@ def main(con=0):
 
 
 
-
 		v=0
 
 		im=Image.new("RGBA",(width,40),(0,0,0,128))
@@ -4794,6 +4954,27 @@ def main(con=0):
 
 		can2.create_image(0,0,image=add_items_ims[v],anchor="nw")
 
+
+
+
+		db_users=database.connect("data/users.db")
+		cur=db_users.cursor()
+
+
+		cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+		row=cur.fetchall()[0]
+
+
+		can2.create_text(width-5-35-15,20, text=row[1],fill="#ffffff",font=("FreeMono",13),anchor="e")
+
+
+		im=process_profile_pic(35)
+
+		v+=1
+		add_items_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=add_items_ims[v],anchor="nw")
 
 
 
@@ -4813,7 +4994,7 @@ def main(con=0):
 		can.create_image(0,0,image=add_items_ims[v],anchor="nw")
 
 
-		xx,yy=700,430
+		xx,yy=750,450
 
 		x=int(dashboard.place_info()["x"])+int(dashboard["width"])
 
@@ -4830,7 +5011,7 @@ def main(con=0):
 
 		x1,y1,x2,y2=x,y, x+xx,y+yy
 
-		im=draw_round_rect(15,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
+		im=draw_round_rect(20,x1,y1,x2,y2, "#ffffff","#ffffff",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x,y,image=add_items_ims[v],anchor="nw")
 
@@ -4853,7 +5034,7 @@ def main(con=0):
 			pass
 
 
-		y+=20
+		y+=40
 
 
 
@@ -5032,13 +5213,13 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=x+xx/2-80,y+yy-10-30-20, x+xx/2+80,y+yy-10-20
+		x1,y1,x2,y2=x+xx/2-80,y+yy-10-30-40, x+xx/2+80,y+yy-10-40
 
 		im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#000000",alpha=1,width=1)
 		add_items_ims[v]=ImageTk.PhotoImage(im)
 		can.create_image(x1,y1,image=add_items_ims[v],anchor="nw")
 
-		can.create_text(x+xx/2, y+yy-10-15-20, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="c")
+		can.create_text(x+xx/2, y+yy-10-15-40, text="Save", font=("FreeMono",13),fill="#ffffff",anchor="c")
 
 		add_items_coords["save"]=[x1,y1,x2,y2]
 
@@ -5057,12 +5238,22 @@ def main(con=0):
 		if con==0:
 
 			profile_st="Update Profile"
+			profile_st2=0
 
 			profile_crop=0
 			profile_crop_coords=[]
 
+			profile_del_st=0
+
 			
 			delete_widgets()
+
+
+		if profile_st2==1:
+
+			profile_del_st=0
+
+
 
 
 
@@ -5116,17 +5307,18 @@ def main(con=0):
 		row=cur.fetchall()[0]
 
 
-		can2.create_text(width-5-25-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
-
-		if row[4]=="":
-
-			can2.create_image(width-5-25,7.5,image=no_profile_im,anchor="nw")
+		can2.create_text(width-5-35-15,20, text=row[1],fill="#ffffff",font=("FreeMono",13),anchor="e")
 
 
-		else:
 
-			#process profile picture
-			pass
+		im=process_profile_pic(35)
+
+		v+=1
+		profile_ims[v]=ImageTk.PhotoImage(im)
+
+		can2.create_image(int(can2["width"])-5-35,2.5,image=profile_ims[v],anchor="nw")
+
+
 
 
 		if int(dashboard.place_info()["x"])<0:
@@ -5316,7 +5508,6 @@ def main(con=0):
 
 			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350,y+20+15-10-5+25+6+60*4
 
-			print((y2+5+25+5+10+30+10)-y)
 			im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 			profile_ims[v]=ImageTk.PhotoImage(im)
 			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
@@ -5365,11 +5556,30 @@ def main(con=0):
 			profile_ims[v]=ImageTk.PhotoImage(im)
 			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
 
-			can.create_text(x1+(x2-x1)/2,y1+15,text="Delete",font=("FreeMono",13),fill="#ffffff")
+			
 
 
 			profile_coords["delete"]=[x1,y1,x2,y2]
 
+
+			if profile_del_st==1:
+
+				can.create_text(x1+(x2-x1)/2,y1+15,text="Delete",font=("FreeMono",13),fill="#ffffff")
+
+				can.create_image(x1+(x2-x1-f.measure("Delete")-20)/2-25,y1+5,image=deletex,anchor="nw")
+
+				profile_coords["deletex"]=[x1+(x2-x1-f.measure("Delete")-20)/2-25,y1+5]
+
+
+				can.create_image(x2-(x2-x1-f.measure("Delete")-20)/2,y1+5,image=cancelx,anchor="nw")
+
+				profile_coords["cancelx"]=[x2-(x2-x1-f.measure("Delete")-20)/2,y1+5]
+
+			else:
+
+				can.create_image(x1+(x2-x1-f.measure("Delete")-10-20)/2,y1+5,image=delete2,anchor="nw")
+
+				can.create_text(x1+(x2-x1-f.measure("Delete")-10-20)/2+20+10,y1+15,text="Delete",font=("FreeMono",13),fill="#ffffff",anchor="w")
 
 			v+=1
 			x1,y1,x2,y2=_x_+xx-x_-xx_/2,y2-30,_x_+xx-x_+xx_/2,y2
@@ -5378,9 +5588,15 @@ def main(con=0):
 			profile_ims[v]=ImageTk.PhotoImage(im)
 			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
 
-			can.create_text(x1+(x2-x1)/2,y1+15,text="Save",font=("FreeMono",13),fill="#ffffff")
 
 			profile_coords["save"]=[x1,y1,x2,y2]
+
+
+			can.create_image(x1+(x2-x1-f.measure("Save")-10-20)/2,y1+5,image=save_im,anchor="nw")
+
+			can.create_text(x1+(x2-x1-f.measure("Save")-10-20)/2+20+10,y1+15,text="Save",font=("FreeMono",13),fill="#ffffff",anchor="w")
+
+
 
 			if con==0:
 
@@ -5426,6 +5642,8 @@ def main(con=0):
 					profile_ims["profile_pic"]=Image.open(f"data/images/u_{user_id}.png")
 
 					profile_pic_st=1
+
+
 
 
 			if profile_sp==0:
@@ -5486,6 +5704,278 @@ def main(con=0):
 			can.create_image(x1+x__,y1+y__,image=profile_ims["profile_pic2"],anchor="nw")
 
 			profile_coords["profile_pic2"]=[x1+x__,y1+y__, x1+x__+_x,y1+y__+_y]
+
+			if profile_pic_st==1:
+
+				can.create_rectangle(profile_coords["profile_pic2"],outline="#000000")
+
+
+			if profile_pic_st==1:
+
+				if con==0:
+
+
+					try:
+
+						profile_coords["show"]=users_dict[str(user_id)]
+
+
+
+
+					except Exception as e:
+
+
+						x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+						x_=x2-x1
+						y_=y2-y1
+
+						
+
+
+						if x_>y_:
+
+							_x1=((x_-y_)/2)/x_
+							_x2=(x_-(x_-y_)/2)/x_
+							_y1=0
+							_y2=1
+
+
+
+						elif x_<y_:
+
+							_y1=((y_-x_)/2)/y_
+							_y2=(y_-(y_-x_)/2)/y_
+							_x1=0
+							_x2=1
+
+						else:
+
+							_x1=0
+							_x2=1
+							_y1=0
+							_y2=1
+
+
+						profile_coords["show"]=[_x1,_y1,_x2,_y2]
+
+
+				if profile_crop==0:
+
+
+					if profile_st2==1:
+
+
+						x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+						x_=x2-x1
+						y_=y2-y1
+
+						
+
+
+						if x_>y_:
+
+							_x1=((x_-y_)/2)/x_
+							_x2=(x_-(x_-y_)/2)/x_
+							_y1=0
+							_y2=1
+
+
+
+						elif x_<y_:
+
+							_y1=((y_-x_)/2)/y_
+							_y2=(y_-(y_-x_)/2)/y_
+							_x1=0
+							_x2=1
+
+						else:
+
+							_x1=0
+							_x2=1
+							_y1=0
+							_y2=1
+
+
+						profile_coords["show"]=[_x1,_y1,_x2,_y2]
+
+
+
+					draw_profile_overlay()
+
+
+
+
+
+
+
+								
+
+
+			if profile_st2==1:
+
+				profile_st2=0
+
+
+def draw_profile_overlay():
+	global profile_coords
+	global profile_ims
+
+
+	_x1,_y1,_x2,_y2=profile_coords["show"]
+
+	x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+	x_,y_=x2-x1,y2-y1
+
+	_x1,_y1,_x2,_y2=int(round(_x1*x_,0)),int(round(_y1*y_,0)),int(round(_x2*x_,0)),int(round(_y2*y_,0))
+
+	im=Image.new("RGBA",((int(round(x_,0)),int(round(y_,0)))),(0,0,0,180))
+	draw=ImageDraw.Draw(im)
+
+
+	draw.ellipse((_x1,_y1,_x2,_y2),fill=(0,0,0,0),outline=(255,0,0,255))
+
+
+	profile_ims["overlay"]=ImageTk.PhotoImage(im)
+
+	can.create_image(x1,y1,image=profile_ims["overlay"],anchor="nw")
+
+
+
+def process_profile_pic(sz):
+
+	global user_id
+	global users_dict
+
+
+	db_users=database.connect("data/users.db")
+
+	cur=db_users.cursor()
+
+	cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+	row=cur.fetchall()[0]
+
+	if row[4]=="":
+
+		im=Image.open("data/icons/no_profile_im.png")
+
+		return im.resize((sz,sz))
+
+	else:
+
+		
+		im=Image.open(f"data/images/u_{user_id}.png")
+
+		w,h=im.size
+
+		x1,y1,x2,y2=users_dict[str(user_id)]
+
+
+		x1=int(round(x1*w,0))
+		y1=int(round(y1*h,0))
+
+		x2=int(round(x2*w,0))
+		y2=int(round(y2*h,0))
+
+		im=im.crop((x1,y1,x2,y2))
+
+		w,h=im.size
+
+
+		r=w/2
+
+
+		im2=Image.new("RGBA",(w,h),(0,0,0,0))
+
+		im2.paste(im,(0,0))
+
+		draw=ImageDraw.Draw(im2)
+
+
+
+		ar=[]
+
+
+		a_=180
+
+		for a in range(90):
+
+			x=r*math.sin(math.radians(a_))+w/2
+			y=r*math.cos(math.radians(a_))+h/2
+
+			x=int(round(x,0))
+			y=int(round(y,0))
+
+			ar.append((x,y))
+
+
+			a_+=1
+
+
+
+		a_=270
+
+		for a in range(90):
+
+			x=r*math.sin(math.radians(a_))+w/2
+			y=r*math.cos(math.radians(a_))+h/2
+
+			x=int(round(x,0))
+			y=int(round(y,0))
+
+			ar.append((x,y))
+
+
+			a_+=1
+
+
+		a_=0
+
+		for a in range(90):
+
+			x=r*math.sin(math.radians(a_))+w/2
+			y=r*math.cos(math.radians(a_))+h/2
+
+			x=int(round(x,0))
+			y=int(round(y,0))
+
+			ar.append((x,y))
+
+
+			a_+=1
+
+
+
+
+		a_=90
+
+		for a in range(90):
+
+			x=r*math.sin(math.radians(a_))+w/2
+			y=r*math.cos(math.radians(a_))+h/2
+
+			x=int(round(x,0))
+			y=int(round(y,0))
+
+			ar.append((x,y))
+
+
+			a_+=1
+
+
+		ar.append((w,0))
+		ar.append((w,h))
+		ar.append((0,h))
+		ar.append((0,0))		
+
+
+		draw.polygon(ar,fill=(0,0,0,0),outline=(0,0,0,0))		
+
+		return im2.resize((sz,sz))
+
 
 
 
@@ -6103,6 +6593,9 @@ previous2,next2=0,0
 graph1,graph2=0,0
 forecast1,forecast2=0,0
 add=0
+
+deletex=0
+cancelx=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -6126,6 +6619,8 @@ def load_im():
 	global graph1,graph2
 	global forecast1,forecast2
 	global add
+	global deletex
+	global cancelx
 
 
 	#db
@@ -6378,6 +6873,22 @@ def load_im():
 	add=ImageTk.PhotoImage(im)
 
 
+
+
+
+	#cancelx
+
+	im=Image.open("data/icons/cancelx.png")
+	im=im.resize((20,20))
+	cancelx=ImageTk.PhotoImage(im)
+
+
+
+	#deletex
+
+	im=Image.open("data/icons/deletex.png")
+	im=im.resize((20,20))
+	deletex=ImageTk.PhotoImage(im)
 db_items_=[]
 def draw_db():
 	global dashboard
@@ -7115,6 +7626,7 @@ cur_sz=[w,h]
 
 
 profile_crop_coords=[]
+profile_drag=[]
 def can_b1(e):
 	global can,dashboard,can3
 	global un_login_coord,	pw1_login_coord
@@ -7147,10 +7659,13 @@ def can_b1(e):
 	global forecast_st,forecast_st2
 	global move_f_st
 	global can3_fb
-	global profile_st,profile_coords,profile_ims
+	global profile_st,profile_st2,profile_coords,profile_ims
 	global profile_sp
 	global profile_pic_st
 	global profile_crop,profile_crop_coords
+	global profile_drag
+	global profile_del_st
+	global man_del_st
 
 
 
@@ -8013,7 +8528,7 @@ def can_b1(e):
 
 						return
 
-				xx,yy=700,430
+				xx,yy=750,450
 
 				if int(dashboard.place_info()["x"])==0:
 
@@ -8090,7 +8605,6 @@ def can_b1(e):
 
 
 						except Exception as e:
-							print(e)
 							message(0,can,"Can't process image!",x+xx/2,y+yy+10+15,350,30)
 
 						return
@@ -8154,7 +8668,36 @@ def can_b1(e):
 					_x=int(dashboard["width"])
 				x_=_x+(int(can["width"])-_x)/2
 
-				
+
+
+				if man_del_st==1:
+
+
+					_x_,_y_=man_items_coords["deletex"]
+
+					if _x_<=e.x<=_x_+20:
+						if _y_<=can.canvasy(e.y)<=_y_+20:
+
+							man_items_delete()
+
+							man_del_st=0
+							main(1)
+
+							message(1,can,"Item removed!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+							return
+					
+
+					_x_,_y_=man_items_coords["cancelx"]
+
+					if _x_<=e.x<=_x_+20:
+						if _y_<=can.canvasy(e.y)<=_y_+20:
+
+							man_del_st=0
+
+							main(1)
+
+							return
+
 
 
 				x1,y1,x2,y2=man_items_coords["_delete_"]
@@ -8165,11 +8708,13 @@ def can_b1(e):
 
 				if r<=15:
 
-					man_items_delete()
+					man_del_st=1
+
 					main(1)
 
-					message(1,can,"Item removed!",x_,can.canvasy(int(can["height"])-20-15),350,30)
 					return
+
+
 
 				cx,cy=x2-15,y1+15
 
@@ -8177,19 +8722,19 @@ def can_b1(e):
 
 				if r<=15:
 
-					man_items_delete()
+					man_del_st=1
+
 					main(1)
-					message(1,can,"Item removed!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+
 					return
 
 				if x1+15<=e.x<=x2-15:
 					if y1<=can.canvasy(e.y)<=y2:
-						man_items_delete()
+						man_del_st=1
+
 						main(1)
-						message(1,can,"Item removed!",x_,can.canvasy(int(can["height"])-20-15),350,30)
+
 						return
-
-
 
 
 				#save
@@ -8344,6 +8889,19 @@ def can_b1(e):
 									y_2=int(round((y2_-y1)*_y/(y2-y1),0))
 
 
+									if x_2<x_1:
+										_x_=x_1
+
+										x_1=x_2
+										x_2=_x_
+
+									if y_2<y_1:
+										_y_=y_1
+
+										y_1=y_2
+										y_2=_y_
+
+
 									man_items_ims["image"]=man_items_ims["image"].crop((x_1,y_1,x_2,y_2))
 
 									man_item_crop_v[0]=False
@@ -8366,7 +8924,10 @@ def can_b1(e):
 
 		elif st=="Add Items":
 
-			xx,yy=700,430
+
+
+
+			xx,yy=750,450
 
 			if int(dashboard.place_info()["x"])==0:
 
@@ -8442,7 +9003,6 @@ def can_b1(e):
 
 
 					except Exception as e:
-						print(e)
 						message(0,can,"Can't process image!",x+xx/2,y+yy+10+15,350,30)
 
 					return
@@ -8575,6 +9135,22 @@ def can_b1(e):
 								y_2=int(round((y2_-y1)*_y/(y2-y1),0))
 
 
+
+								if x_2<x_1:
+									_x_=x_1
+
+									x_1=x_2
+									x_2=_x_
+
+								if y_2<y_1:
+									_y_=y_1
+
+									y_1=y_2
+									y_2=_y_
+
+
+
+
 								add_items_ims["image"]=add_items_ims["image"].crop((x_1,y_1,x_2,y_2))
 
 								add_item_crop_v[0]=False
@@ -8683,6 +9259,11 @@ def can_b1(e):
 					profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
 					profile_pic_st=0
 
+					profile_crop=0
+					profile_crop_coords=[]
+
+
+
 					main(1)
 
 					return
@@ -8695,6 +9276,9 @@ def can_b1(e):
 
 					file=filedialog.askopenfilename()
 
+					if file=="":
+						return
+
 
 					try:
 						im=Image.open(file)
@@ -8704,6 +9288,8 @@ def can_b1(e):
 						profile_ims["profile_pic"]=im
 
 						profile_pic_st=1
+
+						profile_st2=1
 
 						main(1)
 
@@ -8730,6 +9316,8 @@ def can_b1(e):
 
 							profile_crop=0
 
+							profile_crop_coords=[]
+
 
 						main(1)
 
@@ -8745,6 +9333,13 @@ def can_b1(e):
 				if y_<=e.y<=y_+25:
 
 					profile_ims["profile_pic"]=profile_ims["profile_pic_ref"]
+
+
+					profile_crop_coords=[]
+					profile_crop=0
+
+					profile_st2=1
+
 					main(1)
 					return
 
@@ -8784,6 +9379,19 @@ def can_b1(e):
 							y2_=int(round(profile_crop_coords[3]*y/(y2-y1),0))
 
 
+							if x2_<x1_:
+								_x_=x1_
+
+								x1_=x2_
+								x2_=_x_
+
+							if y2_<y1_:
+								_y_=y1_
+
+								y1_=y2_
+								y2_=_y_
+
+
 							im=im.crop((x1_,y1_,x2_,y2_))
 
 							profile_ims["profile_pic"]=im
@@ -8791,10 +9399,66 @@ def can_b1(e):
 							profile_crop_coords=[]
 							profile_crop=0
 
+							profile_st2=1
+
 							main(1)
 							return
 
-			x1,y1,x2,y2=profile_coords["save"]
+
+
+
+			if profile_del_st==1:
+
+				x_,y_=profile_coords["deletex"]
+
+				if x_<=e.x<=x_+20:
+					if y_<=e.y<=y_+20:
+
+						ar=os.listdir("data/images")
+
+						try:
+							v=ar.index(f"u_{user_id}.png")
+
+							os.remove(f"data/images/u_{user_id}.png")
+
+						except:
+							pass
+
+
+
+						try:
+
+							users_dict.pop(str(user_id))
+
+							with open("data/users.json","w") as file:
+
+								json.dump(users_dict,file,indent=4)
+
+						except:
+							pass
+
+
+						db_users=database.connect("data/users.db")
+						cur=db_users.cursor()
+
+						cur.execute(f"DELETE FROM users WHERE user_id={user_id}")
+
+						db_users.commit()
+
+						
+						login()
+						return
+				x_,y_=profile_coords["cancelx"]
+
+				if x_<=e.x<=x_+20:
+					if y_<=e.y<=y_+20:
+
+						profile_del_st=0
+						main(1)
+						return
+
+
+			x1,y1,x2,y2=profile_coords["delete"]
 
 			cx,cy=x1+15,y1+15
 
@@ -8802,12 +9466,11 @@ def can_b1(e):
 
 			if r<=15:
 
+				profile_del_st=1
+
 				main(1)
-				_mess_=update_user()
 
-
-
-				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+				return
 
 
 
@@ -8818,22 +9481,102 @@ def can_b1(e):
 
 			if r<=15:
 
+				profile_del_st=1
+
 				main(1)
 
-				_mess_=update_user()
-
-				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+				return
 
 
 			if x1+15<=e.x<=x2-15:
 
 				if y1<=e.y<=y2:
 
+					profile_del_st=1
+
 					main(1)
+
+					return
+
+
+
+			x1,y1,x2,y2=profile_coords["save"]
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+				_mess_=update_user()
+
+				main(1)
+
+
+
+				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+				return
+
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+
+			if r<=15:
+
+				
+
+				_mess_=update_user()
+
+				main(1)
+
+				message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+				return
+
+
+			if x1+15<=e.x<=x2-15:
+
+				if y1<=e.y<=y2:
+
 
 					_mess_=update_user()
 
+					main(1)
+
 					message(_mess_[0],can,_mess_[1],_x_+xx/2,_y_+yy+10+15,350,30)
+
+					return
+
+
+			profile_drag=[]
+
+
+			_x1,_y1,_x2,_y2=profile_coords["show"]
+
+			x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+			x_,y_=x2-x1,y2-y1
+
+			_x1,_y1,_x2,_y2=int(round(_x1*x_,0)),int(round(_y1*y_,0)),int(round(_x2*x_,0)),int(round(_y2*y_,0))
+
+
+			cx,cy=x1+_x1+(_x2-_x1)/2,y1+_y1+(_y2-_y1)/2
+
+
+			r=math.sqrt((cx-e.x)**2+(cy-e.y)**2)
+
+			if r<=(_x2-_x1)/2:
+
+				profile_drag=[e.x,e.y,_x1,_y1]
+
+
+
+
+
 
 
 def update_user():
@@ -8842,6 +9585,7 @@ def update_user():
 	global ent1,ent2,ent3,ent4,ent5
 	global profile_ims
 	global profile_pic_st
+	global users_dict
 
 	user_name=ent1.get()
 	email=ent2.get()
@@ -8893,6 +9637,16 @@ def update_user():
 
 	if profile_pic_st==1:
 
+		users_dict[str(user_id)]=profile_coords["show"]
+
+		with open("data/users.json","w") as file:
+
+
+			json.dump(users_dict,file,indent=4)
+
+
+
+
 		cur.execute(f"UPDATE users SET pic='u_{user_id}.png' WHERE user_id={user_id}")
 
 
@@ -8904,7 +9658,23 @@ def update_user():
 		cur.execute(f"UPDATE users SET pic='' WHERE user_id={user_id}")
 
 
+		try:
+
+			users_dict[str(user_id)]=[]
+
+			with open("data/users.json","w") as file:
+
+				json.dump(users_dict,file,indent=4)
+
+		except:
+			pass
+
 	db_users.commit()
+
+
+
+
+
 
 
 
@@ -8926,7 +9696,7 @@ def add_new_item():
 
 
 
-	xx,yy=700,410
+	xx,yy=750,450
 
 	if int(dashboard.place_info()["x"])==0:
 
@@ -8936,7 +9706,8 @@ def add_new_item():
 		x=5+25+5
 
 	x=x+((width-x)-xx)/2
-	y=40+((height-40)-yy)/2
+	y=((height-40)-yy)/2
+
 
 	
 
@@ -9164,10 +9935,11 @@ def move_f():
 
 
 
-
+profile_p=[]
 def can_drag(e):
 	global pay_st
 	global st_,st
+	global profile_coords,profile_drag
 
 	if pay_st=="Cash":
 
@@ -9178,6 +9950,80 @@ def can_drag(e):
 
 		sb_drag("can4r",e.x,e.y)
 
+
+
+	if st_=="main" and st=="Profiles":
+
+
+
+		if len(profile_drag)!=4:
+			return
+
+
+		_x1,_y1,_x2,_y2=profile_coords["show"]
+
+		x1,y1,x2,y2=profile_coords["profile_pic2"]
+
+		x_,y_=x2-x1,y2-y1
+
+		_x1,_y1,_x2,_y2=int(round(_x1*x_,0)),int(round(_y1*y_,0)),int(round(_x2*x_,0)),int(round(_y2*y_,0))
+
+		_x=(x2-x1)-(_x2-_x1)
+		_y=(y2-y1)-(_y2-_y1)
+
+		
+
+
+
+
+
+		if _x>_y:
+
+			_x1_=profile_drag[2]-(profile_drag[0]-e.x)
+			_x2_=_x1_+(_x2-_x1)
+
+			_x1_=_x1_/x_
+			_x2_=_x2_/x_
+
+
+			if _x1_<0 or _x2_>1:
+
+				return
+
+
+			_y1_=0
+			_y2_=1
+
+		elif _x<_y:
+
+			_y1_=profile_drag[3]-(profile_drag[1]-e.y)
+			_y2_=_y1_+(_y2-_y1)
+
+			_y1_=_y1_/y_
+			_y2_=_y2_/y_
+
+
+
+			if _y1_<0 or _y2_>1:
+
+				return
+
+
+			_x1_=0
+			_x2_=1
+
+		else:
+
+			_x1_=0
+			_x2_=1
+
+			_y1_=0
+			_y2_=1
+
+		profile_coords["show"]=[_x1_,_y1_,_x2_,_y2_]
+
+
+		draw_profile_overlay()
 
 
 
@@ -9196,12 +10042,16 @@ def can_b1_sb_release(widget):
 def can_b1_release(e):
 
 	global move_f_st
+	global profile_drag
 
 
 	move_f_st=0
 
 
 	can_b1_sb_release("cart2")
+
+
+	profile_drag=[]
 
 
 
