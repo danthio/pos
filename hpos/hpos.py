@@ -10098,13 +10098,31 @@ def can_b1(e):
 					profile_crop_coords=[]
 					profile_crop=0
 
-					profile_st2=1
+					profile_st2=0
 
 
 					if profile_st=="Update Profile":
 
 						if users_dict[str(user_id)]!=[]:
+
+
+
+							profile_ims["profile_pic_ref"]=Image.open(f"data/images/u_{user_id}.png")
+
+							profile_ims["profile_pic"]=Image.open(f"data/images/u_{user_id}.png")
+
+							profile_coords["show"]=users_dict[str(user_id)]
+
 							profile_pic_st=1
+
+						else:
+
+
+							profile_ims["profile_pic_ref"]=Image.open("data/icons/no_profile_im.png")
+
+							profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
+							profile_pic_st=0
+
 
 
 					main(1)
@@ -10289,7 +10307,6 @@ def can_b1(e):
 
 
 			if r<=15:
-				print("ok")
 
 				if profile_st=="Update Profile":
 
