@@ -10123,6 +10123,12 @@ def can_b1(e):
 							profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
 							profile_pic_st=0
 
+					else:
+
+						profile_ims["profile_pic_ref"]=Image.open("data/icons/no_profile_im.png")
+
+						profile_ims["profile_pic"]=Image.open("data/icons/no_profile_im.png")
+						profile_pic_st=0
 
 
 					main(1)
