@@ -138,7 +138,12 @@ rows=cur.fetchall()
 for row in rows:
 	print(row)
 
+
+
 """
+
+
+
 def formart_number(no,x,con=0):
 
 	f=font.Font(family="FreeMono",size=13)
@@ -1711,6 +1716,9 @@ profile_sp=0
 profile_pic_st=0
 
 profile_del_st=0
+profile_details={}
+
+profile_del_st2=[0]
 def main(con=0):
 
 	global st,st_
@@ -1770,12 +1778,16 @@ def main(con=0):
 	global users_dict
 	global profile_del_st
 	global save_im,delete2
+	global profile_details
+	global profile_del_st2
+
 
 	st_="main"
 
 	if con==0:
 
 		sel_sb=None
+		profile_del_st2=[0]
 
 	f=font.Font(family="FreeMono",size=13)
 
@@ -5246,6 +5258,11 @@ def main(con=0):
 
 			profile_del_st=0
 
+
+			search_focus==False
+			search_val=""
+
+
 			
 			delete_widgets()
 
@@ -5267,6 +5284,8 @@ def main(con=0):
 
 			profile_del_st=0
 
+			search_focus==False
+			search_val=""
 			
 			delete_widgets()
 
@@ -5358,7 +5377,7 @@ def main(con=0):
 			x_=int(dashboard["width"])
 
 
-		xx=691+30
+		xx=691+30+50
 
 		yy=376+30-10
 
@@ -5534,7 +5553,7 @@ def main(con=0):
 
 			v+=1
 
-			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350,y+20+15-10-5+25+6+60*4
+			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350+50,y+20+15-10-5+25+6+60*4
 
 			im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 			profile_ims[v]=ImageTk.PhotoImage(im)
@@ -5925,7 +5944,7 @@ def main(con=0):
 
 			v+=1
 
-			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350,y+20+15-10-5+25+6+60*4
+			x1,y1,x2,y2=x2+20+30,y+20+15-10-5,x2+20+30+350+50,y+20+15-10-5+25+6+60*4
 
 			im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
 			profile_ims[v]=ImageTk.PhotoImage(im)
@@ -6137,7 +6156,327 @@ def main(con=0):
 
 
 		elif profile_st=="Manage Profiles":
-			pass
+
+			if con==0:
+
+				profile_del_st2=[0]
+
+
+
+
+
+
+			
+			y=_y_+30+10+30+10
+			x=_x_+10
+
+			can.create_rectangle(x,y, _x_+xx-10-4-10,_y_+yy-20+30,outline="#000000")
+
+
+			_x=(_x_+xx-10-4-10)-x-1
+			_y=(_y_+yy-20+30)-y-1
+
+
+			can3["width"]=_x
+			can3["height"]=_y
+
+			can3["bg"]="#ffffff"
+
+			can3.delete("all")
+
+			can3.place(in_=root,x=x+1,y=y+1+40)
+
+			can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
+
+
+			db_users=database.connect("data/users.db")
+			cur=db_users.cursor()
+
+			cur.execute("SELECT * FROM users")
+
+			rows=cur.fetchall()
+
+
+			profile_details={}
+
+
+
+			y_=0
+
+
+			con_=0
+			for row in rows:
+
+				if row[1].lower().find(search_val.lower())==-1 and row[2].lower().find(search_val.lower())==-1:
+
+					continue
+
+
+
+				con_=1
+
+
+				profile_details[str(row[0])]={"name":row[1],
+												"email":row[2],
+												"contact":row[3],
+												"pic":row[4],
+												"admin_status":row[6],
+												"delete_p":[int(can3["width"])-10-25,y_+10],
+												"admin_status_p":[int(can3["width"])-10-25-30-60,y_+10, int(can3["width"])-10-25-30,y_+10+30]}
+
+
+
+				im=process_profile_pic(80,row[0])
+
+				v+=1
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+				can3.create_image(10,y_+10,image=profile_ims[v],anchor="nw")
+
+				can3.create_text(10+80+20,y_+10,text="User Name ",font=("FreeMono",13),fill="#000000",anchor="nw")
+				can3.create_text(10+80+20+f.measure("User Name ")+30,y_+10,text=row[1],font=("FreeMono",13),fill="#0000ff",anchor="nw")
+
+
+				can3.create_text(10+80+20,y_+50,text="Email ",font=("FreeMono",13),fill="#000000",anchor="w")
+				can3.create_text(10+80+20+f.measure("User Name ")+30,y_+50,text=row[2],font=("FreeMono",13),fill="#0000ff",anchor="w")
+
+
+				can3.create_text(10+80+20,y_+100-10,text="Contact ",font=("FreeMono",13),fill="#000000",anchor="sw")
+				can3.create_text(10+80+20+f.measure("User Name ")+30,y_+100-10,text=row[3],font=("FreeMono",13),fill="#0000ff",anchor="sw")
+
+				can3.create_line(0,y_+100,int(can3["width"]),y_+100,fill="#000000")
+
+
+				can3.create_image(int(can3["width"])-10-25,y_+10, image=delete,anchor="nw")
+
+
+
+				x1,y1,x2,y2=int(can3["width"])-10-25-30-60,y_+10, int(can3["width"])-10-25-30,y_+10+30
+
+				v+=1
+				im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+				can3.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+				profile_coords["admin_status"]=[x1,y1,x2,y2]
+
+				col="#ff0000"
+
+				if int(row[6])==1:
+
+					col="#00ff00"
+
+
+				v+=1
+				im=draw_round_rect(10,0,0,20,20, "#000000",col,alpha=1,width=1)
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+				if int(row[6])==1:
+
+					can3.create_image(x2-15,y1+15,image=profile_ims[v],anchor="c")
+
+				elif int(row[6])==0:
+
+					can3.create_image(x1+15,y1+15,image=profile_ims[v],anchor="c")
+
+
+				can3.create_text(x1-20-f.measure("Admin Status"),y1+15,text="Admin Status",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+				y_+=100
+
+
+
+			if y_<=int(can3["height"]):
+
+				y_=int(can3["height"])
+
+
+				can3["scrollregion"]=(0,0,int(can3["width"]),int(can3["height"]))
+
+			else:
+
+				can3["scrollregion"]=(0,0,int(can3["width"]),y_)
+
+
+			if con_==0:
+
+				im=no_record
+
+				im=im.resize((200,200))
+
+				v+=1
+
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+				can3.create_image(int(can3["width"])/2,int(can3["height"])/2-(10+30)/2,image=profile_ims[v],anchor="c")
+
+				can3.create_text(int(can3["width"])/2,int(can3["height"])/2+100+10+15-(10+30)/2,text="No Record",font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+
+
+
+			if con==0:
+
+				dict_={"widget": can3,
+						"sb_widget":can,
+						"sb_st":"vertical",
+						"sb_sz":10,
+						"v_sb_coord":[(y+1,y+1+int(can3["height"]),_x_+xx-10-4-10+4,_x_+xx-10-4-10+4+10),0],
+						"_y":y_,
+						"v":v1,
+						"h_":h1,
+						"w":int(can3["width"]),
+						"h":int(can3["height"]),
+						"_x":int(can3["width"]),
+						"_x2":int(can3["width"]),
+						"scrollregion":can["scrollregion"],
+						"v_drag_st":0,
+						"h_drag_st":0,
+						"v_var":0,
+						"h_var":0
+
+
+						}
+
+			else:
+
+
+
+
+
+
+				dict_={"widget": can3,
+						"sb_widget":can,
+						"sb_st":"vertical",
+						"sb_sz":10,
+						"v_sb_coord":[(y+1,y+1+int(can3["height"]),_x_+xx-10-4-10+4,_x_+xx-10-4-10+4+10),_scroll_["profiles"]["v_sb_coord"][-1]],
+						"_y":y_,
+						"v":v1,
+						"h_":h1,
+						"w":int(can3["width"]),
+						"h":int(can3["height"]),
+						"_x":int(can3["width"]),
+						"_x2":int(can3["width"]),
+						"scrollregion":can["scrollregion"],
+						"v_drag_st":0,
+						"h_drag_st":0,
+						"v_var":0,
+						"h_var":0
+
+
+						}
+
+	
+
+			_scroll_["profiles"]=dict_
+
+			sel_sb=["profiles","vertical"]
+			_scroll_["profiles"]["_y"]=y_
+
+			if con==0:
+
+				_scroll_["profiles"]["v_sb_coord"][-1]=0
+
+
+			draw_v_sb("profiles")
+
+
+			if profile_del_st2[0]==1:
+
+				im=Image.new("RGBA",(int(can3["width"]),int(can3["height"])),(0,0,0,40))
+
+				v+=1
+
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+
+				can3.create_image(0,can3.canvasy(0),image=profile_ims[v],anchor="nw")
+
+
+				v+=1
+
+				x1,y1,x2,y2=(int(can3["width"])-int(can3["width"])*0.6)/2,can3.canvasy((int(can3["height"])-100)/2), (int(can3["width"])-int(can3["width"])*0.6)/2+int(can3["width"])*0.6,can3.canvasy((int(can3["height"])-100)/2+100)
+
+				im=draw_round_rect(15,x1,y1,x2,y2, "#000000","#ffffff",alpha=1,width=1)
+
+				profile_ims[v]=ImageTk.PhotoImage(im)
+
+				can3.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+				can3.create_image(x2-5-25,y1+5, image=quit,anchor="nw")
+
+				profile_coords["deletep"]=[x2-5-25,y1+5]
+
+
+				can3.create_text(x1+(x2-x1)/2,y1+15,text=f"Delete {profile_details[str(profile_del_st2[1])]["name"]}",font=("FreeMono",13),fill="#000000")
+
+
+
+				can3.create_line(x1,y2-30,x2,y2-30,fill="#000000")
+				can3.create_line(x1+(x2-x1)/2,y2-30,x1+(x2-x1)/2,y2,fill="#000000")
+
+
+				x_=(x2-x1)/4
+
+
+				can3.create_text(x1+x_,y2-15,text="Confirm",font=("FreeMono",13),fill="#000000",anchor="c")
+
+				profile_coords["deletep_"]=[x1,y2-30,x1+(x2-x1)/2,y2]
+
+
+
+				can3.create_text(x2-x_,y2-15,text="Cancel",font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+				profile_coords["canceld"]=[x1+(x2-x1)/2,y2-30,x2,y2]
+
+			__x__=450-10
+
+
+			x_=_x_+(xx-__x__)/2
+
+			x1,y1,x2,y2=x_,_y_+30+10,x_+__x__,_y_+30+10+30
+
+			v+=1
+			im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
+
+			profile_ims[v]=ImageTk.PhotoImage(im)
+
+			can.create_image(x1,y1,image=profile_ims[v],anchor="nw")
+
+			ent_search["width"]=40
+
+			if search_focus==False:
+				if search_val=="":
+
+					can.create_text(x1+15,y1+15,text="Search",font=("FreeMono",13),fill="#000000",anchor="w")
+
+					can.create_image(x1+15+f.measure("Search")+10,y1+2.5,image=search,anchor="nw")
+
+				else:
+
+					can.create_text(x1+15+1,y1+15,text=search_val,font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+			can.create_image(x2+5,y1+2.5,image=quit,anchor="nw")
+
+
+
+			search_coords=[x1,y1,x2,y2,[x2+5,y1+2.5]]
+
+			if search_focus==True:
+
+
+				ent_search.place(in_=root,x=x1+15,y=y1+4.5+40)
+
+				ent_search.focus_set()
+
+
+
 
 def draw_profile_overlay():
 	global profile_coords
@@ -6165,17 +6504,21 @@ def draw_profile_overlay():
 
 
 
-def process_profile_pic(sz):
+def process_profile_pic(sz,id_=None):
 
 	global user_id
 	global users_dict
+
+
+	if id_==None:
+		id_=user_id
 
 
 	db_users=database.connect("data/users.db")
 
 	cur=db_users.cursor()
 
-	cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+	cur.execute(f"SELECT * FROM users WHERE user_id={id_}")
 
 	row=cur.fetchall()[0]
 
@@ -6188,12 +6531,12 @@ def process_profile_pic(sz):
 	else:
 
 		
-		im=Image.open(f"data/images/u_{user_id}.png")
+		im=Image.open(f"data/images/u_{id_}_1.png")
 
 		w,h=im.size
 
-		x1,y1,x2,y2=users_dict[str(user_id)]
 
+		x1,y1,x2,y2=users_dict[str(id_)]
 
 		x1=int(round(x1*w,0))
 		y1=int(round(y1*h,0))
@@ -6203,11 +6546,15 @@ def process_profile_pic(sz):
 
 		im=im.crop((x1,y1,x2,y2))
 
+
+
 		w,h=im.size
 
+		if w>h:
 
-		r=w/2
-
+			r=w/2
+		else:
+			r=h/2
 
 		im2=Image.new("RGBA",(w,h),(0,0,0,0))
 
@@ -7987,6 +8334,9 @@ def can_b1(e):
 	global profile_drag
 	global profile_del_st
 	global man_del_st
+	global profile_details
+	global profile_del_st2
+	global search_coords,search_val,ent_search
 
 
 
@@ -7998,6 +8348,92 @@ def can_b1(e):
 	if st_=="main" and st=="Reports":
 
 		can_b1_sb("can4r",e.x,e.y)
+
+
+	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles" and profile_del_st2[0]==0:
+
+
+		can_b1_sb("profiles",e.x,e.y)
+
+
+
+
+	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles":
+
+
+
+		if search_focus==False:
+
+
+			x1,y1,x2,y2=search_coords[:-1]
+
+
+			cx,cy=x1+15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+
+				search_focus=True
+
+				main(1)
+
+				return
+
+
+
+			cx,cy=x2-15,y1+15
+
+			r=math.sqrt((e.x-cx)**2+(e.y-cy)**2)
+
+			if r<=15:
+
+
+				search_focus=True
+
+				main(1)
+
+				return
+
+
+			if x1+15<=e.x<=x2-15:
+
+				if y1<=e.y<=y2:
+
+
+
+					search_focus=True
+
+					main(1)
+
+					return
+
+
+
+
+		x,y=search_coords[-1]
+
+
+		if x<=e.x<=x+25:
+			if y<=e.y<=y+25:
+
+				search_val=""
+				ent_search.delete(0,tk.END)
+				search_focus=False
+
+				main(1)
+
+				return
+
+		if search_focus==True:			
+
+				search_focus=False
+
+				main(1)
+
+
+
 
 	#sel_sb=None
 
@@ -9504,15 +9940,13 @@ def can_b1(e):
 				x_=int(dashboard["width"])
 
 
-			xx=691+30
+			xx=691+30+50
 
 			yy=376+30-10
 
 
 			_x_=x_+((int(can["width"])-x_)-xx)/2
 			_y_=(int(can["height"])-yy)/2-20+30
-
-
 
 
 			x1,y1,x2,y2=profile_coords["Update Profile"]
@@ -9665,6 +10099,10 @@ def can_b1(e):
 
 					profile_st2=1
 
+					if users_dict[str(user_id)]!=[]:
+						profile_pic_st=1
+
+
 					main(1)
 					return
 
@@ -9752,6 +10190,14 @@ def can_b1(e):
 							except:
 								pass
 
+
+							try:
+								v=ar.index(f"u_{user_id}_1.png")
+
+								os.remove(f"data/images/u_{user_id}_1.png")
+
+							except:
+								pass
 
 
 							try:
@@ -10026,6 +10472,8 @@ def new_user():
 
 		im.save(f"data/images/u_{v}.png")
 
+		scale_down_im(f"u_{v}.png",1,200,200)
+
 	else:
 		cur.execute(f"UPDATE users SET pic='' WHERE user_id={v}")
 
@@ -10122,6 +10570,8 @@ def update_user():
 		im=profile_ims["profile_pic"]
 
 		im.save(f"data/images/u_{user_id}.png")
+
+		scale_down_im(f"u_{user_id}.png",1,200,200)
 
 	else:
 		cur.execute(f"UPDATE users SET pic='' WHERE user_id={user_id}")
@@ -10409,6 +10859,8 @@ def can_drag(e):
 	global pay_st
 	global st_,st
 	global profile_coords,profile_drag
+	global profile_st
+	global profile_del_st2
 
 	if pay_st=="Cash":
 
@@ -10420,6 +10872,11 @@ def can_drag(e):
 		sb_drag("can4r",e.x,e.y)
 
 
+
+	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles" and profile_del_st2[0]==0:
+
+
+		sb_drag("profiles",e.x,e.y)
 
 	if st_=="main" and st=="Profiles":
 
@@ -10530,10 +10987,11 @@ def scroll(e):
 	global _scroll_
 	global sel_sb
 	global sel_item,man_item
+	global profile_del_st2
 
 
 
-	if sel_item==None and man_item==None:
+	if sel_item==None and man_item==None and profile_del_st2[0]==0:
 
 
 
@@ -10737,6 +11195,8 @@ def can3_b1(e):
 	global st_,st
 	global sel_sb
 	global pay_st
+	global profile_details
+	global profile_del_st2
 
 	#sel_sb=None
 
@@ -10759,8 +11219,323 @@ def can3_b1(e):
 		can_b1_sb("cart",e.x,e.y)
 
 
+		if int(dashboard.place_info()["x"])<0:
+
+			x_=5+25+5
+
+		else:
+
+			x_=int(dashboard["width"])
 
 
+		xx=691+30+50
+
+		yy=376+30-10
+
+
+		_x_=x_+((int(can["width"])-x_)-xx)/2
+		_y_=(int(can["height"])-yy)/2-20+30
+
+
+		if profile_st=="Manage Profiles":
+
+			if profile_del_st2[0]==1:
+
+				x,y=profile_coords["deletep"]
+
+				if x<=e.x<=x+25:
+					if y<=can3.canvasy(e.y)<=y+25:
+
+						profile_del_st2=[0]
+
+						main(1)
+
+						return
+
+
+				def delete_profile():
+					global profile_del_st2
+					global users_dict
+					global user_id
+
+
+					id_=profile_del_st2[1]
+
+
+					ar=os.listdir("data/images")
+
+					try:
+						v=ar.index(f"u_{id_}.png")
+
+						os.remove(f"data/images/u_{id_}.png")
+
+					except:
+						pass
+
+
+
+					try:
+						v=ar.index(f"u_{id_}_1.png")
+
+						os.remove(f"data/images/u_{id_}_1.png")
+
+					except:
+						pass
+
+
+
+					try:
+
+						users_dict.pop(str(id_))
+
+						with open("data/users.json","w") as file:
+
+							json.dump(users_dict,file,indent=4)
+
+					except:
+						pass
+
+
+					db_users=database.connect("data/users.db")
+					cur=db_users.cursor()
+
+					cur.execute(f"DELETE FROM users WHERE user_id={id_}")
+
+					db_users.commit()
+
+
+					if str(id_)==str(user_id):
+
+						login()
+
+					else:
+
+						profile_del_st2=[0]
+						main(1)
+
+						message(1,can,"Account Deleted!",_x_+xx/2,_y_+yy+10+15,350,30)
+
+					return
+
+
+
+
+
+
+
+				x1,y1,x2,y2=profile_coords["deletep_"]
+
+
+				cx,cy=x1+15,y2-15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+					delete_profile()
+					return
+
+				cx,cy=x2-15,y2-15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+
+
+					delete_profile()
+					return
+
+
+				if x1<=e.x<=x2:
+					if y1<=can3.canvasy(e.y)<=y2-15:
+
+						delete_profile()
+						return
+
+
+				if x1+15<=e.x<=x2-15:
+					if y2-15<=can3.canvasy(e.y)<=y2:
+
+						delete_profile()
+						return
+
+
+
+
+				x1,y1,x2,y2=profile_coords["canceld"]
+
+
+				cx,cy=x1+15,y2-15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+					profile_del_st2=[0]
+					main(1)
+
+					return
+
+				cx,cy=x2-15,y2-15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+
+
+					profile_del_st2=[0]
+					main(1)
+
+					return
+
+
+				if x1<=e.x<=x2:
+					if y1<=can3.canvasy(e.y)<=y2-15:
+
+						profile_del_st2=[0]
+						main(1)
+
+						return
+
+
+				if x1+15<=e.x<=x2-15:
+					if y2-15<=can3.canvasy(e.y)<=y2:
+
+						profile_del_st2=[0]
+						main(1)
+
+						return
+
+
+
+
+
+			for i in profile_details:
+
+				x,y=profile_details[i]["delete_p"]
+
+				if x<=e.x<=x+25:
+					if y<=can3.canvasy(e.y)<=y+25:
+
+						profile_del_st2=[1,i]
+
+
+
+						main(1)
+
+						return
+
+
+
+
+
+
+				x1,y1,x2,y2=profile_details[i]["admin_status_p"]
+
+				cx,cy=x1+15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+					db_users=database.connect("data/users.db")
+					cur=db_users.cursor()
+
+					a=profile_details[i]["admin_status"]
+
+					if int(a)==0:
+
+						a=1
+
+					elif int(a)==1:
+
+						a=0
+
+
+
+
+					cur.execute(f"UPDATE users SET admin={a} WHERE user_id={i}")
+
+					db_users.commit()
+
+
+
+
+					main(1)
+
+					message(1,can,"Admin Status Changed!",_x_+xx/2,_y_+yy+10+15,350,30)
+
+					return
+
+
+				cx,cy=x2-15,y1+15
+
+				r=math.sqrt((e.x-cx)**2+(can3.canvasy(e.y)-cy)**2)
+
+				if r<=15:
+
+					db_users=database.connect("data/users.db")
+					cur=db_users.cursor()
+
+					a=profile_details[i]["admin_status"]
+
+					if int(a)==0:
+
+						a=1
+
+					elif int(a)==1:
+
+						a=0
+
+
+
+
+					cur.execute(f"UPDATE users SET admin={a} WHERE user_id={i}")
+
+					db_users.commit()
+
+
+
+
+					main(1)
+
+					message(1,can,"Admin Status Changed!",_x_+xx/2,_y_+yy+10+15,350,30)
+
+					return
+
+
+				if x1+15<=e.x<=x2-15:
+					if y1<=can3.canvasy(e.y)<=y2:
+
+						db_users=database.connect("data/users.db")
+						cur=db_users.cursor()
+
+						a=profile_details[i]["admin_status"]
+
+						if int(a)==0:
+
+							a=1
+
+						elif int(a)==1:
+
+							a=0
+
+
+
+
+						cur.execute(f"UPDATE users SET admin={a} WHERE user_id={i}")
+
+						db_users.commit()
+
+
+
+
+						main(1)
+
+						message(1,can,"Admin Status Changed!",_x_+xx/2,_y_+yy+10+15,350,30)
+
+						return
 
 	if sel_item==None:
 
@@ -11538,6 +12313,29 @@ def scale_down_im(im_,con,x,y,save_path="data/images"):
 	im=im.resize((x_,y_))
 
 	im.save(f"{save_path}/{im_.replace(".png",f"_{con}.png")}")
+
+
+
+"""
+
+db_users=database.connect("data/users.db")
+cur=db_users.cursor()
+
+
+cur.execute("SELECT * FROM users")
+rows=cur.fetchall()
+
+
+
+for row in rows:
+	
+
+	if row[4]!="":
+
+
+
+		scale_down_im(f"u_{row[0]}.png",1,200,200)
+"""
 
 
 """
