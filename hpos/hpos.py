@@ -1520,12 +1520,12 @@ def pay_with_cash(con):
 
 
 
-	can.create_text((x+xx)-270+10,y+35+15,text="Sub Total",font=("FreeMono",13),fill="#000000",anchor="w")
-	can.create_text((x+xx)-10,y+35+15,text="Ksh."+str(total),font=("FreeMono",13),fill="#ff0000",anchor="e")
+	can.create_text((x+xx)-270+10,y+35+30,text="Sub Total",font=("FreeMono",13),fill="#000000",anchor="nw")
+	can.create_text((x+xx)-10,y+35+30,text="Ksh."+str(total),font=("FreeMono",13),fill="#ff0000",anchor="ne")
 
 	_total_=total
 
-	can.create_text((x+xx)-270+10,y+40+15+40,text="Cash",font=("FreeMono",13),fill="#000000",anchor="w")
+	can.create_text((x+xx)-270+10,y+40+15+40+30,text="Cash",font=("FreeMono",13),fill="#000000",anchor="w")
 
 
 
@@ -1536,7 +1536,7 @@ def pay_with_cash(con):
 
 
 
-	x1,y1,x2,y2=(x+xx)-270+10+150-5+10-100+29,y+40+15+40-15,(x+xx)-270+10+150-5+10+100+60+6-100+29,y+40+15+40-15+25+6
+	x1,y1,x2,y2=(x+xx)-270+10+150-5+10-100+29,y+40+15+40-15+30,(x+xx)-270+10+150-5+10+100+60+6-100+29,y+40+15+40-15+25+6+30
 
 
 	im=draw_round_rect(5,x1,y1,x2,y2, "#000000",alpha=1,width=1)
@@ -1781,10 +1781,11 @@ def main(con=0):
 	global profile_details
 	global profile_del_st2
 
-
 	st_="main"
 
 	if con==0:
+		sel_item=None
+		man_item=None
 
 		sel_sb=None
 		profile_del_st2=[0]
@@ -4144,7 +4145,7 @@ def main(con=0):
 
 				mx=500000
 
-			a=y_*max_sales*2/(int(can3["height"])-50)
+			a=y_*max_sales/(int(can3["height"])-50)/0.7
 
 
 
@@ -4167,8 +4168,8 @@ def main(con=0):
 			p=s[0]
 			s=s[1]
 
-			y_p=p*(int(can3["height"])-50)/max_sales/2
-			y_s=s*(int(can3["height"])-50)/max_sales/2
+			y_p=p*(int(can3["height"])-50)*0.7/max_sales
+			y_s=s*(int(can3["height"])-50)*0.7/max_sales
 
 
 			can3.create_image(fx[c][0]+50, int(can3["height"])-50-y_p, image=fp, anchor="c")
@@ -4221,9 +4222,9 @@ def main(con=0):
 
 			pb0,pb1=linear_regression(y_values,x_values)
 
-			y1_=pb0*(int(can3["height"])-50)/max_sales/2
+			y1_=pb0*(int(can3["height"])-50)*0.7/max_sales
 
-			y2_=(pb0 + pb1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+			y2_=(pb0 + pb1 * fx[-1][0])*(int(can3["height"])-50)*0.7/max_sales
 
 
 			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#ff0000")
@@ -4247,9 +4248,9 @@ def main(con=0):
 			sb0,sb1=linear_regression(y_values,x_values)
 
 
-			y1_=sb0*(int(can3["height"])-50)/max_sales/2
+			y1_=sb0*(int(can3["height"])-50)*0.7/max_sales
 
-			y2_=(sb0 + sb1 * fx[-1][0])*(int(can3["height"])-50)/max_sales/2
+			y2_=(sb0 + sb1 * fx[-1][0])*(int(can3["height"])-50)*0.7/max_sales
 
 
 			can3.create_line(fx[0][0]+50,int(can3["height"])-50-y1_, fx[-1][0]+50,int(can3["height"])-50-y2_, fill="#0000ff")
@@ -5405,7 +5406,7 @@ def main(con=0):
 			col2="#ffffff"
 
 
-		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+		im=draw_round_rect(10,x1,y1,x2,y2, "#ffffff",col,alpha=1,width=1,corners=[1,0,0,1])
 
 		profile_ims[v]=ImageTk.PhotoImage(im)
 
@@ -5418,7 +5419,7 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=x2+2,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
+		x1,y1,x2,y2=x2+3,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
 
 		if profile_st=="Add New Profile":
 			col="#ffffff"
@@ -5428,7 +5429,7 @@ def main(con=0):
 			col2="#ffffff"
 
 
-		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+		im=draw_round_rect(10,x1,y1,x2,y2, "#ffffff",col,alpha=1,width=1,corners=[1,0,0,1])
 
 		profile_ims[v]=ImageTk.PhotoImage(im)
 
@@ -5440,7 +5441,7 @@ def main(con=0):
 
 		v+=1
 
-		x1,y1,x2,y2=x2+2,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
+		x1,y1,x2,y2=x2+3,_y_,x2+2+f.measure("Add New Profile")+20,_y_+30
 
 		if profile_st=="Manage Profiles":
 			col="#ffffff"
@@ -5450,7 +5451,7 @@ def main(con=0):
 			col2="#ffffff"
 
 
-		im=draw_round_rect(10,x1,y1,x2,y2, col,col,alpha=1,width=1,corners=[1,0,0,1])
+		im=draw_round_rect(10,x1,y1,x2,y2, "#ffffff",col,alpha=1,width=1,corners=[1,0,0,1])
 
 		profile_ims[v]=ImageTk.PhotoImage(im)
 
@@ -6221,8 +6222,8 @@ def main(con=0):
 												"contact":row[3],
 												"pic":row[4],
 												"admin_status":row[6],
-												"delete_p":[int(can3["width"])-10-25,y_+10],
-												"admin_status_p":[int(can3["width"])-10-25-30-60,y_+10, int(can3["width"])-10-25-30,y_+10+30]}
+												"delete_p":[int(can3["width"])-10-25,y_+10+2.5],
+												"admin_status_p":[int(can3["width"])-10-25-30-50,y_+10, int(can3["width"])-10-25-30,y_+10+30]}
 
 
 
@@ -6247,11 +6248,11 @@ def main(con=0):
 				can3.create_line(0,y_+100,int(can3["width"]),y_+100,fill="#000000")
 
 
-				can3.create_image(int(can3["width"])-10-25,y_+10, image=delete,anchor="nw")
+				can3.create_image(int(can3["width"])-10-25,y_+10+2.5, image=delete,anchor="nw")
 
 
 
-				x1,y1,x2,y2=int(can3["width"])-10-25-30-60,y_+10, int(can3["width"])-10-25-30,y_+10+30
+				x1,y1,x2,y2=int(can3["width"])-10-25-30-50,y_+10, int(can3["width"])-10-25-30,y_+10+30
 
 				v+=1
 				im=draw_round_rect(15,x1,y1,x2,y2, "#000000",alpha=1,width=1)
@@ -6412,12 +6413,12 @@ def main(con=0):
 				profile_coords["deletep"]=[x2-5-25,y1+5]
 
 
-				can3.create_text(x1+(x2-x1)/2,y1+15,text=f"Delete {profile_details[str(profile_del_st2[1])]["name"]}",font=("FreeMono",13),fill="#000000")
+				can3.create_text(x1+(x2-x1-f.measure(f"Delete   {profile_details[str(profile_del_st2[1])]["name"]}"))/2,y1+((y2-30)-y1)/2,text="Delete   ",font=("FreeMono",13),fill="#000000",anchor="w")
 
+				can3.create_text(x1+(x2-x1-f.measure(f"Delete   {profile_details[str(profile_del_st2[1])]["name"]}"))/2+f.measure("Delete   "),y1+((y2-30)-y1)/2,text=f"{profile_details[str(profile_del_st2[1])]["name"]}",font=("FreeMono",13),fill="#0000ff",anchor="w")
 
-
-				can3.create_line(x1,y2-30,x2,y2-30,fill="#000000")
-				can3.create_line(x1+(x2-x1)/2,y2-30,x1+(x2-x1)/2,y2,fill="#000000")
+				can3.create_line(x1,y2-30,x2,y2-30,fill="#808080")
+				can3.create_line(x1+(x2-x1)/2,y2-30,x1+(x2-x1)/2,y2,fill="#808080")
 
 
 				x_=(x2-x1)/4
@@ -10099,8 +10100,11 @@ def can_b1(e):
 
 					profile_st2=1
 
-					if users_dict[str(user_id)]!=[]:
-						profile_pic_st=1
+
+					if profile_st=="Update Profile":
+
+						if users_dict[str(user_id)]!=[]:
+							profile_pic_st=1
 
 
 					main(1)
@@ -12368,3 +12372,80 @@ check_balance()
 
 move_f()
 root.mainloop()
+
+
+"""
+how do i get consumer_key, consumer_secret, shortcode and passkey
+
+import requests
+import base64
+from datetime import datetime
+
+consumer_key = "YOUR_CONSUMER_KEY"
+consumer_secret = "YOUR_CONSUMER_SECRET"
+
+shortcode = "YOUR_SHORTCODE"
+passkey = "YOUR_PASSKEY"
+
+phone = "2547XXXXXXXX"
+amount = 100
+
+# Get access token
+credentials = f"{consumer_key}:{consumer_secret}"
+encoded = base64.b64encode(credentials.encode()).decode()
+
+response = requests.get(
+    "https://api.safaricom.co.ke/oauth/v1/generate"
+    "?grant_type=client_credentials",
+    headers={
+        "Authorization": f"Basic {encoded}"
+    }
+)
+
+access_token = response.json()["access_token"]
+
+# Timestamp
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+
+# Password
+password = base64.b64encode(
+    f"{shortcode}{passkey}{timestamp}".encode()
+).decode()
+
+payload = {
+    "BusinessShortCode": shortcode,
+    "Password": password,
+    "Timestamp": timestamp,
+    "TransactionType": "CustomerPayBillOnline",
+    "Amount": amount,
+    "PartyA": phone,
+    "PartyB": shortcode,
+    "PhoneNumber": phone,
+    "CallBackURL": "https://your-domain.com/mpesa/callback",
+    "AccountReference": "ORDER123",
+    "TransactionDesc": "Payment"
+}
+
+response = requests.post(
+    "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+    json=payload,
+    headers={
+        "Authorization": f"Bearer {access_token}"
+    }
+)
+
+print(response.json())
+
+Daraja account
+      ↓
+Create Sandbox App
+      ↓
+Get Consumer Key + Consumer Secret
+      ↓
+Use Daraja test credentials
+      ↓
+Python STK Push
+      ↓
+Test payment
+
+"""
