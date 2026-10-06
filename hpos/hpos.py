@@ -1414,29 +1414,59 @@ def pay_with_cash(con):
 
 	can5.delete("all")
 
-	
-
-	dict_={"widget": can5,
-			"sb_widget":can,
-			"sb_st":"both",
-			"sb_sz":10,
-			"v_sb_coord":[(y1+15,y1+15+int(can5["height"]),x2+4,x2+4+10,0),0],
-			"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),y2+4,y2+4+10),0],
-			"_y":int(can5["height"]),
-			"v":v4,
-			"h_":h4,
-			"w":int(can5["width"]),
-			"h":int(can5["height"]),
-			"_x":int(can5["width"]),
-			"_x2":int(can5["width"]),
-			"scrollregion":can5["scrollregion"],
-			"v_drag_st":0,
-			"h_drag_st":0,
-			"v_var":0,
-			"h_var":0
 
 
-			}
+
+	if con==0:	
+
+		dict_={"widget": can5,
+				"sb_widget":can,
+				"sb_st":"both",
+				"sb_sz":10,
+				"v_sb_coord":[(y1+15,y1+15+int(can5["height"]),x2+4,x2+4+10,0),0],
+				"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),y2+4,y2+4+10),0],
+				"_y":int(can5["height"]),
+				"v":v4,
+				"h_":h4,
+				"w":int(can5["width"]),
+				"h":int(can5["height"]),
+				"_x":int(can5["width"]),
+				"_x2":int(can5["width"]),
+				"scrollregion":can5["scrollregion"],
+				"v_drag_st":0,
+				"h_drag_st":0,
+				"v_var":0,
+				"h_var":0
+
+
+				}
+
+	else:
+
+		dict_={"widget": can5,
+				"sb_widget":can,
+				"sb_st":"both",
+				"sb_sz":10,
+				"v_sb_coord":[(y1+15,y1+15+int(can5["height"]),x2+4,x2+4+10,0),_scroll_["cart2"]["v_sb_coord"][-1]],
+				"h_sb_coord":[(x1+1,x1+1+int(can5["width"]),y2+4,y2+4+10),_scroll_["cart2"]["h_sb_coord"][-1]],
+				"_y":int(can5["height"]),
+				"v":v4,
+				"h_":h4,
+				"w":int(can5["width"]),
+				"h":int(can5["height"]),
+				"_x":int(can5["width"]),
+				"_x2":int(can5["width"]),
+				"scrollregion":can5["scrollregion"],
+				"v_drag_st":0,
+				"h_drag_st":0,
+				"v_var":0,
+				"h_var":0
+
+
+				}
+
+
+
 
 	_scroll_["cart2"]=dict_
 
@@ -1486,6 +1516,8 @@ def pay_with_cash(con):
 		can5.create_text(5+f.measure("Total")+20,_y+15+30+10,text=str(formart_number(quantity,(int(can4["width"]))-(5+f.measure("Total")+20))),font=("FreeMono",13),fill="#ff0000",anchor="w")
 		can5.create_text(5,_y+15+30+10+30,text="Total",font=("FreeMono",13),fill="#000000",anchor="w")
 		can5.create_text(5+f.measure("Total")+20,_y+15+30+10+30,text=f"Ksh.{formart_number(int(sold_at)*int(quantity),(int(can4["width"]))-(5+f.measure("Total")+20),1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
+
+		can5.create_image(can5.canvasx(int(can5["width"])-10-25),can5.canvasy(_y+(15+30+10+30+20)/2-12.5),image=quit,anchor="nw")
 
 		_y+=15+30+10+30+20
 
@@ -1568,8 +1600,8 @@ def pay_with_cash(con):
 
 	__y2=y1
 
-	_scroll_["cart2"]["v_sb_coord"][-1]=0
-	_scroll_["cart2"]["h_sb_coord"][-1]=0
+	#_scroll_["cart2"]["v_sb_coord"][-1]=0
+	#_scroll_["cart2"]["h_sb_coord"][-1]=0
 
 	draw_v_sb("cart2")
 	draw_h_sb("cart2")
@@ -1719,10 +1751,11 @@ profile_del_st=0
 profile_details={}
 
 profile_del_st2=[0]
+admin_st=0
 def main(con=0):
 
 	global st,st_
-	global can,can2,can3,can4
+	global can,can2,can3,can4,can5,can6
 	global add_items_ims
 	global dashboard
 	global ent1,ent2,ent3,ent4,ent_search,text1
@@ -1780,6 +1813,8 @@ def main(con=0):
 	global save_im,delete2
 	global profile_details
 	global profile_del_st2
+	global info
+	global admin_st
 
 	st_="main"
 
@@ -1789,6 +1824,20 @@ def main(con=0):
 
 		sel_sb=None
 		profile_del_st2=[0]
+
+
+	db_users=database.connect("data/users.db")
+	cur=db_users.cursor()
+
+	cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+	row=cur.fetchall()[0]
+
+	admin_st=int(row[6])
+
+
+
+
 
 	f=font.Font(family="FreeMono",size=13)
 
@@ -1880,7 +1929,7 @@ def main(con=0):
 
 		can2.delete("all")
 
-		can2.create_line(0,0,width,0,fill="#000000")
+		#can2.create_line(0,0,width,0,fill="#000000")
 		#can2.create_line(0,39,width,39,fill="#eeeeee")
 
 		can2.place(in_=root,x=0,y=0)
@@ -2236,29 +2285,54 @@ def main(con=0):
 
 		can4["scrollregion"]=(0,0,int(can4["width"]),int(can4["height"]))
 
-		
+		if con==0:
 
-		dict_={"widget": can4,
-				"sb_widget":can3,
-				"sb_st":"both",
-				"sb_sz":10,
-				"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x2+4,x2+4+10,0),0],
-				"h_sb_coord":[(x1+1,x1+1+int(can4["width"]),y2+4,y2+4+10),0],
-				"_y":int(can4["height"]),
-				"v":v2,
-				"h_":h2,
-				"w":int(can4["width"]),
-				"h":int(can4["height"]),
-				"_x":int(can4["width"]),
-				"_x2":int(can4["width"]),
-				"scrollregion":can4["scrollregion"],
-				"v_drag_st":0,
-				"h_drag_st":0,
-				"v_var":0,
-				"h_var":0
+			dict_={"widget": can4,
+					"sb_widget":can3,
+					"sb_st":"both",
+					"sb_sz":10,
+					"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x2+4,x2+4+10,0),0],
+					"h_sb_coord":[(x1+1,x1+1+int(can4["width"]),y2+4,y2+4+10),0],
+					"_y":int(can4["height"]),
+					"v":v2,
+					"h_":h2,
+					"w":int(can4["width"]),
+					"h":int(can4["height"]),
+					"_x":int(can4["width"]),
+					"_x2":int(can4["width"]),
+					"scrollregion":can4["scrollregion"],
+					"v_drag_st":0,
+					"h_drag_st":0,
+					"v_var":0,
+					"h_var":0
 
 
-				}
+					}
+		else:
+
+
+			dict_={"widget": can4,
+					"sb_widget":can3,
+					"sb_st":"both",
+					"sb_sz":10,
+					"v_sb_coord":[(y1+15,y1+15+int(can4["height"]),x2+4,x2+4+10,0),_scroll_["cart"]["v_sb_coord"][-1]],
+					"h_sb_coord":[(x1+1,x1+1+int(can4["width"]),y2+4,y2+4+10),_scroll_["cart"]["h_sb_coord"][-1]],
+					"_y":int(can4["height"]),
+					"v":v2,
+					"h_":h2,
+					"w":int(can4["width"]),
+					"h":int(can4["height"]),
+					"_x":int(can4["width"]),
+					"_x2":int(can4["width"]),
+					"scrollregion":can4["scrollregion"],
+					"v_drag_st":0,
+					"h_drag_st":0,
+					"v_var":0,
+					"h_var":0
+
+
+					}
+
 
 		_scroll_["cart"]=dict_
 
@@ -2309,6 +2383,9 @@ def main(con=0):
 			can4.create_text(5,y+15+30+10+30,text="Total",font=("FreeMono",13),fill="#000000",anchor="w")
 			can4.create_text(5+f.measure("Total")+20,y+15+30+10+30,text=f"Ksh.{formart_number(int(sold_at)*int(quantity),(int(can4["width"]))-(5+f.measure("Total")+20),1)}",font=("FreeMono",13),fill="#ff0000",anchor="w")
 	
+			can4.create_image(can4.canvasx(int(can4["width"])-10-25),can4.canvasy(y+(15+30+10+30+20)/2-12.5),image=quit,anchor="nw")
+
+
 			y+=15+30+10+30+20
 
 			can4.create_line(0,y, int(can4["width"]),y,fill="#000000")
@@ -2317,6 +2394,7 @@ def main(con=0):
 			no_items+=int(quantity)
 			total+=int(sold_at)*int(quantity)
 			discount+=(int(sp)-int(sold_at))*int(quantity)
+
 		y+=10
 
 
@@ -2358,8 +2436,8 @@ def main(con=0):
 
 		
 
-		_scroll_["cart"]["v_sb_coord"][-1]=1
-		_scroll_["cart"]["h_sb_coord"][-1]=0
+		#_scroll_["cart"]["v_sb_coord"][-1]=1
+		#_scroll_["cart"]["h_sb_coord"][-1]=0
 
 		draw_v_sb("cart")
 		draw_h_sb("cart")
@@ -2502,7 +2580,7 @@ def main(con=0):
 
 		can2.delete("all")
 
-		can2.create_line(0,0,width,0,fill="#000000")
+		#can2.create_line(0,0,width,0,fill="#000000")
 		#can2.create_line(0,39,width,39,fill="#eeeeee")
 		v=0
 
@@ -2759,6 +2837,31 @@ def main(con=0):
 
 
 
+		can5["width"]=x_sz[0]+1
+		can5["height"]=30
+
+		can5["bg"]="#000000"
+
+		can5.delete("all")
+
+		can5.create_text(x_sz[0]/2,15,text=ar[0],font=("FreeMono",13),fill="#ffffff",anchor="c")
+
+		can5.create_line(x_sz[0],0, x_sz[0],30, fill="#ffffff")
+
+		can5["scrollregion"]=(0,0,int(can5["width"]),int(can5["height"]))
+		can5.place(in_=root,x=_x_,y=40+40)
+
+
+		can6["width"]=x_sz[0]+1
+		can6["height"]=int(can4["height"])
+
+		can6["bg"]="#ffffff"
+
+		can6.delete("all")
+
+		can6["scrollregion"]=(0,0,int(can6["width"]),int(can6["height"]))
+		can6.place(in_=root,x=_x_,y=40+40+30)
+
 
 
 		_st_=0
@@ -2773,6 +2876,19 @@ def main(con=0):
 			if _st_==1:
 
 				can4.create_rectangle(0,y, xt,y+30, fill="#eeeeee",outline="#eeeeee")
+				can6.create_rectangle(0,y, int(can6["width"]),y+30, fill="#eeeeee",outline="#eeeeee")
+
+
+			txt=i[0]
+
+			can6.create_text(x_sz[0]/2,y+15,text=txt,font=("FreeMono",13),fill="#000000",anchor="c")
+
+
+
+			_x=x_sz[0]
+
+			can6.create_line(_x,y, _x,y+30, fill="#000000")
+
 
 			_x=0
 
@@ -2804,6 +2920,8 @@ def main(con=0):
 			y+=30
 
 		can4.create_line(0,y, xt,y,fill="#000000")
+		can6.create_line(0,y, int(can6["width"]),y,fill="#000000")
+
 
 		if len(data)==0:
 
@@ -2876,12 +2994,14 @@ def main(con=0):
 
 			can4["scrollregion"]=(0,0,xxx,int(can4["height"]))
 
+			can6["scrollregion"]=(0,0,int(can6["width"]),int(can6["width"]))
+
 			yyy=int(can4["height"])
 
 		else:
 
 			can4["scrollregion"]=(0,0,xxx,y)
-
+			can6["scrollregion"]=(0,0,int(can6["width"]),y)
 			yyy=y
 
 
@@ -3091,6 +3211,10 @@ def main(con=0):
 
 		can2.delete("all")
 
+
+
+
+
 		db_users=database.connect("data/users.db")
 		cur=db_users.cursor()
 
@@ -3113,6 +3237,29 @@ def main(con=0):
 
 
 
+
+		if admin_st==0:
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			
+
+
+			xx_=100+f.measure("Resitricted only to Admin!")+30
+
+			x_=_x+(int(can["width"])-_x-xx_)/2
+
+
+
+			can.create_image(x_,int(can["height"])/2-20-50,image=info,anchor="nw")
+			can.create_text(x_+100+30,int(can["height"])/2-20,text="Resitricted only to Admin!",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+			return
 
 
 		if int(dashboard.place_info()["x"])<0:
@@ -3604,6 +3751,28 @@ def main(con=0):
 		can2.create_image(int(can2["width"])-5-35,2.5,image=forecast_ims[v],anchor="nw")
 
 
+		if admin_st==0:
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			
+
+
+			xx_=100+f.measure("Resitricted only to Admin!")+30
+
+			x_=_x+(int(can["width"])-_x-xx_)/2
+
+
+
+			can.create_image(x_,int(can["height"])/2-20-50,image=info,anchor="nw")
+			can.create_text(x_+100+30,int(can["height"])/2-20,text="Resitricted only to Admin!",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+			return
 
 
 		if int(dashboard.place_info()["x"])<0:
@@ -4567,6 +4736,71 @@ def main(con=0):
 
 		can["scrollregion"]=(0,0,width-4-10,height-40)
 
+		can.delete("all")
+
+		can.place(in_=root,x=0,y=40)
+
+
+		if admin_st==0:
+
+			can["width"]=width
+
+
+			
+
+			can2["width"]=width
+			can2["height"]=40
+			can2["bg"]="#ffffff"
+
+			can2.delete("all")
+
+			#can2.create_line(0,0,width,0,fill="#000000")
+			#can2.create_line(0,39,width,39,fill="#eeeeee")
+
+			can2.place(in_=root,x=0,y=0)
+
+
+
+			db_users=database.connect("data/users.db")
+			cur=db_users.cursor()
+
+
+			cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+			row=cur.fetchall()[0]
+
+
+			can2.create_text(width-5-35-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+
+			im=process_profile_pic(35)
+
+			v=0
+			man_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can2.create_image(int(can2["width"])-5-35,2.5,image=man_items_ims[v],anchor="nw")
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			
+
+
+			xx_=100+f.measure("Resitricted only to Admin!")+30
+
+			x_=_x+(int(can["width"])-_x-xx_)/2
+
+
+
+			can.create_image(x_,int(can["height"])/2-20-50,image=info,anchor="nw")
+			can.create_text(x_+100+30,int(can["height"])/2-20,text="Resitricted only to Admin!",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+			return
+
 
 		if con==0:
 
@@ -4627,7 +4861,7 @@ def main(con=0):
 
 		can2.delete("all")
 
-		can2.create_line(0,0,width,0,fill="#000000")
+		#can2.create_line(0,0,width,0,fill="#000000")
 		#can2.create_line(0,39,width,39,fill="#eeeeee")
 
 		can2.place(in_=root,x=0,y=0)
@@ -4948,7 +5182,13 @@ def main(con=0):
 		can["scrollregion"]=(0,0,width,height-40)
 		can["bg"]="#ffffff"
 
+		can.delete("all")
+
 		can.place(in_=root,x=0,y=40)
+
+
+
+
 
 
 		can2["width"]=width
@@ -4958,6 +5198,58 @@ def main(con=0):
 		can2.place(in_=root,x=0,y=0)
 
 
+
+
+		if admin_st==0:
+
+
+
+
+
+			db_users=database.connect("data/users.db")
+			cur=db_users.cursor()
+
+
+			cur.execute(f"SELECT * FROM users WHERE user_id={user_id}")
+
+			row=cur.fetchall()[0]
+
+
+			user_name=row[1]
+
+
+
+			can2.create_text(width-5-35-15,20, text=row[1],fill="#000000",font=("FreeMono",13),anchor="e")
+
+
+			im=process_profile_pic(35)
+
+			v=0
+			add_items_ims[v]=ImageTk.PhotoImage(im)
+
+			can2.create_image(int(can2["width"])-5-35,2.5,image=add_items_ims[v],anchor="nw")
+
+
+
+			if int(dashboard.place_info()["x"])<0:
+				_x=5+25+5
+			else:
+				_x=int(dashboard["width"])
+			
+
+
+			xx_=100+f.measure("Resitricted only to Admin!")+30
+
+			x_=_x+(int(can["width"])-_x-xx_)/2
+
+
+
+			can.create_image(x_,int(can["height"])/2-20-50,image=info,anchor="nw")
+			can.create_text(x_+100+30,int(can["height"])/2-20,text="Resitricted only to Admin!",font=("FreeMono",13),fill="#000000",anchor="w")
+
+
+
+			return
 
 
 		v=0
@@ -5869,6 +6161,17 @@ def main(con=0):
 
 		elif profile_st=="Add New Profile":
 
+			if admin_st==0:
+
+				xx_=100+f.measure("Resitricted only to Admin!")+30
+
+				x_=(xx-xx_)/2
+
+
+				can.create_image(_x_+x_,_y_+30+(yy-30)/2-50,image=info,anchor="nw")
+				can.create_text(_x_+x_+100+30,_y_+30+(yy-30)/2,text="Resitricted only to Admin!",font=("FreeMono",13),anchor="w")
+
+				return
 
 			can.create_text(x+10+10,y+20+15, text="User Name",font=("FreeMono",13), anchor="w",fill="#000000")
 
@@ -6157,6 +6460,20 @@ def main(con=0):
 
 
 		elif profile_st=="Manage Profiles":
+
+			if admin_st==0:
+
+				xx_=100+f.measure("Resitricted only to Admin!")+30
+
+				x_=(xx-xx_)/2
+
+
+				can.create_image(_x_+x_,_y_+30+(yy-30)/2-50,image=info,anchor="nw")
+				can.create_text(_x_+x_+100+30,_y_+30+(yy-30)/2,text="Resitricted only to Admin!",font=("FreeMono",13),anchor="w")
+
+				return
+
+
 
 			if con==0:
 
@@ -6846,7 +7163,7 @@ def can_b1_sb(widget,_x_,_y_):
     global _scroll_
     global sel_sb
     global can3
-
+    global can6
 
 
     #terminal
@@ -6892,6 +7209,8 @@ def can_b1_sb(widget,_x_,_y_):
 	            
 
 	            _scroll_[widget]["v_sb_coord"][-1]=y/_scroll_[widget]["h"]
+
+	            can6.yview_moveto(y/_scroll_[widget]["h"])
 
 
 	            draw_v_sb(widget)
@@ -6967,6 +7286,7 @@ def sb_drag(widget,_x_,_y_):
 
 
     global _scroll_
+    global can6
 
 
 
@@ -7004,6 +7324,8 @@ def sb_drag(widget,_x_,_y_):
 
 	                _scroll_[widget]["v_sb_coord"][-1]=y/_scroll_[widget]["h"]
 
+	                can6.yview_moveto(y/_scroll_[widget]["h"])
+
 
 	                draw_v_sb(widget)
 
@@ -7014,6 +7336,8 @@ def sb_drag(widget,_x_,_y_):
 
 	            _scroll_[widget]["v_sb_coord"][-1]=0
 
+	            can6.yview_moveto(0)
+
 
 	            draw_v_sb(widget)
 
@@ -7023,6 +7347,8 @@ def sb_drag(widget,_x_,_y_):
 
 
 	            _scroll_[widget]["v_sb_coord"][-1]=1
+
+	            can6.yview_moveto(1)
 
 
 	            draw_v_sb(widget)
@@ -7265,6 +7591,8 @@ add=0
 
 deletex=0
 cancelx=0
+
+info=0
 def load_im():
 	global db
 	global sell_items_im,reports_im,manage_items_im,add_items_im,profiles_im
@@ -7290,6 +7618,7 @@ def load_im():
 	global add
 	global deletex
 	global cancelx
+	global info
 
 
 	#db
@@ -7558,6 +7887,15 @@ def load_im():
 	im=Image.open("data/icons/deletex.png")
 	im=im.resize((20,20))
 	deletex=ImageTk.PhotoImage(im)
+
+
+
+
+	#info
+
+	im=Image.open("data/icons/info.png")
+	info=ImageTk.PhotoImage(im)
+
 db_items_=[]
 def draw_db():
 	global dashboard
@@ -8338,6 +8676,9 @@ def can_b1(e):
 	global profile_details
 	global profile_del_st2
 	global search_coords,search_val,ent_search
+	global _scroll_
+	global admin_st
+
 
 
 
@@ -8351,7 +8692,7 @@ def can_b1(e):
 		can_b1_sb("can4r",e.x,e.y)
 
 
-	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles" and profile_del_st2[0]==0:
+	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles" and profile_del_st2[0]==0 and admin_st==1:
 
 
 		can_b1_sb("profiles",e.x,e.y)
@@ -8359,7 +8700,7 @@ def can_b1(e):
 
 
 
-	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles":
+	if st_=="main" and st=="Profiles" and profile_st=="Manage Profiles" and admin_st==1:
 
 
 
@@ -8711,7 +9052,12 @@ def can_b1(e):
 						#sel_item=None
 						#qp=None
 
+						_scroll_["cart"]["v_sb_coord"][-1]=1
+						_scroll_["cart"]["h_sb_coord"][-1]=0
+
 						main(1)
+
+
 
 						message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
 
@@ -8746,7 +9092,13 @@ def can_b1(e):
 						#sel_item=None
 						#qp=None
 
+
+						_scroll_["cart"]["v_sb_coord"][-1]=1
+						_scroll_["cart"]["h_sb_coord"][-1]=0
+
 						main(1)
+
+
 
 						message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
 
@@ -8777,8 +9129,11 @@ def can_b1(e):
 
 							#sel_item=None
 							#qp=None
-
+							_scroll_["cart"]["v_sb_coord"][-1]=1
+							_scroll_["cart"]["h_sb_coord"][-1]=0
 							main(1)
+
+
 
 							message(1,can,"Item added to cart!",x+xx/2,y+yy+10+15,350,30)
 
@@ -9090,6 +9445,10 @@ def can_b1(e):
 
 		elif st=="Graphs":
 
+
+			if admin_st==0:
+				return
+
 			x_,y_=graph_coords["calendar"]
 
 
@@ -9140,6 +9499,9 @@ def can_b1(e):
 					return
 
 		elif st=="Forecasts":
+
+			if admin_st==0:
+				return
 
 
 			x_,y_=forecast_coords["previous"]
@@ -9251,6 +9613,9 @@ def can_b1(e):
 
 
 		elif st=="Manage items":
+
+			if admin_st==0:
+				return
 
 
 
@@ -9682,6 +10047,9 @@ def can_b1(e):
 
 		elif st=="Add Items":
 
+			if admin_st==0:
+				return
+
 
 
 
@@ -9987,6 +10355,10 @@ def can_b1(e):
 					main(1)
 
 					return
+
+
+			if profile_st=="Add New Profile" and admin_st==0:
+				return
 
 
 			x_,y_=profile_coords["password"]
@@ -11015,6 +11387,7 @@ def scroll(e):
 	global sel_sb
 	global sel_item,man_item
 	global profile_del_st2
+	global can6
 
 
 
@@ -11044,6 +11417,9 @@ def scroll(e):
 
 
 				draw_v_sb(sel_sb[0])
+
+				if sel_sb==['can4r', 'vertical']:
+					can6.yview_scroll(var,"units")
 
 			elif sel_sb[1]=="horizontal":
 
@@ -11690,18 +12066,68 @@ can["scrollregion"]=(0,0,width,height)
 
 def can4_b1(e):
 	global sel_sb
+	global cart_ar
+	global can4
 
-	#sel_sb=None
 
 
+	y=0
+	c=0
+	for i in cart_ar:
 
-	pass
+		if can4.canvasx(int(can4["width"])-10-25)<=e.x<=can4.canvasx(int(can4["width"])-10):
+
+			if y+(15+30+10+30+20)/2-12.5<=can4.canvasy(e.y)<=y+(15+30+10+30+20)/2+12.5:
+				cart_ar.pop(c)
+
+				main(1)
+				return
+
+		y+=15+30+10+30+20
+
+		c+=1
+
+
 
 
 can4=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
 can4.bind("<Button-1>",can4_b1)
 
+def can5_b1(e):
+
+	global cart_ar
+	global can5
+	global pay_st
+
+
+
+	y=0
+	c=0
+	for i in cart_ar:
+
+		if can5.canvasx(int(can5["width"])-10-25)<=e.x<=can5.canvasx(int(can5["width"])-10):
+
+			if y+(15+30+10+30+20)/2-12.5<=can5.canvasy(e.y)<=y+(15+30+10+30+20)/2+12.5:
+				cart_ar.pop(c)
+
+				if len(cart_ar)==0:
+					pay_st=None
+
+				main(1)
+
+
+				return
+
+		y+=15+30+10+30+20
+
+		c+=1
+
+
 can5=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+
+can6=tk.Canvas(relief="flat",bg="#ffffff",highlightthickness=0,border=0)
+
+can5.bind("<Button-1>",can5_b1)
 
 db_st=0
 def dashboard_b1(e):
@@ -12232,7 +12658,7 @@ cal.bind("<Button-1>",cal_b1)
 
 t_widgets={"entries":[ent1,ent2,ent3,ent4,ent5,ent_search],
 			"text":[text1],
-			"canvas":[dashboard,can,can2,can3,can4,can5,cal]}
+			"canvas":[dashboard,can,can2,can3,can4,can5,can6,cal]}
 
 
 
