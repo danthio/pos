@@ -3888,7 +3888,7 @@ def main(con=0):
 
 					if m==12:
 
-						return f"{y+1}-{m+1} ({1})"
+						return f"{y+1}-{1} ({1})"
 
 					else:
 						return f"{y}-{m+1} ({1})"
